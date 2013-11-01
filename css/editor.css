@@ -1,0 +1,48 @@
+/* Класс для прорисовки inline редактора содержимого SamsonCMS */
+.__editor {	
+	.transition(all);
+	display:inline-block;
+	position:relative;	
+	z-index:9999;
+	border:1px dashed black;
+	
+	.__clear {width:1px; height:1px; display:none; clear:both;}
+	
+	/* Блок со значением поля материала */
+	.__value
+	{
+		&:focus { outline: none; }
+	}
+	
+	/* При наведении*/
+	&:hover {  }	
+	
+	/* Стиль редактора при редактировании */
+	&.__active, &:focus {
+		border:0;		
+		box-shadow:0px -1px 10px rgba(0,0,0,0.8),0px 1px 10px rgba(0,0,0,0.8); 
+	}
+}
+/* Панель редактора */
+.__editor_panel {
+	position:fixed;
+	z-index:9999;
+	top:0px; left:0px; right:0px;
+	height:25px;	
+	background: url('../img/bg.png') repeat-x 0% 0%;	
+	
+	> a { 
+		line-height: 25px;
+		color:white; 
+		cursor:pointer;
+		border:1px transparent;
+		font-size:0.7em;
+		font-weight:bold;
+		&:hover{ color:black; background-color: white; }
+	}
+	
+	.__editable { height:18px; float:left;color:white; border:1px dashed white; margin-top:4px; font-size:0.7em; padding:0 10px; line-height: 17px; }
+	.__logo { display:block; float:left; background: url('../img/logo.png') no-repeat 0% 50%; width:90px; height:25px; margin:0 10px; }
+	.__exit { float:right; padding:0px 10px; }
+	.__tocms { float:right; padding:0px 10px; }
+}
