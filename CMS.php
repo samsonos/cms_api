@@ -226,6 +226,7 @@ class CMS extends CompressableService
 		new TableRelation( 'structurematerial', 'structure', 'StructureID' );
 		new TableRelation( 'structurematerial', 'materialfield', 'MaterialID', TableRelation::T_ONE_TO_MANY  );		
 		new TableRelation( 'structure', 'material', 'MaterialID' );
+		new TableRelation( 'structure', 'user', 'UserID' );
 		new TableRelation( 'related_materials', 'material', 'first_material', TableRelation::T_ONE_TO_MANY, 'MaterialID' );
 		new TableRelation( 'related_materials', 'materialfield', 'first_material', TableRelation::T_ONE_TO_MANY, 'MaterialID' );
 		new TableRelation( 'field', 'structurefield', 'FieldID' );
