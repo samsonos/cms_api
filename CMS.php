@@ -7,6 +7,7 @@ use samson\activerecord\CacheTable;
 use samson\activerecord\material;
 use samson\core\CompressableService;
 use samson\activerecord\dbRecord;
+use samson\activerecord\dbMySQLConnector;
 
 class CMS extends CompressableService
 {	
@@ -31,7 +32,7 @@ class CMS extends CompressableService
 	public function prepare()
 	{
 		// SQL команда на добавление таблицы пользователей
-		$sql_user = "CREATE TABLE IF NOT EXISTS `user` (
+		$sql_user = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."user` (
 		  `UserID` int(11) NOT NULL AUTO_INCREMENT,
 		  `FName` varchar(255) NOT NULL,
 		  `SName` varchar(255) NOT NULL,
@@ -50,7 +51,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 		
 		// SQL команда на добавление таблицы пользователей
-		$sql_gallery = "CREATE TABLE IF NOT EXISTS `gallery` (
+		$sql_gallery = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."gallery` (
 		  `PhotoID` int(11) NOT NULL AUTO_INCREMENT,
 		  `MaterialID` int(11) NOT NULL,
 		  `Path` varchar(255) NOT NULL,
@@ -65,7 +66,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";	
 			
 		// SQL команда на добавление таблицы групп пользователей
-		$sql_group = "CREATE TABLE IF NOT EXISTS `group` (
+		$sql_group = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."group` (
 		  `GroupID` int(20) NOT NULL AUTO_INCREMENT,
 		  `Name` varchar(255) NOT NULL,
 		  `Active` int(11) NOT NULL,
@@ -73,7 +74,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 	
 		// SQL команда на добавление таблицы связей пользователей и групп
-		$sql_groupright ="CREATE TABLE IF NOT EXISTS `groupright` (
+		$sql_groupright ="CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."groupright` (
 		  `GroupRightID` int(11) NOT NULL AUTO_INCREMENT,
 		  `GroupID` int(10) NOT NULL,
 		  `RightID` int(20) NOT NULL,
@@ -86,7 +87,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;";
 	
 		// SQL команда на добавление таблицы прав пользователей
-		$sql_right = "CREATE TABLE IF NOT EXISTS `right` (
+		$sql_right = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."right` (
 		  `RightID` int(20) NOT NULL AUTO_INCREMENT,
 		  `Name` varchar(255) NOT NULL,
 		  `Active` int(11) NOT NULL,
@@ -94,7 +95,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 	
 		// Related materials
-		$sql_relation_material = "CREATE TABLE IF NOT EXISTS `related_materials` (
+		$sql_relation_material = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."related_materials` (
 		  `related_materials_id` int(11) NOT NULL AUTO_INCREMENT,
 		  `first_material` int(11) NOT NULL,
 		  `first_locale` varchar(10) NOT NULL,
@@ -104,7 +105,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";		
 	
 		// SQL команда на добавление таблицы материалов
-		$sql_material = "CREATE TABLE IF NOT EXISTS `material` (
+		$sql_material = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."material` (
 		  `MaterialID` int(11) NOT NULL AUTO_INCREMENT,
 		  `Name` varchar(555) NOT NULL,
 		  `Content` text NOT NULL,
@@ -125,7 +126,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 			
 		// SQL команда на добавление таблицы навигации
-		$sql_structure = "CREATE TABLE IF NOT EXISTS `structure` (
+		$sql_structure = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."structure` (
 		  `StructureID` int(11) NOT NULL AUTO_INCREMENT,
 		  `ParentID` int(11) NOT NULL,
 		  `Name` varchar(255) NOT NULL,
@@ -141,7 +142,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 			
 		// SQL комманда на создание таблицы связей навигации и материалов
-		$sql_structurematerial = "CREATE TABLE IF NOT EXISTS `structurematerial` (
+		$sql_structurematerial = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."structurematerial` (
 		  `StructureMaterialID` int(11) NOT NULL AUTO_INCREMENT,
 		  `StructureID` int(11) NOT NULL,
 		  `MaterialID` int(11) NOT NULL,
@@ -153,7 +154,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
 		// SQL команда на добавление таблицы полей
-		$sql_field = "CREATE TABLE IF NOT EXISTS `field` (
+		$sql_field = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."field` (
 		  `FieldID` int(11) NOT NULL AUTO_INCREMENT,
 		  `ParentID` int(11) NOT NULL,
 		  `Name` varchar(255) NOT NULL,
@@ -168,7 +169,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
 		// SQL команда на добавление таблицы связей ЄНС с полями
-		$sql_navfield = "CREATE TABLE IF NOT EXISTS `structurefield` (
+		$sql_navfield = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."structurefield` (
 		  `StructureFieldID` int(11) NOT NULL AUTO_INCREMENT,
 		  `StructureID` int(11) NOT NULL,
 		  `FieldID` int(11) NOT NULL,
@@ -179,7 +180,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
 		// SQL комманда на создание таблицы связей материалов и полей
-		$sql_materialfield = "CREATE TABLE IF NOT EXISTS `materialfield` (
+		$sql_materialfield = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."materialfield` (
 		  `MaterialFieldID` int(11) NOT NULL AUTO_INCREMENT,
 		  `FieldID` int(11) NOT NULL,
 		  `MaterialID` int(11) NOT NULL,
@@ -190,7 +191,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 		
 		// SQL table for storing database version
-		$sql_version = " CREATE TABLE IF NOT EXISTS `cms_version` ( `version` varchar(15) not null default '1')
+		$sql_version = " CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."cms_version` ( `version` varchar(15) not null default '1')
 				ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
 		// Выполним SQL комманды
@@ -207,7 +208,7 @@ class CMS extends CompressableService
 		db()->simple_query($sql_groupright);
 		db()->simple_query($sql_relation_material);
 		db()->simple_query($sql_gallery);
-		db()->simple_query("INSERT INTO `user` (`UserID`, `FName`, `SName`, `TName`, `Email`, `Password`, `md5_Email`, `md5_Password`, `Created`, `Modyfied`, `GroupID`, `Active`, `Online`, `LastLogin`) VALUES
+		db()->simple_query("INSERT INTO `".dbMySQLConnector::$prefix."user` (`UserID`, `FName`, `SName`, `TName`, `Email`, `Password`, `md5_Email`, `md5_Password`, `Created`, `Modyfied`, `GroupID`, `Active`, `Online`, `LastLogin`) VALUES
 	 (1, 'Виталий', 'Егоров', 'Игоревич', 'admin', 'vovan123', '21232f297a57a5a743894a0e4a801fc3', 'fa9bb23b40db7ccff9ccfafdac0f647c', '2011-10-25 14:59:06', '2013-05-22 11:52:38', 1, 1, 1, '2013-05-22 14:52:38')
 			ON DUPLICATE KEY UPDATE Active=1");
 		
@@ -252,12 +253,12 @@ class CMS extends CompressableService
 		if( func_num_args() ) 
 		{
 			// Save current version to special db table
-			db()->simple_query("ALTER TABLE  `cms_version` CHANGE  `version`  `version` VARCHAR( 15 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT  '".$to_version."';");
+			db()->simple_query("ALTER TABLE  `".dbMySQLConnector::$prefix."cms_version` CHANGE  `version`  `version` VARCHAR( 15 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT  '".$to_version."';");
 		}
 		// Return current database version
 		else 
 		{
-			$version_row = db()->query('SHOW COLUMNS FROM `cms_version`');
+			$version_row = db()->query('SHOW COLUMNS FROM `'.dbMySQLConnector::$prefix.'cms_version`');
 			return $version_row[0]['Default'];
 		}
 	}
@@ -266,16 +267,16 @@ class CMS extends CompressableService
 	public function migrate_1_to_2()
 	{		
 		elapsed('Removing `Relations` table');
-		db()->simple_query('DROP TABLE relations');
+		db()->simple_query('DROP TABLE '.dbMySQLConnector::$prefix.'relations');
 		
 		elapsed('Adding `numeric_value` field into `materialfield` table');
-		db()->simple_query('ALTER TABLE  `materialfield` ADD  `numeric_value` INT( 255 ) NOT NULL AFTER  `Value`');
+		db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield` ADD  `numeric_value` INT( 255 ) NOT NULL AFTER  `Value`');
 		
 		elapsed('Adding `locale` field into `material` table');
-		db()->simple_query('ALTER TABLE  `material` ADD  `locale` varchar( 2 ) NOT NULL AFTER `Name`');	
+		db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` ADD  `locale` varchar( 2 ) NOT NULL AFTER `Name`');	
 		
 		elapsed('Removing `Draftmaterial` field from `material` table');
-		db()->simple_query('ALTER TABLE `material` DROP `Draftmaterial`');
+		db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` DROP `Draftmaterial`');
 		
 		/*
 		
@@ -315,29 +316,29 @@ class CMS extends CompressableService
 		db()->simple_query('ALTER TABLE `material` DROP `Title`');
 		*/
 		
-		elapsed('Changing `material` table columns order');
-		db()->simple_query('ALTER TABLE `material` MODIFY `Teaser` TEXT AFTER `Content`');
-		db()->simple_query('ALTER TABLE `material` MODIFY `Published` INT(1) UNSIGNED AFTER `Draft`');
-		db()->simple_query('ALTER TABLE `material` MODIFY `Active` INT(1) UNSIGNED AFTER `Published`');
-		db()->simple_query('ALTER TABLE `material` MODIFY `UserID` INT(11) AFTER `Title`');
-		db()->simple_query('ALTER TABLE `material` MODIFY `Modyfied` TIMESTAMP AFTER `Title`');		
-		db()->simple_query('ALTER TABLE `material` MODIFY `Created` DATETIME AFTER `Title`');
+		elapsed('Changing `'.dbMySQLConnector::$prefix.'material` table columns order');
+		db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `Teaser` TEXT AFTER `Content`');
+		db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `Published` INT(1) UNSIGNED AFTER `Draft`');
+		db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `Active` INT(1) UNSIGNED AFTER `Published`');
+		db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `UserID` INT(11) AFTER `Title`');
+		db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `Modyfied` TIMESTAMP AFTER `Title`');		
+		db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `Created` DATETIME AFTER `Title`');
 	}
 	
 	/** Automatic migration to new CMS table structure */
 	public function migrate_2_to_3()
 	{	
 		elapsed('Adding `locale` field into `structure` table');
-		db()->simple_query('ALTER TABLE  `structure` ADD  `locale` VARCHAR( 10 ) NOT NULL AFTER  `Name` ;');
+		db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure` ADD  `locale` VARCHAR( 10 ) NOT NULL AFTER  `Name` ;');
 	}
 	
 	/** Automatic migration to new CMS table structure */
 	public function migrate_3_to_4()
 	{
 		elapsed('Adding `locale` field into `materialfield` table');
-		db()->simple_query('ALTER TABLE  `materialfield` ADD  `locale` VARCHAR( 10 ) NOT NULL AFTER  `numeric_value` ;');
+		db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield` ADD  `locale` VARCHAR( 10 ) NOT NULL AFTER  `numeric_value` ;');
 		elapsed('Adding `local` field into `field` table');
-		db()->simple_query('ALTER TABLE  `field` ADD  `local` int( 10 ) NOT NULL AFTER  `Type` ;');
+		db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field` ADD  `local` int( 10 ) NOT NULL AFTER  `Type` ;');
 	}
 		
 	
@@ -363,7 +364,7 @@ class CMS extends CompressableService
 		$classname = ns_classname('cmsmaterial', 'samson\cms');
 		
 		// If instance of CMSMaterial passed - just return it
-		if( is_a( $selector, $classname )) return $selector;		
+		if( $selector instanceof $classname ) return $selector;
 		// Try to search activerecord instances cache by selector 
 		else if( isset( dbRecord::$instances[$classname][$selector] )) $db_cmsmat = & dbRecord::$instances[$classname][$selector];
 		// Try to load from memory cache
@@ -518,14 +519,14 @@ class CMS extends CompressableService
 			
 			// Set additional object metadata
 			CMSMaterial::$_attributes[ $db_field->Name ] = $db_field->Name;
-			CMSMaterial::$_map[ $db_field->Name ] = 'material.'.$db_field->Name;
+			CMSMaterial::$_map[ $db_field->Name ] = dbMySQLConnector::$prefix.'material.'.$db_field->Name;
 		}		
 		
 		// Set additional object metadata
 		CMSMaterial::$_sql_select['this'] = ' STRAIGHT_JOIN '.CMSMaterial::$_sql_select['this'];	
 		if(sizeof($select_data)) CMSMaterial::$_sql_select['this'] .= ','.implode(',', $select_data);
-		CMSMaterial::$_sql_from['this'] .= "\n".'LEFT JOIN materialfield as '.$t_name.' on material.MaterialID = '.$t_name.'.MaterialID';
-		CMSMaterial::$_own_group[] = 'material.MaterialID';
+		CMSMaterial::$_sql_from['this'] .= "\n".'LEFT JOIN '.dbMySQLConnector::$prefix.'materialfield as '.$t_name.' on '.dbMySQLConnector::$prefix.'material.MaterialID = '.$t_name.'.MaterialID';
+		CMSMaterial::$_own_group[] = dbMySQLConnector::$prefix.'material.MaterialID';
 	}
 	
 	/** @see \samson\core\ExternalModule::init() */

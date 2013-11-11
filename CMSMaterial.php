@@ -58,7 +58,8 @@ class CMSMaterial extends material implements idbLocalizable, iModuleViewable
 			->join( 'samson\cms\cmsgallery')			
 			->join( 'user')		
 			->join( 'samson\cms\cmsnavmaterial')
-			->own_group_by('material.MaterialID');
+			//->own_group_by('material.MaterialID')
+			;
 		
 		// If we need limiting results
 		if( isset($limit) ) $query->limit( $limit[0], $limit[1] );
