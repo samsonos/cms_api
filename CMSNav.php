@@ -237,4 +237,4 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
 	public function valid(){$key = key( $this->children );	return ( $key !== NULL && $key !== FALSE );	}	
 }
 
-dbRecord::$instances[ "samson\cms\cmsnav" ] = array();
+// dbRecord::$instances[ "samson\cms\cmsnav" ] = array();
