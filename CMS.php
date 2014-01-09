@@ -340,7 +340,62 @@ class CMS extends CompressableService
 		elapsed('Adding `local` field into `field` table');
 		db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field` ADD  `local` int( 10 ) NOT NULL AFTER  `Type` ;');
 	}
-		
+
+    public function migrate_4_to_5()
+    {
+        if(!dbQuery('field')->Name('Content')->first($db_field))
+        {
+            // Create structure for all materials
+            if(!dbQuery('structure')->Url('__material')->Active(1)->first($db_structure))
+            {
+                $db_structure = new \samson\activerecord\structure(false);
+                $db_structure->Name = 'Материал';
+                $db_structure->Url = '__material';
+                $db_structure->Active = 1;
+                if(dbQuery('user')->first($db_user)) $db_structure->UserID = $db_user->id;
+                $db_structure->save();
+            }
+
+            $db_field = new \samson\activerecord\field(false);
+            $db_field->Name = 'Content';
+            $db_field->Type = 8;
+            $db_field->Active = 1;
+            $db_field->save();
+
+            $db_structurefield = new \samson\activerecord\structurefield(false);
+            $db_structurefield->FieldID = $db_field->id;
+            $db_structurefield->StructureID = $db_structure->id;
+            $db_structurefield->Active = 1;
+            $db_structurefield->save();
+
+            if(dbQuery('material')->Active(1)->Draft(0)->exec($db_materials))
+            {
+                foreach($db_materials as $db_material)
+                {
+                    if(isset($db_material->Content))
+                    {
+                        if(!dbQuery('materialfield')->MaterialID($db_material->id)->FieldID($db_field->id)->Active(1)->first($db_mf))
+                        {
+                            $db_mf = new \samson\activerecord\materialfield(false);
+                            $db_mf->MaterialID = $db_material->id;
+                            $db_mf->FieldID = $db_field->id;
+                            $db_mf->Active = 1;
+                            $db_mf->Value = $db_material->Content;
+                            $db_mf->save();
+
+                            $db_sm =new \samson\activerecord\structurematerial(false);
+                            $db_sm->StructureID = $db_structure->id;
+                            $db_sm->MaterialID = $db_material->id;
+                            $db_sm->Active = 1;
+                            $db_sm->save();
+                        }
+                    }
+                }
+            }
+
+            db()->simple_query('ALTER TABLE  `material` DROP  `Content`');
+        }
+    }
 	
 	
 	
