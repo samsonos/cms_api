@@ -340,8 +340,77 @@ class CMS extends CompressableService
 		elapsed('Adding `local` field into `field` table');
 		db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field` ADD  `local` int( 10 ) NOT NULL AFTER  `Type` ;');
 	}
-		
-	
+
+    public function migrate_4_to_5()
+    {
+        if(!dbQuery('field')->Name('Content')->first($db_field))
+        {
+            $db_field = new \samson\activerecord\field(false);
+            $db_field->Name = 'Content';
+            $db_field->Type = 8;
+            $db_field->Active = 1;
+            $db_field->save();
+        }
+
+        // Create structure for all materials
+        if(!dbQuery('structure')->Url('__material')->Active(1)->first($db_structure))
+        {
+            $db_structure = new \samson\activerecord\structure(false);
+            $db_structure->Name = 'Материал';
+            $db_structure->Url = '__material';
+            $db_structure->Active = 1;
+            if(dbQuery('user')->first($db_user)) $db_structure->UserID = $db_user->id;
+            $db_structure->save();
+        }
+
+        if(!dbQuery('structurefield')->FieldID($db_field->id)->StructureID($db_structure->id)->Active(1)->first($db_sf))
+        {
+            $db_structurefield = new \samson\activerecord\structurefield(false);
+            $db_structurefield->FieldID = $db_field->id;
+            $db_structurefield->StructureID = $db_structure->id;
+            $db_structurefield->Active = 1;
+            $db_structurefield->save();
+        }
+
+        if(dbQuery('material')->Active(1)->Draft(0)->exec($db_materials))
+        {
+            foreach($db_materials as $db_material)
+            {
+                //if(isset($db_material->Content{0}))
+                {
+                    if(!dbQuery('materialfield')->MaterialID($db_material->id)->FieldID($db_field->id)->Active(1)->first($db_mf))
+                    {
+                        $db_mf = new \samson\activerecord\materialfield(false);
+                        $db_mf->MaterialID = $db_material->id;
+                        $db_mf->FieldID = $db_field->id;
+                        $db_mf->Active = 1;
+                        $db_mf->Value = $db_material->Content;
+                        $db_mf->save();
+
+                        $db_sm =new \samson\activerecord\structurematerial(false);
+                        $db_sm->StructureID = $db_structure->id;
+                        $db_sm->MaterialID = $db_material->id;
+                        $db_sm->Active = 1;
+                        $db_sm->save();
+                    }
+                }
+            }
+        }
+
+        db()->simple_query('ALTER TABLE  `material` DROP  `Content`');
+    }
+
+    public function migrate_5_to_6()
+    {
+        // Convert all old "date" fields to numeric for fixing db requests
+        if (dbQuery('field')->Type(3)->fields('id',$fields)) {
+            foreach( dbQuery('materialfield')->FieldID($fields)->exec() as $mf) {
+                $mf->numeric_value = strtotime($mf->Value);
+                $mf->save();
+            }
+        }
+
+    }
 	
 	
 	/**
@@ -512,9 +581,15 @@ class CMS extends CompressableService
 			if ($db_field->local==1) $equal = '(('.$t_name.'.FieldID = '.$db_field->id.')&&('.$t_name.".locale = '".locale()."'))";	
 			else $equal = '(('.$t_name.'.FieldID = '.$db_field->id.')&&('.$t_name.".locale = ''))";
 
-			// Define field value column
-			$v_col = 'Value'; 	
-			if( $db_field->Type == 7 ) $v_col = 'numeric_value';
+			// Define field value DB column for storing data
+			$v_col = 'Value';
+            // We must get data from other column for this type of field
+			if ( $db_field->Type == 7 ) {
+                $v_col = 'numeric_value';
+            }
+            else if( $db_field->Type == 3 ) {
+                $v_col = 'numeric_value';
+            }
 			$select_data[] = "\n".' MAX(IF('.$equal.','.$t_name.'.`'.$v_col.'`, NULL)) as `'.$db_field->Name.'`';			
 			
 			// Set additional object metadata
