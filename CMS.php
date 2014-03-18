@@ -190,7 +190,7 @@ class CMS extends CompressableService
 		  KEY `MaterialID` (`MaterialID`)
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
-        $sql_user = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."structure_relation` (
+        $sql_structure_relation = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."structure_relation` (
 		  `structure_relation_id` int(11) NOT NULL AUTO_INCREMENT,
 		  `parent_id` int(11) NOT NULL,
 		  `child_id` int(11) NOT NULL,
@@ -215,6 +215,7 @@ class CMS extends CompressableService
 		db()->simple_query($sql_groupright);
 		db()->simple_query($sql_relation_material);
 		db()->simple_query($sql_gallery);
+        db()->simple_query( $sql_structure_relation);
 		db()->simple_query("INSERT INTO `".dbMySQLConnector::$prefix."user` (`UserID`, `FName`, `SName`, `TName`, `Email`, `Password`, `md5_Email`, `md5_Password`, `Created`, `Modyfied`, `GroupID`, `Active`, `Online`, `LastLogin`) VALUES
 	 (1, 'Виталий', 'Егоров', 'Игоревич', 'admin', 'vovan123', '21232f297a57a5a743894a0e4a801fc3', 'fa9bb23b40db7ccff9ccfafdac0f647c', '2011-10-25 14:59:06', '2013-05-22 11:52:38', 1, 1, 1, '2013-05-22 14:52:38')
 			ON DUPLICATE KEY UPDATE Active=1");
