@@ -399,19 +399,70 @@ class CMS extends CompressableService
 
         db()->simple_query('ALTER TABLE  `material` DROP  `Content`');
     }
+    /**
+     * make date value in style 'dd.mm.yyyy'
+     * @param $date - old style of date
+     * @return string - new date
+     */
+    public function trueDate($date)
+    {
+        //$matches = array();
+        $data = '';
+        $matches = preg_split("/[-\.]/", $date);
+        if (empty($matches[2])) {
+            $matches[2] = '2014';
+        }
+        if (strlen($matches[0]) > strlen($matches[2])) {
+            $temp = $matches[0];
+            $matches[0] = $matches[2];
+            $matches[2] = $temp;
+        }
+        if (strlen($matches[0]) < 2) {
+            $matches[0] = '0'.$matches[0];
+        }
+        if (strlen($matches[1]) < 2) {
+            $matches[1] = '0'.$matches[1];
+        }
+        if (strlen($matches[2]) == 2) {
+            $matches[2] = '20'.$matches[2];
+        }
+        $data = $matches[0].'.'.$matches[1].'.'.$matches[2];
+        return $data;
+    }
 
     public function migrate_5_to_6()
     {
         // Convert all old "date" fields to numeric for fixing db requests
-        if (dbQuery('field')->Type(3)->fields('id',$fields)) {
-            foreach( dbQuery('materialfield')->FieldID($fields)->exec() as $mf) {
-                $mf->numeric_value = strtotime($mf->Value);
+        $mf = null;
+        if (dbQuery('field')->Type(3)->FieldID(128)) {
+            if(dbQuery('materialfield')->FieldID(128)->exec($mf)) {
+                foreach ($mf as $key => $val) {
+                    $val->Value = $this->trueDate($val->Value);
+                    $val->numeric_value = strtotime($val->Value);
+                    $val->save();
+                }
+                //$mf->Value = '12.12.2012';
+                //$mf->numeric_value = strtotime($mf->Value);
+                //$mf->save();
+            }
+        }
+        if (dbQuery('field')->Type(0)->FieldID(126)) {
+            foreach( dbQuery('materialfield')->FieldID(126)->exec() as $mf) {
+                $mf->numeric_value = intval($mf->Value);
                 $mf->save();
             }
         }
-
+        $delete_tables = db()->query("SELECT GROUP_CONCAT('DROP TABLE ', table_name, ';' SEPARATOR '') AS statement
+                                    FROM information_schema.tables
+                                    WHERE table_name LIKE 'en%' AND table_schema LIKE 'p.onysko'");
+        db()->simple_query($delete_tables['statement']);
+        /*
+         *  SELECT GROUP_CONCAT('DROP TABLE ', table_name, ';' SEPARATOR '') AS statement
+            FROM information_schema.tables
+            WHERE table_name LIKE 'en%' AND table_schema LIKE 'p.onysko'
+         */
     }
-	
+
 	
 	/**
 	 * Get CMSMaterial by selector 
@@ -608,7 +659,7 @@ class CMS extends CompressableService
 	public function init( array $params = array() )
 	{
 		// Build navigation tree
-		$this->buildNavigation();	
+		$this->buildNavigation();
 
 		// Change static class data
 		$this->afterCompress();		

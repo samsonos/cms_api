@@ -26,7 +26,9 @@ class CMSMaterial extends material implements idbLocalizable, iModuleViewable
 	/**
 	 * Universal method for retrieving material from database with all additional data
 	 * such as additional field data with ability to sort, limit, filter by it and gallery data/
-	 * 
+     *
+	 * @deprecated use simple dbQuery instead
+     *
 	 * @param array $field_value 	Array( FIELD_NAME, FIELD_VALUE ) for filtering
 	 * @param string $db_cmsnav		Pointer to CMSNav for getting particular materials
 	 * @param string $draft			Request "draft" filter
@@ -84,9 +86,26 @@ class CMSMaterial extends material implements idbLocalizable, iModuleViewable
 		// If we have CMSNav filter
 		if( isset( $db_cmsnav ) ) 
 		{
-			$query
-				->cond( 'structurematerial_StructureID', $db_cmsnav->id )
-				->cond( 'structurematerial_Active', 1 );			
+            if (is_array($db_cmsnav)){
+                $cmsnav_array = array();
+                foreach ($db_cmsnav as $cmsnav) {
+                    if (is_object($cmsnav)) {
+                        $cmsnav_array[] = $cmsnav->id;
+                    } else {
+                        $cmsnav_array[] = $cmsnav;
+                    }
+                }
+                if (sizeof($cmsnav_array)) {
+                    $query
+                        ->cond( 'structurematerial_StructureID', $cmsnav_array )
+                        ->cond( 'structurematerial_Active', 1 );
+                }
+            } else {
+                $query
+                    ->cond( 'structurematerial_StructureID', $db_cmsnav->id )
+                    ->cond( 'structurematerial_Active', 1 );
+            }
+
 		}				
 
 		// if we have handler
@@ -205,16 +224,15 @@ class CMSMaterial extends material implements idbLocalizable, iModuleViewable
 			$html = $this->$name;
 				
 			// If we are in editor mode
-			if( isset($_SESSION['__CMS_EDITOR__']) )
+			/*if( isset($_SESSION['__CMS_EDITOR__']) )
 			{				
 				// Render editor value view
 				$html = m('cmsapi')
-				->set('field',$name)
-				->set('id',$this->id)
-				->set('value',$this->$name)
-				->set('entity','cmsmaterial')
-				->output('app/view/editor/material.php');	
-			}
+					->view('editor/material')
+					->material($this)
+					->entity('cmsmaterial')
+				->output();	
+			}*/
 			
 			// Echo or return
 			if( $returnValue === false ) echo $html; 

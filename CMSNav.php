@@ -28,6 +28,7 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
 					$url_base = trim($current->Url.'/'.$url_base);
 
 					$record->url_base[ $current->StructureID ] = $url_base;
+
 					$record->url_base[ $current->StructureID.'_'.locale() ] = locale().'/'.$url_base;
 	
 					$current = & $current->parent;
@@ -40,10 +41,12 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
 				self::build( $record, $records, ( $level + 1 ) );
 			}
 		}
-	}		
-	
-	
-	public static $top;
+	}
+
+    /**
+     * @var CMSNav
+     */
+    public static $top;
 	
 	
 	public $parent = NULL;
@@ -152,38 +155,37 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
 								$second_nav = $children[ $new_index ];
 								$second_nav->PriorityNumber = $old_index;
 								$second_nav->save();
-					
 								$this->PriorityNumber = $new_index;
 								$this->save();
 			}
 		}
 	}
-	
-	
+
+
 	public function toHTML( CMSNav & $parent = NULL, & $html = '', $view = NULL, $level = 0 )
-	{		
+	{
 		if( ! isset( $parent ) ) $parent = & $this;
 
-		$children_count = sizeof($parent->children);	
+		$children_count = sizeof($parent->children);
 
 		//trace($level.'-'.$parent->Name);
-		
+
 		//if($level > 10) return $html;
 
 		if( $children_count )
 		{
 			$html .= '<ul>';
-			
-			foreach ( $parent->children as $id => $child ) 		
-			{				
+
+			foreach ( $parent->children as $id => $child )
+			{
 				if( isset( $view ) ) $html .= '<li>'.s()->render( $view, array( 'db_structure' => $child ) ).'';
 				else $html .= '<li>'.$child->Name.'</li>';
-	
+
 				$this->toHTML( $child, $html, $view, $level++ );
 
 				$html .= '</li>';
 			}
-	
+
 			$html .='</ul>';
 		}
 
@@ -211,17 +213,17 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
 		{
 						$html = $this->$name;
 			
-						if( isset($_SESSION['__CMS_EDITOR__']) ) 
+						/*if( isset($_SESSION['__CMS_EDITOR__']) )
 				$html = m('cmsapi')
 				->set('field',$name)
 				->set('id',$this->id)
 				->set('value',$this->$name)
 				->set('entity','cmsnav')
-			->output('app/view/editor/material.php');
+			->output('app/view/editor/material.php');*/
 			
 						echo $html;
 		}
-	}	
+	}
 
 	/** Serialize handler */
 	public function __sleep()

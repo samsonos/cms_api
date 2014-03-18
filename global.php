@@ -83,6 +83,25 @@ function ifcmsmat( $selector, & $cmsmat = NULL, $field = 'Url' )
 	return true;
 }
 
+/**
+ * Output module view variable by key with ability to edit it if it is
+ * a SamsonCMS object. Method is used for outputting SamsonCMS material
+ * and navigation fields to be able to edit directly in site
+ *
+ * @param string $key Module view variable name
+ * @param string $attributeName Real samsoncms object attribute name for insite editing
+ * @return string
+ */
+function cmsv($key, $attributeName = null )
+{
+    // If no attribute name is passed consider key as valid attribute name
+    if (!isset($attributeName)) {
+        $attributeName = $key;
+    }
+
+    v($attributeName);
+}
+
 /** @return \samson\cms\Query */
 function cmsquery(){ return new samson\cms\CMSMaterialQuery(); }
 
