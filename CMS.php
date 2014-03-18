@@ -189,6 +189,13 @@ class CMS extends CompressableService
 		  PRIMARY KEY (`MaterialFieldID`),
 		  KEY `MaterialID` (`MaterialID`)
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+
+        $sql_user = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."structure_relation` (
+		  `structure_relation_id` int(11) NOT NULL AUTO_INCREMENT,
+		  `parent_id` int(11) NOT NULL,
+		  `child_id` int(11) NOT NULL,
+		  PRIMARY KEY (`structure_relation_id`)
+		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 		
 		// SQL table for storing database version
 		$sql_version = " CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."cms_version` ( `version` varchar(15) not null default '1')
@@ -418,6 +425,7 @@ class CMS extends CompressableService
 
     public function migrate_6_to_7()
     {
+
         $db_structures = null;
         // Convert all old "date" fields to numeric for fixing db requests
         if (dbQuery('structure')->Active(1)->exec($db_structures)) {
