@@ -47,12 +47,13 @@ class CMSMaterial extends material implements idbLocalizable, iModuleViewable
 			$limit = null, 
 			$group_by = null, 
 			$handler  = null,
-			$handler_params = array())
+			$handler_params = array(),
+            $class_name = null)
 	{			
 		$db_materials = array();
-
+        if (!isset($class_name))$class_name = 'samson\cms\cmsmaterial';
 		// Create db request
-		$query = dbQuery( 'samson\cms\cmsmaterial' )
+		$query = dbQuery( $class_name )
 			->cond( 'Active', 1 )
 			//->cond( 'locale', locale())
 			->join( 'samson\cms\cmsgallery')			

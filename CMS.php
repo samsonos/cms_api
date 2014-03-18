@@ -234,7 +234,11 @@ class CMS extends CompressableService
 		new TableRelation( 'field', 'structure', 'structurefield.StructureID' );		
 		new TableRelation( 'structurefield', 'field', 'FieldID'  );
 		new TableRelation( 'structurefield', 'materialfield', 'FieldID'  );		
-		new TableRelation( 'structurefield', 'material', 'materialfield.MaterialID'  );				
+		new TableRelation( 'structurefield', 'material', 'materialfield.MaterialID'  );
+        new TableRelation( 'structure', 'structure_relation', 'StructureID', TableRelation::T_ONE_TO_MANY, 'parent_id', 'children_relations' );
+        new TableRelation( 'structure', 'structure', 'children_relations.child_id', TableRelation::T_ONE_TO_MANY, 'StructureID', 'children' );
+        new TableRelation( 'structure', 'structure_relation', 'StructureID', TableRelation::T_ONE_TO_MANY, 'child_id', 'parents_relations' );
+        new TableRelation( 'structure', 'structure', 'parents_relations.parent_id', TableRelation::T_ONE_TO_MANY, 'StructureID', 'parents' );
 	
 		//elapsed('CMS:prepare');
 		
@@ -411,6 +415,23 @@ class CMS extends CompressableService
         }
 
     }
+
+    public function migrate_6_to_7()
+    {
+        $db_structures = null;
+        // Convert all old "date" fields to numeric for fixing db requests
+        if (dbQuery('structure')->Active(1)->exec($db_structures)) {
+            foreach( $db_structures as $db_structure) {
+                if ($db_structure->ParentID!=0){
+                    $relation = new \samson\activerecord\structure_relation(false);
+                    $relation->parent_id = $db_structure->ParentID;
+                    $relation->child_id = $db_structure->id;
+                    $relation->save();
+                }
+            }
+        }
+
+    }
 	
 	
 	/**
@@ -478,7 +499,16 @@ class CMS extends CompressableService
 		// Try to search activerecord instances cache by selector
 		else if( isset(dbRecord::$instances[$classname][$selector]) ) {$cmsnav = & dbRecord::$instances[$classname][$selector];}		
 		// Perform request to database
-		else if( dbQuery($classname)->cond('Active',1)->cond( $field, $selector )->first( $cmsnav ));			
+		else if( dbQuery($classname)
+            ->cond('Active',1)
+            ->cond( $field, $selector )
+            ->join('children_relations')
+            ->join('children', '\samson\cms\cmsnav')
+            ->join('parents_relations')
+            ->join('parents', '\samson\cms\cmsnav')
+            ->first( $cmsnav )) {
+            $cmsnav->prepare();
+        }
 		
 		return $cmsnav;
 	}	
@@ -608,7 +638,7 @@ class CMS extends CompressableService
 	public function init( array $params = array() )
 	{
 		// Build navigation tree
-		$this->buildNavigation();	
+		//$this->buildNavigation();
 
 		// Change static class data
 		$this->afterCompress();		

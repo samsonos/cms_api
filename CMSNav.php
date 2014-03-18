@@ -40,13 +40,22 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
 				self::build( $record, $records, ( $level + 1 ) );
 			}
 		}
-	}		
+	}
+
+    public static function build2( $parent, $level = 0 )
+    {
+        if (dbQuery('cmsnav')->Url($parent)->Active(1)->join('children_relations')->join('children')->first($cmsnav)) {
+            trace($cmsnav);
+        }
+    }
 	
 	
 	public static $top;
 	
 	
 	public $parent = NULL;
+
+    public $parentsnav = array();
 	
 	
 	protected $parents = array();
@@ -59,6 +68,8 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
 	
 	
 	protected $level = 0;
+
+    protected $base = false;
 	
 	
 	public function toView( $key_prefix = '', array $restricted = array() )
@@ -104,21 +115,28 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
 		
 		echo (isset($this->url_base[ $parent->id ]) ? $this->url_base[ $parent->id ]:'');
 	}
-	
-	
-	public function parents( CMSNav & $bound = NULL )
-	{		
-		$parents = array();
-		
-		for ($i = 0; $i < sizeof( $this->parents ); $i++ )
-		{
-			$parents[] = & $this->parents[ $i ];
-			
-			if( isset( $bound ) && ( $bound == $this->parents[ $i ] ) ) break;
-		}		
-	
+
+    public function parents( CMSNav & $bound = NULL)
+	{
+        $parents = array();
+        $this->base();
+        if (sizeof($this->parentsnav)>0) {
+            $parent = current($this->parentsnav);
+            $parents[] = $parent;
+            if( !(isset( $bound ) && ( $bound == $this->parentsnav[0] )) ){
+                $parents = array_merge($parents, $parent->parents($bound));
+            }
+        }
+
 		return array_reverse( $parents );
 	}
+
+    public function children()
+    {
+        // check? is this objeck full;
+        $this->base();
+        return $this->children;
+    }
 	
 	
 	public function priority( $direction = NULL )
@@ -221,20 +239,70 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
 			
 						echo $html;
 		}
-	}	
+	}
+    public function prepare()
+    {
+        $this->base = true;
+
+        if (isset($this->onetomany['_children'])) {
+            foreach ($this->onetomany['_children'] as $child) {
+                $this->children['id_'.$child->id] = $child;
+            }
+            unset($this->onetomany['_children']);
+        }
+
+        if (isset($this->onetomany['_parents'])) {
+            foreach ($this->onetomany['_parents'] as $parent) {
+                $this->parentsnav['id_'.$parent->id] = $parent;
+            }
+            unset($this->onetomany['_parents']);
+        }
+    }
+
+    /*
+     * Has object all its relations?
+     * If not, fill relations.
+     */
+    protected function base()
+    {
+        if (!$this->base){
+            $classname = ns_classname('cmsnav', 'samson\cms');
+            $cmsnav = null;
+            if( dbQuery($classname)
+                ->cond('Active',1)
+                ->StructureID( $this->id)
+                ->join('children_relations')
+                ->join('children', '\samson\cms\cmsnav')
+                ->join('parents_relations')
+                ->join('parents', '\samson\cms\cmsnav')
+                ->first( $cmsnav )) {
+
+                if (isset($cmsnav->onetomany['_children'])) {
+                    $this->onetomany['_children'] = $cmsnav->onetomany['_children'];
+                }
+
+                if (isset($cmsnav->onetomany['_parents'])) {
+                   $this->onetomany['_parents'] = $cmsnav->onetomany['_parents'];
+                }
+
+                $this->prepare();
+            }
+        }
+    }
 
 	/** Serialize handler */
 	public function __sleep()
-	{		
+	{
+        $_attributes = null;
 		eval('$_attributes = '.get_class($this).'::$_attributes;');		
 		
 		return $_attributes; 
 	}
-	public function rewind(){reset( $this->children );	}
-	public function next(){	return next( $this->children );	}
-	public function current(){	return current( $this->children );	}
-	public function key(){	return key( $this->children );	}
-	public function valid(){$key = key( $this->children );	return ( $key !== NULL && $key !== FALSE );	}	
+	public function rewind(){$this->base(); reset( $this->children );	}
+	public function next(){$this->base();	return next( $this->children );	}
+	public function current(){$this->base(); return current( $this->children );	}
+	public function key(){$this->base();return key( $this->children );	}
+	public function valid(){$this->base(); $key = key( $this->children );	return ( $key !== NULL && $key !== FALSE );	}
 }
 
 // dbRecord::$instances[ "samson\cms\cmsnav" ] = array();
