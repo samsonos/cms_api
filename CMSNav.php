@@ -137,6 +137,13 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
         $this->base();
         return $this->children;
     }
+
+    public function purent()
+    {
+        // check? is this objeck full;
+        $this->base();
+        return $this->parent;
+    }
 	
 	
 	public function priority( $direction = NULL )
@@ -254,6 +261,7 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
         if (isset($this->onetomany['_parents'])) {
             foreach ($this->onetomany['_parents'] as $parent) {
                 $this->parentsnav['id_'.$parent->id] = $parent;
+                $this->parent = $parent;
             }
             unset($this->onetomany['_parents']);
         }
