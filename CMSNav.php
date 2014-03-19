@@ -138,7 +138,7 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
         return $this->children;
     }
 
-    public function purent()
+    public function parent()
     {
         // check? is this objeck full;
         $this->base();
