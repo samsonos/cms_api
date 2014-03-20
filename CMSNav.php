@@ -176,34 +176,65 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
 			}
 		}
 	}
-	
-	
-	public function toHTML( CMSNav & $parent = NULL, & $html = '', $view = NULL, $level = 0 )
-	{		
-		if( ! isset( $parent ) ) $parent = & $this;
 
-		$children_count = sizeof($parent->children);	
+    /**
+     * Render CMSNav tree as HTML ul>li
+     *
+     * @param CMSNav    $parent Pointer to parent CMSNav
+     * @param string    $view   Path to external view for rendering tree element
+     * @param integer   $limit  Maximal depth
+     * @param int       $level  Current nesting level
+     * @param string    $html   Current
+     *
+     * @return bool|string
+     */
+    public function toHTML( CMSNav & $parent = NULL, $view = NULL, $limit = null, $ulClass = null, $liClass = null, $level = -1, & $html = '' )
+	{
+        // If no parent passed - consider current CMSNav as parent
+		if (!isset( $parent )) {
+            $parent = & $this;
+        }
 
-		//trace($level.'-'.$parent->Name);
-		
-		//if($level > 10) return $html;
+        //trace($level.'-'.$limit.'-'.$parent->Name);
 
-		if( $children_count )
-		{
-			$html .= '<ul>';
-			
-			foreach ( $parent->children as $id => $child ) 		
-			{				
-				if( isset( $view ) ) $html .= '<li>'.s()->render( $view, array( 'db_structure' => $child ) ).'';
-				else $html .= '<li>'.$child->Name.'</li>';
-	
-				$this->toHTML( $child, $html, $view, $level++ );
+        // If nesting limit is specified
+        if(($limit > $level) || !isset($limit)) {
 
-				$html .= '</li>';
-			}
-	
-			$html .='</ul>';
-		}
+            // Get all CMSNav children
+            $children = $parent->children();
+
+            // If we have children
+            if (sizeof($children)) {
+
+                $level++;
+
+                // Open container block and pass specified class
+                $html .= '<ul class="'.$ulClass.' level-'.$level.'")>';
+
+                // Iterate all CMSNav children
+                foreach ( $parent->children() as $id => $child )
+                {
+                    // Open inner container block
+                    $html .= '<li class="'.$liClass.'" level-'.$level.'>';
+                    //$html .= '<li class="'.$liClass.' level-'.$level.'>';
+                    // If external view is passed - render it
+                    if (isset($view)) {
+                        $html .= m()->view($view)->cmsmaterial($child)->output();
+                    } else { // Only output CMSNav name
+                        $html .= $child->Name;
+                    }
+
+                    // Go deeper into recursion
+                    $this->toHTML( $child, $view, $limit, $ulClass, $liClass, $level, $html );
+
+                    // Close inner container block
+                    $html .= '</li>';
+                }
+
+                // Close container block
+                $html .='</ul>';
+            }
+        }
 
 		return $html;
 	}

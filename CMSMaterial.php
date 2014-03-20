@@ -270,7 +270,7 @@ class CMSMaterial extends material implements idbLocalizable, iModuleViewable
 	/**
 	 * Find all materials that current material relates to
 	 * @param function $handler External DB request handler
-	 * @return array Collection of materials that current material relates to
+	 * @return \samson\cms\CMSMaterial[] Collection of materials that current material relates to
 	 */
 	public function & relates( $handler = null  )
 	{
