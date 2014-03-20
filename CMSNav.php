@@ -42,13 +42,6 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
 		}
 	}
 
-    public static function build2( $parent, $level = 0 )
-    {
-        if (dbQuery('cmsnav')->Url($parent)->Active(1)->join('children_relations')->join('children')->first($cmsnav)) {
-            trace($cmsnav);
-        }
-    }
-	
 	
 	public static $top;
 	
@@ -280,9 +273,9 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
                 ->cond('Active',1)
                 ->StructureID( $this->id)
                 ->join('children_relations')
-                ->join('children', '\samson\cms\cmsnav')
+                ->join('children', get_class($this))
                 ->join('parents_relations')
-                ->join('parents', '\samson\cms\cmsnav')
+                ->join('parents', get_class($this))
                 ->first( $cmsnav )) {
 
                 if (isset($cmsnav->onetomany['_children'])) {
