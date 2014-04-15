@@ -44,8 +44,7 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
 
 	
 	public static $top;
-	
-	
+
 	public $parent = NULL;
 
     public $parentsnav = array();
@@ -63,6 +62,15 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
 	protected $level = 0;
 
     protected $base = false;
+
+    public function tree(){
+        $tree = array();
+        $s_rs = array();
+        //Get all structure telations
+        if(dbQuery('structure_relation')->exec($s_r)){
+
+        }
+    }
 	
 	
 	public function toView( $key_prefix = '', array $restricted = array() )
@@ -121,7 +129,8 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
             }
         }
 
-		return array_reverse( $parents );
+		//return array_reverse( $parents );
+        return $parents;
 	}
 
     public function children()
@@ -185,47 +194,73 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
      * @param integer   $limit  Maximal depth
      * @param int       $level  Current nesting level
      * @param string    $html   Current
+     * @param function  $counterFunc  Callable function
      *
      * @return bool|string
      */
-    public function toHTML( CMSNav & $parent = NULL, $view = NULL, $limit = null, $ulClass = null, $liClass = null, $level = -1, & $html = '' )
+    public function toHTML( CMSNav & $parent = NULL, $view = NULL, $limit = null, $ulClass = null, $liClass = null, $counterFunc = null, $level = -1, & $html = '' )
 	{
         // If no parent passed - consider current CMSNav as parent
 		if (!isset( $parent )) {
             $parent = & $this;
         }
 
-        //trace($level.'-'.$limit.'-'.$parent->Name);
-
         // If nesting limit is specified
         if(($limit > $level) || !isset($limit)) {
-
+            $last = isset($limit)?($limit-$level):0;
             // Get all CMSNav children
-            $children = $parent->children();
+            if ($level != -1) {
+                if ($parent->base || ($last == 1)){
+                    $children = $parent->children();
+                } else {
+                    $children = $parent->baseChildren();
+                }
+            } else {
+                $children = $parent->baseChildren();
+            }
+
 
             // If we have children
             if (sizeof($children)) {
-
                 $level++;
+                //trace(sizeof($children).' - ');
+
 
                 // Open container block and pass specified class
                 $html .= '<ul class="'.$ulClass.' level-'.$level.'")>';
 
                 // Iterate all CMSNav children
-                foreach ( $parent->children() as $id => $child )
+                foreach ( $children as $id => $child )
                 {
                     // Open inner container block
-                    $html .= '<li class="'.$liClass.'" level-'.$level.'>';
-                    //$html .= '<li class="'.$liClass.' level-'.$level.'>';
+
+                    $currClass = '';
+
+                    // set current
+                    if (url()->last == '') {
+                        $currClass = 'currentSamsonCMS';
+                    }
+
+                    $html .= '<li class="'.$liClass.' '.$currClass.'">';
+
+                    // count how much materials in current structure
+                    $counter = 0;
+                    if (isset($counterFunc)) { $counter = $counterFunc; }
                     // If external view is passed - render it
                     if (isset($view)) {
-                        $html .= m()->view($view)->cmsmaterial($child)->output();
+                        $html .= m()->view($view)
+                            ->counter($counter)
+                            ->cmsmaterial($child)
+                            ->output()
+                        ;
                     } else { // Only output CMSNav name
                         $html .= $child->Name;
                     }
 
-                    // Go deeper into recursion
-                    $this->toHTML( $child, $view, $limit, $ulClass, $liClass, $level, $html );
+                    if (!isset($level) || $level < $limit) {
+                        // Go deeper into recursion
+                        $this->toHTML( $child, $view, $limit, $ulClass, $liClass, null, $level, $html );
+                    }
 
                     // Close inner container block
                     $html .= '</li>';
@@ -276,16 +311,16 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
         $this->base = true;
 
         if (isset($this->onetomany['_children'])) {
-            foreach ($this->onetomany['_children'] as $child) {
-                $this->children['id_'.$child->id] = $child;
+            foreach ($this->onetomany['_children'] as & $child) {
+                $this->children[$child->id] = & $child;
             }
             unset($this->onetomany['_children']);
         }
 
         if (isset($this->onetomany['_parents'])) {
-            foreach ($this->onetomany['_parents'] as $parent) {
-                $this->parentsnav['id_'.$parent->id] = $parent;
-                $this->parent = $parent;
+            foreach ($this->onetomany['_parents'] as & $parent) {
+                $this->parentsnav[$parent->id] = & $parent;
+                $this->parent = & $parent;
             }
             unset($this->onetomany['_parents']);
         }
@@ -298,28 +333,61 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
     protected function base()
     {
         if (!$this->base){
-            $classname = ns_classname('cmsnav', 'samson\cms');
+            //$classname = ns_classname('cmsnav', 'samson\cms');
+            $classname = get_class($this);
             $cmsnav = null;
             if( dbQuery($classname)
                 ->cond('Active',1)
                 ->StructureID( $this->id)
-                ->join('children_relations')
+                ->join('children_relations',null, true)
                 ->join('children', get_class($this))
-                ->join('parents_relations')
+                ->join('parents_relations', null, true)
                 ->join('parents', get_class($this))
                 ->first( $cmsnav )) {
 
                 if (isset($cmsnav->onetomany['_children'])) {
-                    $this->onetomany['_children'] = $cmsnav->onetomany['_children'];
+                    $this->onetomany['_children'] = & $cmsnav->onetomany['_children'];
                 }
 
                 if (isset($cmsnav->onetomany['_parents'])) {
-                   $this->onetomany['_parents'] = $cmsnav->onetomany['_parents'];
+                    $this->onetomany['_parents'] = & $cmsnav->onetomany['_parents'];
                 }
 
                 $this->prepare();
             }
         }
+    }
+
+    protected function baseChildren()
+    {
+        //elapsed('startBaseChildren');
+        //trace('baseChildren');
+        $this->base();
+        //$classname = ns_classname('cmsnav', 'samson\cms');
+        $classname = get_class($this);
+        //trace($classname);
+        $cmsnavs = null;
+        $children_id = array_keys($this->children);
+        //elapsed('queryStart');
+        if (sizeof($children_id)){
+            if( dbQuery($classname)
+                ->cond('Active',1)
+                ->cond('StructureID', $children_id)
+                ->join('children_relations', null, true)
+                ->join('children', $classname)
+                ->join('parents_relations', null, true)
+                ->join('parents', $classname)
+                ->exec( $cmsnavs )) {
+                //elapsed('queryEnd');
+                $this->children = array();
+                foreach ($cmsnavs as & $cmsnav) {
+                    $cmsnav->prepare();
+                    $this->children[] = & $cmsnav;
+                }
+            }
+        }
+        //elapsed('endBaseChildren');
+        return$this->children;
     }
 
 	/** Serialize handler */

@@ -233,7 +233,8 @@ class CMS extends CompressableService
 		new TableRelation( 'materialfield', 'field', 'FieldID' );
 		new TableRelation( 'materialfield', 'material', 'MaterialID' );
 		new TableRelation( 'structurematerial', 'structure', 'StructureID' );
-		new TableRelation( 'structurematerial', 'materialfield', 'MaterialID', TableRelation::T_ONE_TO_MANY  );		
+		new TableRelation( 'structurematerial', 'materialfield', 'MaterialID', TableRelation::T_ONE_TO_MANY  );
+        new TableRelation( 'structurematerial', 'material', 'MaterialID', TableRelation::T_ONE_TO_MANY  );
 		new TableRelation( 'structure', 'material', 'MaterialID' );
 		new TableRelation( 'structure', 'user', 'UserID' );
 		new TableRelation( 'related_materials', 'material', 'first_material', TableRelation::T_ONE_TO_MANY, 'MaterialID' );
@@ -426,19 +427,20 @@ class CMS extends CompressableService
 
     public function migrate_6_to_7()
     {
-
         $db_structures = null;
         // Convert all old "date" fields to numeric for fixing db requests
         if (dbQuery('structure')->Active(1)->exec($db_structures)) {
             foreach( $db_structures as $db_structure) {
-                if ($db_structure->ParentID!=0){
-                    $relation = new \samson\activerecord\structure_relation(false);
-                    $relation->parent_id = $db_structure->ParentID;
-                    $relation->child_id = $db_structure->id;
-                    $relation->save();
-                }
+                $relation = new \samson\activerecord\structure_relation(false);
+                $relation->parent_id = $db_structure->ParentID;
+                $relation->child_id = $db_structure->id;
+                $relation->save();
             }
         }
+    }
+
+    public function migrate_7_to_8()
+    {
 
     }
 	

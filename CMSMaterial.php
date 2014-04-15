@@ -85,8 +85,11 @@ class CMSMaterial extends material implements idbLocalizable, iModuleViewable
 		// If we have CMSNav filter
 		if( isset( $db_cmsnav ) ) 
 		{
+            $navId = 0;
+            if (!is_array($db_cmsnav)) $navId = $db_cmsnav->id;
+            else $navId = $db_cmsnav;
 			$query
-				->cond( 'structurematerial_StructureID', $db_cmsnav->id )
+				->cond( 'structurematerial_StructureID', $navId )
 				->cond( 'structurematerial_Active', 1 );			
 		}				
 
