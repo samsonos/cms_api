@@ -198,7 +198,7 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
      *
      * @return bool|string
      */
-    public function toHTML( CMSNav & $parent = NULL, $view = NULL, $limit = null, $ulClass = null, $liClass = null, $counterFunc = null, $level = -1, & $html = '' )
+    public function toHTML( & $parent = NULL, $view = NULL, $limit = null, $ulClass = null, $liClass = null, $counterFunc = null, $level = -1, & $html = '' )
 	{
         // If no parent passed - consider current CMSNav as parent
 		if (!isset( $parent )) {
@@ -245,7 +245,7 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
 
                     // count how much materials in current structure
                     $counter = 0;
-                    if (isset($counterFunc)) { $counter = $counterFunc; }
+                    if (is_callable($counterFunc)) { $counter = call_user_func($counterFunc, $child); }
                     // If external view is passed - render it
                     if (isset($view)) {
                         $html .= m()->view($view)

@@ -1,1 +1,1 @@
-{"name":"samsonos/cms_api","author":"Vitaly Iegorov <egorov@samsonos.com>","version":"0.0.1","require":{"samsonos/php_activerecord":"*","samsonos/js_md5":"*"},"license":"Open Software License (OSL) v 3.0","homepage":"http://samsonos.com/"}
+{"name":"samsonos/cms","author":"Vitaly Iegorov <egorov@samsonos.com>","version":"0.0.1","require":{"samsonos/activerecord":"dev-master","samsonos/js_md5":"dev-master"},"license":"Open Software License (OSL) v 3.0","homepage":"http://samsonos.com/"}
