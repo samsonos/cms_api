@@ -1,8 +1,9 @@
 {
-	"name":"samsonos/cms",
+	"name":"samsonos/cms_api",
 	"author":"Vitaly Iegorov <egorov@samsonos.com>",
 	"version":"0.0.1",
-	"require":	{
+	"require":
+	{
 		"samsonos/php_activerecord":"*",
 		"samsonos/js_md5":"*"
 	},
