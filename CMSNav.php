@@ -343,6 +343,7 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
                 ->join('children', get_class($this))
                 ->join('parents_relations', null, true)
                 ->join('parents', get_class($this))
+                ->order_by('Name')
                 ->first( $cmsnav )) {
 
                 if (isset($cmsnav->onetomany['_children'])) {
