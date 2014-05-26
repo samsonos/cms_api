@@ -22,7 +22,12 @@ use samson\activerecord\material;
 class CMSMaterial extends material implements idbLocalizable, iModuleViewable
 {			
 	public $class_name = 'material';
-	
+
+    /** Gallery images sorter */
+    public static function usortGallery($a, $b) {
+        return $a->PhotoID > $b->PhotoID;
+    }
+
 	/**
 	 * Universal method for retrieving material from database with all additional data
 	 * such as additional field data with ability to sort, limit, filter by it and gallery data/
@@ -117,6 +122,9 @@ class CMSMaterial extends material implements idbLocalizable, iModuleViewable
 			$db_material->gallery = array();
 			if(isset($db_material->onetomany['_gallery'])) 
 			{
+                // Sort gallery images
+                usort($db_material->onetomany['_gallery'], '\samson\cms\CMSMaterial::usortGallery');
+
 				foreach ( $db_material->onetomany['_gallery'] as $db_gallery ) $db_material->gallery[] = $db_gallery->Src;			
 			}
 			
