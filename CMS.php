@@ -443,6 +443,22 @@ class CMS extends CompressableService
     {
 
     }
+
+    public function migrate_8_to_9()
+    {
+        ini_set('memory_limit','4000M');
+        set_time_limit(2000);
+        $dbFields = array();
+        if (dbQuery('field')->local(1)->fields('FieldID', $dbFields)) {
+            $dbMFs = array();
+            if (dbQuery('materialfield')->FieldID($dbFields)->locale('')->exec($dbMFs)){
+                foreach($dbMFs as $dbMF) {
+                    $dbMF->locale = 'ru';
+                    $dbMF->save();
+                }
+            }
+        }
+    }
 	
 	
 	/**
