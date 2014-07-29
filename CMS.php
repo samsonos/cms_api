@@ -1,6 +1,7 @@
 <?php 
 namespace samson\cms;
 
+use samson\activerecord\dbRelation;
 use samson\activerecord\TableRelation;
 
 use samson\activerecord\CacheTable;
@@ -39,8 +40,8 @@ class CMS extends CompressableService
 		  `TName` varchar(255) NOT NULL,
 		  `Email` varchar(255) NOT NULL,
 		  `Password` varchar(255) NOT NULL,
-		  `md5_email` varchar(255) NOT NULL,
-		  `md5_password` varchar(255) NOT NULL,
+		  `md5_Email` varchar(255) NOT NULL,
+		  `md5_Password` varchar(255) NOT NULL,
 		  `Created` datetime NOT NULL,
 		  `Modyfied` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 		  `GroupID` int(11) NOT NULL,
@@ -443,22 +444,6 @@ class CMS extends CompressableService
     {
 
     }
-
-    public function migrate_8_to_9()
-    {
-        ini_set('memory_limit','4000M');
-        set_time_limit(2000);
-        $dbFields = array();
-        if (dbQuery('field')->local(1)->fields('FieldID', $dbFields)) {
-            $dbMFs = array();
-            if (dbQuery('materialfield')->FieldID($dbFields)->locale('')->exec($dbMFs)){
-                foreach($dbMFs as $dbMF) {
-                    $dbMF->locale = 'ru';
-                    $dbMF->save();
-                }
-            }
-        }
-    }
 	
 	
 	/**
@@ -488,9 +473,9 @@ class CMS extends CompressableService
 		//else if( CacheTable::ifget( $selector, $db_cmsmat ) );
 		// Perform request to database 	 
 		else
-		{		
-			// Get material	by field		
-			$db_cmsmat = CMSMaterial::get( array( $field, $selector ), NULL, 0, 1 );	
+		{
+			// Get material	by field
+			$db_cmsmat = CMSMaterial::get( array( $field, $selector ), NULL, 0, 1 );
 
 			// If we have found material - get the first one 
 			if( is_array( $db_cmsmat ) && sizeof( $db_cmsmat ) ) $db_cmsmat = array_shift($db_cmsmat);
@@ -632,7 +617,7 @@ class CMS extends CompressableService
 		$t_name = '_mf';		
 		
 		// Perform db query to get all possible material fields
-		if( dbQuery('field')->Active(1)->exec($this->material_fields)) foreach ($this->material_fields as $db_field)
+		if( dbQuery('field')->Active(1)->Name('', dbRelation::NOT_EQUAL)->exec($this->material_fields)) foreach ($this->material_fields as $db_field)
 		{
 			// Add additional field localization condition
 			if ($db_field->local==1) $equal = '(('.$t_name.'.FieldID = '.$db_field->id.')&&('.$t_name.".locale = '".locale()."'))";	
