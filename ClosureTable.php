@@ -2,7 +2,6 @@
 namespace samson\cms;
 
 use samson\activerecord\dbMySQLConnector;
-use samson\activerecord\dbRelation;
 
 /**
  * Created by Maxim Omelchenko <omelchenko@samsonos.com>
@@ -17,7 +16,7 @@ class ClosureTable
     private $entity = null;
 
     /**
-     * Constructor with parameters
+     * Constructor with parameter
      * It sets the name of table and entity to work with
      * @param string $name Name of table
      * @param string $entity Entity type
@@ -80,7 +79,10 @@ class ClosureTable
         $parentId = $this->isObject($parentObj);
         /** @var array $parents Array of parent Nodes */
         $parents = null;
+        /** @var \samson\activerecord\dbRecord $temp */
+        $temp = null;
 
+        // Find all parent elements and add relations with them
         dbQuery($this->name)->cond('child_id', $parentId)->exec($parents);
         foreach ($parents as $parent) {
             $temp = new $this->name();
@@ -109,6 +111,7 @@ class ClosureTable
         /** @var string $name Short name of table */
         $name = substr($this->name, 20);
 
+        // Find all child elements and delete all occurrences of input object in database
         dbQuery($this->name)->cond('parent_id', $parentId)->cond('level', 1)->fields('child_id', $children);
         db()->simple_query('DELETE FROM `'.$name.'` WHERE parent_id ='.$parentId.' OR child_id='.$parentId);
         foreach ($children as $child) {
@@ -123,17 +126,22 @@ class ClosureTable
      */
     public function moveTo($obj, $parentObj)
     {
-        /** @var int $childId Input object Identifier */
-        $id = $this->isObject($obj);
+        /** @var int $currentId Input object Identifier */
+        $currentId = $this->isObject($obj);
+        /** @var int $newParentId New parent identifier */
         $newParentId = $this->isObject($parentObj);
+        /** @var int[] $children Array of child identifiers */
         $children = null;
+        /** @var string $name Full table name */
         $name = substr($this->name, 20);
 
-        db()->simple_query('DELETE FROM `'.$name.'` WHERE child_id='.$id);
-        dbQuery($this->name)->cond('parent_id', $id)->cond('level', 1)->fields('child_id', $children);
-        $this->add($id, $newParentId);
+        // Delete relations with parent elements and get list of children with level = 1
+        db()->simple_query('DELETE FROM `'.$name.'` WHERE child_id='.$currentId);
+        dbQuery($this->name)->cond('parent_id', $currentId)->cond('level', 1)->fields('child_id', $children);
+        // Adds current element and calls this function for them
+        $this->add($currentId, $newParentId);
         foreach ($children as $child) {
-            $this->moveTo($child, $id);
+            $this->moveTo($child, $currentId);
         }
     }
 
@@ -147,9 +155,12 @@ class ClosureTable
     {
         /** @var int $parentId Input object Identifier */
         $parentId = $this->isObject($obj);
+        /** @var int[] $children List of children identifiers */
         $children = null;
+        /** @var \samson\activerecord\dbRecord $childrenEntities Collection of child objects */
         $childrenEntities = null;
 
+        // Gets the list of child elements identifiers on specified level
         dbQuery($this->name)->cond('parent_id', $parentId)->cond('level', $level)->fields('child_id', $children);
         $childrenEntities = dbQuery($this->entity)->cond('id', $children);
         return $childrenEntities;
@@ -168,8 +179,8 @@ class ClosureTable
         $childId = $this->isObject($obj);
         /** @var string[] $parents Collection of parent elements identifiers */
         $parents = null;
-        /** @var \samson\activerecord\dbRecord $child  */
-        $child = null;
+        /** @var array $child Child object */
+        $child = array();
         // Gets object by Identifier
         if (dbQuery($this->entity)->cond('id', $childId)->first($child)) {
             // Gets child elements of current object
@@ -180,7 +191,7 @@ class ClosureTable
                         $level = $level - 1;
                     }
                     foreach ($parents as $parent) {
-                        $child->parents[] = $this->getParents($parent, $level);
+                        $child[$parent] = $this->getParents($parent, $level);
                     }
                 }
             }
