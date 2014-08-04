@@ -1,12 +1,17 @@
 {
 	"name":"samsonos/cms_api",
 	"author":"Vitaly Iegorov <egorov@samsonos.com>",
+    "minimum-stability":"dev",
 	"version":"0.0.1",
 	"require":
 	{
 		"samsonos/php_activerecord":"*",
 		"samsonos/js_md5":"*"
+
 	},
-	"license":"Open Software License (OSL) v 3.0",
+    "require-dev": {
+        "phpunit/phpunit": "4.1.*"
+    },
+    "license":"Open Software License (OSL) v 3.0",
 	"homepage":"http://samsonos.com/"
 }

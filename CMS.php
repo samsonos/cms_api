@@ -1,6 +1,7 @@
 <?php 
 namespace samson\cms;
 
+use samson\activerecord\dbRelation;
 use samson\activerecord\TableRelation;
 
 use samson\activerecord\CacheTable;
@@ -121,6 +122,7 @@ class CMS extends CompressableService
 		  `Draft` int(11) NOT NULL,
 		  `Draftmaterial` int(11) NOT NULL,
 		  `Active` int(11) NOT NULL DEFAULT '1',
+		  `structure_id` int(11) NOT NULL,
 		PRIMARY KEY (`MaterialID`),
 		KEY `Url` (`Url`)
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
@@ -260,7 +262,7 @@ class CMS extends CompressableService
 	 * @param string $to_version Version to switch to
 	 * @return string Current database version
 	 */
-	public function migrator( $to_version = null )
+	public function migrator($to_version = null)
 	{
 		// If something passed - change database version to it
 		if( func_num_args() ) 
@@ -275,84 +277,84 @@ class CMS extends CompressableService
 			return $version_row[0]['Default'];
 		}
 	}
-	
-	/** Automatic migration to new CMS table structure */
-	public function migrate_1_to_2()
-	{		
-		elapsed('Removing `Relations` table');
-		db()->simple_query('DROP TABLE '.dbMySQLConnector::$prefix.'relations');
-		
-		elapsed('Adding `numeric_value` field into `materialfield` table');
-		db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield` ADD  `numeric_value` INT( 255 ) NOT NULL AFTER  `Value`');
-		
-		elapsed('Adding `locale` field into `material` table');
-		db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` ADD  `locale` varchar( 2 ) NOT NULL AFTER `Name`');	
-		
-		elapsed('Removing `Draftmaterial` field from `material` table');
-		db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` DROP `Draftmaterial`');
-		
-		/*
-		
-		// Create additional fields to move
-		$fields = array('Content','Teaser','Keywords','Description','Title');
-		$ids = array();
-		foreach ( $fields as $f) 
-		{
-			$field = new \samson\activerecord\field( false );
-			$field->Name = $f;
-			$field->save();
-			
-			// Save field id
-			$ids[ $f ] = $field->id;
-		}
-		
-		// Iterate existing materials and create material field
-		if( dbQuery('material')->exec( $db_materials ) ) foreach ( $db_materials as $db_material )
-		{
-			foreach ( $ids as $f => $fid )
-			{
-				// Create materialfield entry
-				$mf = new \samson\activerecord\materialfield( false );
-				$mf->MaterialID = $db_material->id;
-				$mf->FieldID = $fid;
-				$mf->Value = $db_material->$f;
-				$mf->save();
-			}
-		}		
-		*/
-		/*
-		elapsed('Removing data fields from `material` table');
-		db()->simple_query('ALTER TABLE `material` DROP `Teaser`');		
-		db()->simple_query('ALTER TABLE `material` DROP `Keywords`');		
-		db()->simple_query('ALTER TABLE `material` DROP `Description`');
-		db()->simple_query('ALTER TABLE `material` DROP `Content`');
-		db()->simple_query('ALTER TABLE `material` DROP `Title`');
-		*/
-		
-		elapsed('Changing `'.dbMySQLConnector::$prefix.'material` table columns order');
-		db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `Teaser` TEXT AFTER `Content`');
-		db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `Published` INT(1) UNSIGNED AFTER `Draft`');
-		db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `Active` INT(1) UNSIGNED AFTER `Published`');
-		db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `UserID` INT(11) AFTER `Title`');
-		db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `Modyfied` TIMESTAMP AFTER `Title`');		
-		db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `Created` DATETIME AFTER `Title`');
-	}
-	
-	/** Automatic migration to new CMS table structure */
-	public function migrate_2_to_3()
-	{	
-		elapsed('Adding `locale` field into `structure` table');
-		db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure` ADD  `locale` VARCHAR( 10 ) NOT NULL AFTER  `Name` ;');
-	}
-	
-	/** Automatic migration to new CMS table structure */
-	public function migrate_3_to_4()
-	{
-		elapsed('Adding `locale` field into `materialfield` table');
-		db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield` ADD  `locale` VARCHAR( 10 ) NOT NULL AFTER  `numeric_value` ;');
-		elapsed('Adding `local` field into `field` table');
-		db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field` ADD  `local` int( 10 ) NOT NULL AFTER  `Type` ;');
-	}
+
+    /** Automatic migration to new CMS table structure */
+    public function migrate_1_to_2()
+    {
+        elapsed('Removing `Relations` table');
+        db()->simple_query('DROP TABLE '.dbMySQLConnector::$prefix.'relations');
+
+        elapsed('Adding `numeric_value` field into `materialfield` table');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield` ADD  `numeric_value` INT( 255 ) NOT NULL AFTER  `Value`');
+
+        elapsed('Adding `locale` field into `material` table');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` ADD  `locale` varchar( 2 ) NOT NULL AFTER `Name`');
+
+        elapsed('Removing `Draftmaterial` field from `material` table');
+        db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` DROP `Draftmaterial`');
+
+        /*
+
+        // Create additional fields to move
+        $fields = array('Content','Teaser','Keywords','Description','Title');
+        $ids = array();
+        foreach ( $fields as $f)
+        {
+            $field = new \samson\activerecord\field( false );
+            $field->Name = $f;
+            $field->save();
+
+            // Save field id
+            $ids[ $f ] = $field->id;
+        }
+
+        // Iterate existing materials and create material field
+        if( dbQuery('material')->exec( $db_materials ) ) foreach ( $db_materials as $db_material )
+        {
+            foreach ( $ids as $f => $fid )
+            {
+                // Create materialfield entry
+                $mf = new \samson\activerecord\materialfield( false );
+                $mf->MaterialID = $db_material->id;
+                $mf->FieldID = $fid;
+                $mf->Value = $db_material->$f;
+                $mf->save();
+            }
+        }
+        */
+        /*
+        elapsed('Removing data fields from `material` table');
+        db()->simple_query('ALTER TABLE `material` DROP `Teaser`');
+        db()->simple_query('ALTER TABLE `material` DROP `Keywords`');
+        db()->simple_query('ALTER TABLE `material` DROP `Description`');
+        db()->simple_query('ALTER TABLE `material` DROP `Content`');
+        db()->simple_query('ALTER TABLE `material` DROP `Title`');
+        */
+
+        elapsed('Changing `'.dbMySQLConnector::$prefix.'material` table columns order');
+        db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `Teaser` TEXT AFTER `Content`');
+        db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `Published` INT(1) UNSIGNED AFTER `Draft`');
+        db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `Active` INT(1) UNSIGNED AFTER `Published`');
+        db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `UserID` INT(11) AFTER `Title`');
+        db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `Modyfied` TIMESTAMP AFTER `Title`');
+        db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `Created` DATETIME AFTER `Title`');
+    }
+
+    /** Automatic migration to new CMS table structure */
+    public function migrate_2_to_3()
+    {
+        elapsed('Adding `locale` field into `structure` table');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure` ADD  `locale` VARCHAR( 10 ) NOT NULL AFTER  `Name` ;');
+    }
+
+    /** Automatic migration to new CMS table structure */
+    public function migrate_3_to_4()
+    {
+        elapsed('Adding `locale` field into `materialfield` table');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield` ADD  `locale` VARCHAR( 10 ) NOT NULL AFTER  `numeric_value` ;');
+        elapsed('Adding `local` field into `field` table');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field` ADD  `local` int( 10 ) NOT NULL AFTER  `Type` ;');
+    }
 
     public function migrate_4_to_5()
     {
@@ -385,14 +387,12 @@ class CMS extends CompressableService
             $db_structurefield->save();
         }
 
-        if(dbQuery('material')->Active(1)->Draft(0)->exec($db_materials))
+        if (dbQuery('material')->Active(1)->Draft(0)->exec($db_materials))
         {
-            foreach($db_materials as $db_material)
-            {
+            foreach ($db_materials as $db_material) {
                 //if(isset($db_material->Content{0}))
                 {
-                    if(!dbQuery('materialfield')->MaterialID($db_material->id)->FieldID($db_field->id)->Active(1)->first($db_mf))
-                    {
+                    if (!dbQuery('materialfield')->MaterialID($db_material->id)->FieldID($db_field->id)->Active(1)->first($db_mf)) {
                         $db_mf = new \samson\activerecord\materialfield(false);
                         $db_mf->MaterialID = $db_material->id;
                         $db_mf->FieldID = $db_field->id;
@@ -417,7 +417,7 @@ class CMS extends CompressableService
     {
         // Convert all old "date" fields to numeric for fixing db requests
         if (dbQuery('field')->Type(3)->fields('id',$fields)) {
-            foreach( dbQuery('materialfield')->FieldID($fields)->exec() as $mf) {
+            foreach (dbQuery('materialfield')->FieldID($fields)->exec() as $mf) {
                 $mf->numeric_value = strtotime($mf->Value);
                 $mf->save();
             }
@@ -430,7 +430,7 @@ class CMS extends CompressableService
         $db_structures = null;
         // Convert all old "date" fields to numeric for fixing db requests
         if (dbQuery('structure')->Active(1)->exec($db_structures)) {
-            foreach( $db_structures as $db_structure) {
+            foreach ($db_structures as $db_structure) {
                 $relation = new \samson\activerecord\structure_relation(false);
                 $relation->parent_id = $db_structure->ParentID;
                 $relation->child_id = $db_structure->id;
@@ -441,11 +441,11 @@ class CMS extends CompressableService
 
     public function migrate_7_to_8()
     {
-
+        elapsed('Adding `StructureID` field into `material` table');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` ADD  `structure_id` INT( 255 ) NOT NULL AFTER  `Active`');
     }
-	
-	
-	/**
+
+    /**
 	 * Get CMSMaterial by selector 
 	 * Field to search for can be specified, by default search if performed by URL field
 	 * Function supports finding material by own fields and by any additional fields
@@ -454,7 +454,7 @@ class CMS extends CompressableService
 	 * @param string $field		Field name for searching
 	 * @return CMSMaterial Instance of CMSMaterial on successfull search
 	 */
-	public function & material( $selector, $field = 'Url' )
+	public function & material($selector, $field = 'Url')
 	{			
 		$db_cmsmat = null;	
 	
@@ -472,9 +472,9 @@ class CMS extends CompressableService
 		//else if( CacheTable::ifget( $selector, $db_cmsmat ) );
 		// Perform request to database 	 
 		else
-		{		
-			// Get material	by field		
-			$db_cmsmat = CMSMaterial::get( array( $field, $selector ), NULL, 0, 1 );	
+		{
+			// Get material	by field
+			$db_cmsmat = CMSMaterial::get( array( $field, $selector ), NULL, 0, 1 );
 
 			// If we have found material - get the first one 
 			if( is_array( $db_cmsmat ) && sizeof( $db_cmsmat ) ) $db_cmsmat = array_shift($db_cmsmat);
@@ -492,7 +492,7 @@ class CMS extends CompressableService
 	 * @param string $field
 	 * @return string|NULL
 	 */
-	public function & navigation( $selector, $field = 'Url' )
+	public function & navigation($selector, $field = 'Url')
 	{	
 		$cmsnav = null;
 		
@@ -529,6 +529,7 @@ class CMS extends CompressableService
 	 * @param mixed $selector 	CMSNav selector
 	 * @param string $field		CMSNav field name for searching
 	 * @param string $handler	External handler
+     * @return array
 	 */
 	public function & navmaterials( $selector, $field = 'Url', $handler = null )
 	{
@@ -616,7 +617,7 @@ class CMS extends CompressableService
 		$t_name = '_mf';		
 		
 		// Perform db query to get all possible material fields
-		if( dbQuery('field')->Active(1)->exec($this->material_fields)) foreach ($this->material_fields as $db_field)
+		if( dbQuery('field')->Active(1)->Name('', dbRelation::NOT_EQUAL)->exec($this->material_fields)) foreach ($this->material_fields as $db_field)
 		{
 			// Add additional field localization condition
 			if ($db_field->local==1) $equal = '(('.$t_name.'.FieldID = '.$db_field->id.')&&('.$t_name.".locale = '".locale()."'))";	
