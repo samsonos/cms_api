@@ -9,9 +9,9 @@ before_script:
   - travis_retry composer install --prefer-source --no-interaction --dev
 
 script: 
- - vendor/bin/phpunit --verbose
  - mkdir -p build/logs
  - vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+ - vendor/bin/phpunit --verbose
 
 after_script:
- - php vendor/bin/coveralls -v
+ - vendor/bin/coveralls -v
