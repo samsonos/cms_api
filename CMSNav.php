@@ -286,7 +286,12 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
 				return $db_cmsmat;
 	}	
 	
-	public function isCurrent( $output = '' ){ if( in_array( url()->text().'/', $this->url_base) ) { echo $output; return TRUE; } return FALSE; }	
+	public function isCurrent( $output = '' ){
+        if( in_array( url()->text().'/', $this->url_base) ) {
+            echo $output; return TRUE;
+        }
+        return FALSE;
+    }
 	
 	
 	public function __call( $name, $arguments )
@@ -343,7 +348,6 @@ class CMSNav extends structure implements  \Iterator, idbLocalizable
                 ->join('children', get_class($this))
                 ->join('parents_relations', null, true)
                 ->join('parents', get_class($this))
-                ->order_by('Name')
                 ->first( $cmsnav )) {
 
                 if (isset($cmsnav->onetomany['_children'])) {
