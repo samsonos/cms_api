@@ -14,6 +14,7 @@ class CMSMainTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $stack[count($stack)-1]);
         $this->assertEquals(1, count($stack));
 
+		// Change to make push
         $this->assertEquals('foo', array_pop($stack));
         $this->assertEquals(0, count($stack));
     }
