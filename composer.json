@@ -10,7 +10,8 @@
 
 	},
     "require-dev": {
-        "phpunit/phpunit": "4.1.*"
+        "phpunit/phpunit": "4.1.*",
+		"satooshi/php-coveralls": "dev-master"
     },
     "license":"Open Software License (OSL) v 3.0",
 	"homepage":"http://samsonos.com/"
