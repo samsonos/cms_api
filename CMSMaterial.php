@@ -41,16 +41,17 @@ class CMSMaterial extends material implements idbLocalizable, iModuleViewable
 	 * @param string $group_by		Request group by params
 	 * @param mixed $handler		External query handler
 	 * @param mixed $handler_params	External query handler additional parameters
+     * @param array $class_name     ss
 	 * @return array CMSMaterial collection by specified request parameters
 	 */	
 	public static function & get( 
-			array $field_value = null, 
-			$db_cmsnav = null, 
-			$draft = null, 
-			$published = null, 
-			$order_by = null, 
-			$limit = null, 
-			$group_by = null, 
+			array $field_value = null,
+			$db_cmsnav = null,
+			$draft = null,
+			$published = null,
+			$order_by = null,
+			$limit = null,
+			$group_by = null,
 			$handler  = null,
 			$handler_params = array(),
             $class_name = null)
