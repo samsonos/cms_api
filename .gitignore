@@ -1,6 +1,7 @@
 .buildpath
 .project
 .settings*
+.idea
 .idea/*
 cache/*
 vendor/*
