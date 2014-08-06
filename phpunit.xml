@@ -20,9 +20,13 @@
         <whitelist addUncoveredFilesFromWhitelist="false">
             <directory suffix=".php">.</directory>
             <exclude>
-                <directory suffix=".php">vendor</directory>
-				<directory suffix=".php">tests</directory>
+                <directory suffix=".php">./vendor</directory>
+		<directory suffix=".php">./tests</directory>
             </exclude>
         </whitelist>
     </filter>
+    
+    <logging>
+        <log type="coverage-clover" target="build/logs/clover.xml"/>
+    </logging>
 </phpunit>
