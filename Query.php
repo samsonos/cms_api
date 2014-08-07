@@ -30,11 +30,36 @@ class Query extends \samson\activerecord\Query
     protected function & execute( & $result = null, $r_type = false, $limit = null, $handler = null, $handler_args = array() )
     {
         // Add additional material fields
+        // Here we need ability to create custom select statement
 
+        // Convert query fields collection to SQL select statement
+        $select = implode(',', $this->queryFields);
 
         // Call standard execution logic
         return parent::execute($result, $r_type, $limit, $handler, $handler_args);
     }
+
+
+    /**
+     * Add additional field condition to query.
+     *
+     * Function checks if db schema supports this field and
+     * automatically ads this field to query fields so it
+     * will be available in result object
+     *
+     * @param string $name      Additional field name
+     * @param string $value     Additional field value
+     * @param string $condition Additional field condition
+     *
+     * @return $this Chaining
+     */
+    public function field($name, $value, $condition = dbRelation::EQUAL)
+    {
+
+
+        return $this;
+    }
+
 
     /**
      * Add CMSMaterial field to query to get this field filled in an object
@@ -56,6 +81,8 @@ class Query extends \samson\activerecord\Query
 
         // Convert arguments array to keys and perform keys match from db table scheme
         $this->queryFields = array_merge($this->queryFields, array_intersect_key(self::$fields, array_flip($fields)));
+
+        return $this;
     }
 
     /**
