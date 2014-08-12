@@ -33,15 +33,6 @@ class CMS extends CompressableService
         /** @var \samson\activerecord\structure[] $countData */
         $countData = null;
 
-        // TODO: Make activerecord generate such kind of SQL code
-        // Quickiest possible query
-        /*$sql = "SELECT s.Url, COUNT(m.materialid) as __COUNT
-        FROM structure as s
-        JOIN structurematerial as sm ON sm.structureid = s.structureid
-        JOIN material as m ON sm.materialid = m.materialid
-        WHERE s.Url in ('plants', 'services', 'products') AND m.Active = 1 AND m.Published = 1 AND m.Draft = 0
-        GROUP BY s.url";*/
-
         // Perform db request to get materials count by passed structure selectors
         if (dbQuery('structure')
             ->cond($selector, $selectors)
@@ -66,65 +57,49 @@ class CMS extends CompressableService
     }
 
     /**
+     * Generic optimized method to find materials by structures
+     * with ability to add custom external db request handler.
      *
-     * @param array  $selectors
-     * @param string $selector
+     * Method makes two requests and performs them as quick as possible
      *
-     * @return \samson\activerecord\dbQuery
+     * @param        $structures    Identifier of structure, or collection of them
+     * @param array  $materials     Collection  where results will be returned
+     * @param string $className     Class name of final result objects, must be Material ancestor
+     * @param callable $handler     External function to change generic query(add conditions and etc.)
+     * @param array  $handlerParams External handler additional parameters collection to pass to handler
+     *
+     * @return bool True if materials ancestors has been found
      */
-    public static function getMaterialsByStructuresQuery($class, $selectors, & $results = array(), $fields = array(), $sql = array(), $selector = 'Url')
+    public static function getMaterialsByStructures($structures, & $materials = array(), $className = 'samson\cms\cmsmaterial', $handler = null, array $handlerParams = array())
     {
-        // If not array is passed
-        if(!is_array($selectors)) {
-            // convert it to array
-            $selectors = array($selectors);
-        }
+        // Create query to get materials for current structure
+        $query = dbQuery('samson\cms\cmsnavmaterial')
+            ->cond('StructureID', is_array($structures) ? $structures : array($structures)) // If not array of structures is passed - create it
+            ->join('material')
+            ->cond('material_Draft', 0)
+            ->cond('material_Active', 1)
+            ->cond('material_Published', 1)
+            ->group_by('MaterialID');
 
-        // Get only necessary fields
-        $fields = array_intersect_key(self::$fields, array_flip($fields));
-
-        // Create additional fields collection
-        $objectFields = array_merge(array_combine(array_keys($fields), array_keys($fields)), array_combine(array_keys(self::$materialAttributes),array_keys(self::$materialAttributes)) );
-
-        // Build SQL select statement fields from attributes
-        $select = array();
-        foreach(self::$materialAttributes as $attribute) {
-            $select[] = 'material.'.$attribute;
-        }
-
-        // Create SQL query
-        $sql = "SELECT ".implode(',', $fields).", ".implode(',', $select)."
-        FROM structure as s
-        JOIN structurematerial as sm ON sm.structureid = s.structureid
-        JOIN material ON sm.MaterialID = material.MaterialID
-        JOIN materialfield as _mf ON material.MaterialID = _mf.MaterialID
-        JOIN gallery as g ON material.MaterialID = g.MaterialID
-        WHERE s.".$selector." in (".implode(',', $selectors).")
-        AND material.Active = 1
-        AND material.Published = 1
-        AND material.Draft = 0
-        GROUP BY material.MaterialID";
-
-        /*
-         * TODO: Make this possible in active record - you path request and objects data in some format and it works
-         * also make easy configuration of SQL select, join, where statement to avoid direct SQL syntax
-         */
-        $rows = db()->query($sql);
-        if (sizeof($rows)) {
-
-            // Pointer to current main object identifier
-            $currentId = $rows[0]['MaterialID'];
-
-            // Iterate all structures
-            foreach ($rows as & $row) {
-
-                // Create object from database row with needed fields
-                $results[] = db()->createObject($class, $row['MaterialID'], $objectFields, $row);
+        // If external request handler is passed - use it
+        if (is_callable($handler)) {
+            // Call external query handler
+            if (call_user_func_array($handler, array_merge(array(&$query), $handlerParams)) === false) {
+                // Someone else has failed my lord
+                return false;
             }
         }
 
-        // if 0 - We have failed my lord...
-        return sizeof($results);
+        // Perform request to find all matched material ids
+        if ($query->fieldsNew('MaterialID', $ids)) {
+            // Perform CMSMaterial request with handlers
+            if (dbQuery($className)->MaterialID($ids)->join('samson\cms\cmsgallery')->exec($materials)) {
+                return true;
+            }
+        }
+
+        //I have failed my lord
+        return false;
     }
 
     /** Identifier */
@@ -353,9 +328,11 @@ class CMS extends CompressableService
         new TableRelation( 'structurematerial', 'materialfield', 'MaterialID', TableRelation::T_ONE_TO_MANY  );
         new TableRelation( 'structurematerial', 'material', 'MaterialID', TableRelation::T_ONE_TO_MANY  );
         new TableRelation( 'structure', 'material', 'structurematerial.MaterialID', TableRelation::T_ONE_TO_MANY, null, 'manymaterials');
+        new TableRelation( 'structure', 'gallery', 'structurematerial.MaterialID', TableRelation::T_ONE_TO_MANY, null, 'manymaterials');
         /*new TableRelation( 'structure', 'material', 'MaterialID' );*/
         new TableRelation( 'structure', 'user', 'UserID' );
-        new TableRelation( 'structure', 'structurematerial', 'StructureID' );
+        new TableRelation( 'structure', 'materialfield', 'material.MaterialID', TableRelation::T_ONE_TO_MANY, 'MaterialID', '_mf');
+        new TableRelation( 'structure', 'structurematerial', 'StructureID', TableRelation::T_ONE_TO_MANY );
         new TableRelation( 'related_materials', 'material', 'first_material', TableRelation::T_ONE_TO_MANY, 'MaterialID' );
         new TableRelation( 'related_materials', 'materialfield', 'first_material', TableRelation::T_ONE_TO_MANY, 'MaterialID' );
         new TableRelation( 'field', 'structurefield', 'FieldID' );
@@ -768,6 +745,11 @@ class CMS extends CompressableService
         }
         CMSMaterial::$_sql_from['this'] .= "\n".'LEFT JOIN '.dbMySQLConnector::$prefix.'materialfield as '.$t_name.' on '.dbMySQLConnector::$prefix.'material.MaterialID = '.$t_name.'.MaterialID';
         CMSMaterial::$_own_group[] = dbMySQLConnector::$prefix.'material.MaterialID';
+
+        // Store additional fields by their name
+        foreach($this->material_fields as $id => $field) {
+            Query::$fields[$field->Name] = $field;
+        }
     }
 
     /** @see \samson\core\ExternalModule::init() */
