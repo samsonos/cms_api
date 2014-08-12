@@ -745,11 +745,6 @@ class CMS extends CompressableService
         }
         CMSMaterial::$_sql_from['this'] .= "\n".'LEFT JOIN '.dbMySQLConnector::$prefix.'materialfield as '.$t_name.' on '.dbMySQLConnector::$prefix.'material.MaterialID = '.$t_name.'.MaterialID';
         CMSMaterial::$_own_group[] = dbMySQLConnector::$prefix.'material.MaterialID';
-
-        // Store additional fields by their name
-        foreach($this->material_fields as $id => $field) {
-            Query::$fields[$field->Name] = $field;
-        }
     }
 
     /** @see \samson\core\ExternalModule::init() */
