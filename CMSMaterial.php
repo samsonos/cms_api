@@ -7,9 +7,9 @@ use samson\activerecord\dbQuery;
 
 use samson\core\iModuleViewable;
 use samson\activerecord\CacheTable;
-use Samson\ActiveRecord\idbQuery;
-use Samson\ActiveRecord\dbConditionArgument;
-use Samson\ActiveRecord\dbConditionGroup;
+use samson\activerecord\idbQuery;
+use samson\activerecord\dbConditionArgument;
+use samson\activerecord\dbConditionGroup;
 use samson\activerecord\dbRecord;
 use samson\activerecord\idbLocalizable;
 use samson\activerecord\material;
