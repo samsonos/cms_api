@@ -9,5 +9,3 @@ require __DIR__.'/vendor/autoload.php';
 
 /** Set The Default Timezone */
 date_default_timezone_set('UTC');
-
-echo 'test';
