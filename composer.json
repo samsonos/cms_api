@@ -14,5 +14,12 @@
         "phpunit/dbunit": ">=1.2"
     },
     "license":"Open Software License (OSL) v 3.0",
-	"homepage":"http://samsonos.com/"
+	"homepage":"http://samsonos.com/",
+    "autoload": {
+        "classmap": ["src/"],
+        "psr-0": {
+            "samsonos\\cms\\": "src/"
+        },
+        "files": ["src/global.php"]
+    }
 }
