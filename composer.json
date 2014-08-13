@@ -1,7 +1,7 @@
 {
 	"name":"samsonos/cms_api",
 	"author":"Vitaly Iegorov <egorov@samsonos.com>",
-    "description":"SamsonCMS API module"
+    "description":"SamsonCMS API module",
     "minimum-stability":"dev",
 	"require":
 	{
