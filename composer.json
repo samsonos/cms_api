@@ -1,13 +1,11 @@
 {
 	"name":"samsonos/cms_api",
 	"author":"Vitaly Iegorov <egorov@samsonos.com>",
+    "description":"SamsonCMS API module"
     "minimum-stability":"dev",
-	"version":"0.0.1",
 	"require":
 	{
-		"samsonos/php_activerecord":"*",
-		"samsonos/js_md5":"*"
-
+		"samsonos/php_activerecord":"*"
 	},
     "require-dev": {
         "phpunit/phpunit": "4.1.*",
