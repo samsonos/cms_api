@@ -63,9 +63,10 @@ class Navigation extends structure implements  \Iterator
 
     public $children = array();
 
+    /** @var string Navigation string identifier */
+    public $Url;
 
     protected $url_base = '';
-
 
     protected $level = 0;
 

@@ -1,13 +1,7 @@
 <?php 
 namespace samson\cms; 
 
-//trace('cmsmaterial');
-
-use samson\activerecord\dbQuery;
-
 use samson\core\iModuleViewable;
-use samson\activerecord\CacheTable;
-use samson\activerecord\idbQuery;
 use samson\activerecord\dbConditionArgument;
 use samson\activerecord\dbConditionGroup;
 use samson\activerecord\dbRecord;

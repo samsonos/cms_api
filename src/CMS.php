@@ -3,8 +3,6 @@ namespace samson\cms;
 
 use samson\activerecord\dbRelation;
 use samson\activerecord\TableRelation;
-
-use samson\activerecord\CacheTable;
 use samson\activerecord\material;
 use samson\core\CompressableService;
 use samson\activerecord\dbRecord;
@@ -30,7 +28,7 @@ class CMS extends CompressableService
         /** @var integer[] $results Collection of materials count grouped by selectors as array keys */
         $results = array_flip($selectors);
 
-        /** @var \samson\activerecord\structure[] $countData */
+        /** @var Navigation[] $countData */
         $countData = null;
 
         // Perform db request to get materials count by passed structure selectors
@@ -62,19 +60,22 @@ class CMS extends CompressableService
      *
      * Method makes two requests and performs them as quick as possible
      *
-     * @param        $structures    Identifier of structure, or collection of them
-     * @param array  $materials     Collection  where results will be returned
-     * @param string $className     Class name of final result objects, must be Material ancestor
-     * @param callable $handler     External function to change generic query(add conditions and etc.)
-     * @param array  $handlerParams External handler additional parameters collection to pass to handler
+     * @param mixed     $structures     Identifier of structure, or collection of them
+     * @param array     $materials      Collection  where results will be returned
+     * @param string    $className      Class name of final result objects, must be Material ancestor
+     * @param callable  $handler        External function to change generic query(add conditions and etc.)
+     * @param array     $handlerParams  External handler additional parameters collection to pass to handler
      *
      * @return bool True if materials ancestors has been found
      */
     public static function getMaterialsByStructures($structures, & $materials = array(), $className = 'samson\cms\cmsmaterial', $handler = null, array $handlerParams = array())
     {
+        // If not array of structures is passed - create it
+        $structures = is_array($structures) ? $structures : array($structures);
+
         // Create query to get materials for current structure
         $query = dbQuery('samson\cms\cmsnavmaterial')
-            ->cond('StructureID', is_array($structures) ? $structures : array($structures)) // If not array of structures is passed - create it
+            ->cond('StructureID', $structures)
             ->join('material')
             ->cond('material_Draft', 0)
             ->cond('material_Active', 1)
@@ -91,9 +92,10 @@ class CMS extends CompressableService
         }
 
         // Perform request to find all matched material ids
+        $ids = array();
         if ($query->fieldsNew('MaterialID', $ids)) {
             // Perform CMSMaterial request with handlers
-            if (dbQuery($className)->MaterialID($ids)->join('samson\cms\cmsgallery')->exec($materials)) {
+            if (dbQuery($className)->cond('MaterialID', $ids)->join('samson\cms\cmsgallery')->exec($materials)) {
                 return true;
             }
         }
