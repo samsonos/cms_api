@@ -77,9 +77,7 @@ class CMS extends CompressableService
         $query = dbQuery('samson\cms\cmsnavmaterial')
             ->cond('StructureID', $structures)
             ->join('material')
-            ->cond('material_Draft', 0)
             ->cond('material_Active', 1)
-            ->cond('material_Published', 1)
             ->group_by('MaterialID');
 
         // If external request handler is passed - use it
