@@ -666,7 +666,6 @@ class CMS extends CompressableService
 
             cmsapi_template();
         }
-        else cmsapi_e404();
     }
 
     public function buildNavigation()
@@ -763,9 +762,6 @@ class CMS extends CompressableService
     /** Constructor */
     public function __construct( $path = null )
     {
-        // Установим обработчик e404
-        s()->e404( array( $this, 'e404' ) );
-
         parent::__construct( $path );
     }
 }
