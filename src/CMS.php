@@ -130,8 +130,8 @@ class CMS extends CompressableService
 		  `TName` varchar(255) NOT NULL,
 		  `Email` varchar(255) NOT NULL,
 		  `Password` varchar(255) NOT NULL,
-		  `md5_Email` varchar(255) NOT NULL,
-		  `md5_Password` varchar(255) NOT NULL,
+		  `md5_email` varchar(255) NOT NULL,
+		  `md5_password` varchar(255) NOT NULL,
 		  `Created` datetime NOT NULL,
 		  `Modyfied` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 		  `GroupID` int(11) NOT NULL,
@@ -684,7 +684,6 @@ class CMS extends CompressableService
 
             cmsapi_template();
         }
-        else cmsapi_e404();
     }
 
     public function buildNavigation()
@@ -781,9 +780,6 @@ class CMS extends CompressableService
     /** Constructor */
     public function __construct( $path = null )
     {
-        // Установим обработчик e404
-        s()->e404( array( $this, 'e404' ) );
-
         parent::__construct( $path );
     }
 }
