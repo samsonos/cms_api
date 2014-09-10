@@ -282,6 +282,7 @@ class CMS extends CompressableService
 		  KEY `MaterialID` (`MaterialID`)
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
+        // SQL комманда на создание таблицы связей между структурами
         $sql_structure_relation = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."structure_relation` (
 		  `structure_relation_id` int(11) NOT NULL AUTO_INCREMENT,
 		  `parent_id` int(11) NOT NULL,
@@ -539,6 +540,23 @@ class CMS extends CompressableService
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` ADD  `structure_id` INT( 255 ) NOT NULL AFTER  `Active`');
     }
 
+    public function migrate_8_to_9()
+    {
+        elapsed('Adding `filter` table');
+        elapsed('Adding `filtered` field into `field` table');
+        // SQL комманда на создание таблицы фильтров
+        $sql_filter = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."filter` (
+		  `filter_id` int(11) NOT NULL AUTO_INCREMENT,
+		  `field_id` int(11) NOT NULL,
+		  `value` varchar(255) NOT NULL,
+		  `locale` VARCHAR( 10 ) NOT NULL,
+		  PRIMARY KEY (`filter_id`)
+		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+        db()->simple_query($sql_filter);
+
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field` ADD  `filtered` INT( 10 ) NOT NULL AFTER  `local`');
+    }
+
     /**
      * Get CMSMaterial by selector
      * Field to search for can be specified, by default search if performed by URL field
@@ -625,12 +643,12 @@ class CMS extends CompressableService
      * @param string $handler	External handler
      * @return array
      */
-    public function & navmaterials( $selector, $field = 'Url', $handler = null )
+    public function & navmaterials($selector, $field = 'Url', $handler = null)
     {
         $result = array();
 
         // Find CMSNav
-        if( null !== ($db_nav = $this->navigation( $selector, $field )) )
+        if(null !== ($db_nav = $this->navigation($selector, $field)))
         {
             // Get material ids from structure materials records
             $ids = array();
