@@ -46,9 +46,12 @@ class CMS extends CompressableService
                 // Check if we have this structure in results array
                 if (isset($results[$result->Url])) {
                     // Store materials count
-                    $results[$result->Url] = $result->__Count;
+                    $results[$result->Url.'Count'] = $result->__Count;
                 }
             }
+        }
+		foreach ($selectors as $select) {
+            unset($results[$select]);
         }
 
         return $results;
