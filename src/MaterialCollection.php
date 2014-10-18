@@ -9,8 +9,14 @@ namespace samson\cms;
 
 use samson\core\iModuleViewable;
 
-
-class MaterialCollection implements \Iterator, iModuleViewable
+/**
+ * This class is a generic approach for rendering catalogs and lists
+ * of materials, it should be extended to match needs of specific
+ * project.
+ *
+ * @package samson\cms
+ */
+abstract class MaterialCollection implements \Iterator, iModuleViewable
 {
     /** @var string Path to collection block view */
     protected $indexView;
@@ -18,7 +24,10 @@ class MaterialCollection implements \Iterator, iModuleViewable
     /** @var string Path to collection item view */
     protected $itemView;
 
-    /** @var Product[] Collection of products */
+    /** @var callable External handler for rendering material item */
+    protected $materialRenderer;
+
+    /** @var Material[] Collection of products */
     protected $collection = array();
 
     /**
@@ -45,10 +54,7 @@ class MaterialCollection implements \Iterator, iModuleViewable
      * Fill collection with items
      * @return Product[] Collection of product items
      */
-    public function fill()
-    {
-        return $this->collection;
-    }
+    public abstract function fill();
 
     /**
      * Generic collection constructor
