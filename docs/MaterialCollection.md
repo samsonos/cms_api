@@ -40,7 +40,8 @@ Created hundreds of projects we have added generic implementation for ```Materia
 way in project
 
 This class has two additional fields:
-* ```indexView``` - path to block view file
+* ```indexRenderer``` - external callable which is responsible for rendering block, rendered inner block contents is 
+passed by reference.
 * ```itemRenderer``` - external callable which is responsible for rendering block item, item object is passed to it
  by reference.
  Also this class has implementation of ```render()``` method which is covering most of the cases. 
@@ -55,11 +56,72 @@ we need to show this block differently in two places.
 
 > So, if your block *database* logic is equivalent but design for views is different, don't be shy and parametrize this by adding
 > view parameter.
- 
+
+So we have created two classes:
+* ```ProductCollection``` - which is generic material collection implementation in our project
+* ```CategoryProductCollection``` - which is specific implementation of filtered collection
+
 ```php
 namespace mynamespace;
 
-class CategoryProductCollection extends \samson\cms\GenericMaterialCollection
+class ProductCollection extends \samson\cms\GenericMaterialCollection
+{
+    /** @var string Block view file */
+    protected $indexView;
+
+    /** @var string Item view file */
+    protected $itemView;
+
+    /**
+     * Block renderer
+     * @param string $itemsHTML Block inner rendered content
+     * @return string Rendered product block
+     */
+    protected function indexRenderer($itemsHTML)
+    {
+        return m()->view($this->indexView)->items($itemsHTML)->output();
+    }
+
+    /**
+     * Product item renderer
+     * @param Product $item Product for rendering
+     * @return string Rendered product item
+     */
+    protected function itemRenderer(Product & $item)
+    {
+        m()->view($this->itemView);
+
+        // Set image if it exists
+        if (isset($item->gallery[0])) {
+            m()->img(str_replace('cms/upload/', 'cms/upload/mini/', $item->gallery[0]));
+        }
+
+        // Set minimal quantity for html
+        if($item->Остаток < 1) {
+            m()->remains(1);
+        }
+
+        // Render product
+        return m()
+            ->class('class')
+            ->cmsmaterial($item)
+            ->output();
+    }
+
+    public function __construct($indexView, $itemView)
+    {
+        $this->indexView = $indexView;
+        $this->itemView = $itemView;
+
+        parent::__construct(array($this, 'indexRenderer'), array($this, 'itemRenderer'));
+    }
+}
+```
+
+```php
+namespace mynamespace;
+
+class CategoryProductCollection extends ProductCollection
 {
     /** @var int Collection maximum size */
     protected $limit = 4;
