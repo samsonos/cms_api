@@ -18,53 +18,34 @@ use samson\core\iModuleViewable;
  */
 abstract class MaterialCollection implements \Iterator, iModuleViewable
 {
-    /** @var string Path to collection block view */
-    protected $indexView;
-
-    /** @var string Path to collection item view */
-    protected $itemView;
-
-    /** @var callable External handler for rendering material item */
-    protected $materialRenderer;
-
     /** @var Material[] Collection of products */
     protected $collection = array();
+
+    /**
+     * Render material collection block
+     * @return string Rendered material collection block
+     */
+    public abstract function render();
+
+    /**
+     * Fill collection with items
+     * @return Material[] Collection of product items
+     */
+    public abstract function fill();
 
     /**
      * Render products collection block
      */
     public function toView($prefix = null, array $restricted = array())
     {
-        $html = '';
-
-        // Do not render block if there is no items
-        if (sizeof($this->collection)) {
-            // Render all block items
-            foreach ($this->collection as $product) {
-                $html .= $product->renderPreview($this->itemView, '');
-            }
-            // Render block view
-            $html = m()->view($this->indexView)->items($html)->output();
-        }
-
-        return array($prefix.'html' => $html);
+        return array($prefix.'html' => $this->render());
     }
-
-    /**
-     * Fill collection with items
-     * @return Product[] Collection of product items
-     */
-    public abstract function fill();
 
     /**
      * Generic collection constructor
      */
-    public function __construct($indexView, $itemView = 'product/item')
+    public function __construct()
     {
-        $this->indexView = $indexView;
-
-        $this->itemView = $itemView;
-
         // Call internal method to fill collection
         $this->collection = call_user_func_array(array($this, 'fill'), func_get_args());
     }
