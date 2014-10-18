@@ -5,15 +5,13 @@ use samson\core\iModuleViewable;
 use samson\activerecord\dbConditionArgument;
 use samson\activerecord\dbConditionGroup;
 use samson\activerecord\dbRecord;
-use samson\activerecord\idbLocalizable;
-use samson\activerecord\material;
 
 /**
  * Class for managing CMS material with all related data
  * @author Vitaly Iegorov <egorov@samsonos.com>
  * @version 0.9.1
  */
-class CMSMaterial extends material implements idbLocalizable, iModuleViewable
+class CMSMaterial extends Material implements iModuleViewable
 {
     public $class_name = 'material';
 
