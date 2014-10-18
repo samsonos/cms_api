@@ -43,7 +43,7 @@ actually ```samson\cms\Material``` ancestor with two available parameters:
 * ```indexView``` - We added this parameter to make our custom material collection even more flexible, in our project
 we need to show this block differently in two places.
 
-> So, if you block *database* logic is equivalent but view differs, don't be shy and parametrize this by adding
+> So, if your block *database* logic is equivalent but design for views is different, don't be shy and parametrize this by adding
 > view parameter.
  
 ```php
