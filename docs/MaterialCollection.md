@@ -19,11 +19,28 @@ extended and implemented in your specific projects. Main function is ```fill()``
 and should be implement. It is responsible for filling the collection of your ```samson\cms\Material```
 ancestors. 
 
+Main purpose of this class is to give ability to quickly create backend for showing some blocks with materials,
+which must be filtered and showed with some logic dependently on specific project. For this purposes class
+has two rendering fields, so we have *blocks* which consists of *items*:
+* ```indexView``` - Path to block index view file
+* ```itemView``` - Path to material item index view file
+
+#Passing material collection to view
+This class implements ```\samson\core\iModuleViewable``` for giving ability
+to pass this object to views immediately after creation, also prefixes can
+be used to get access to multiple MaterialCollections while rendering one view.
+```php
+m()->view('product/catalog')->items(new MaterialCollection())
+```
+And then rendered version of this ```MaterialCollection``` or its ancestor class
+will be available via ```items_html``` view variable.
+
+#Real world example
 Example of custom MaterialCollection implementation which is creating collection of ```Product``` who is
 actually ```samson\cms\Material``` ancestor with two available parameters:
-* ```category``` - Which is ```samson\cms\Navigation``` idetifier to filter material collection
-* ```limit``` - Maximum size of collection, in real projects you always need to show limited block 
- with materials as needed by design
+* ```category``` - Which is ```samson\cms\Navigation``` identifier to filter material collection.
+* ```limit``` - Maximum size of collection, in real projects you always need to show blocks with limited
+materials as needed by design.
  
 ```php
 namespace mynamespace;
@@ -76,12 +93,3 @@ class CategoryProductCollection extends \samson\cms\MaterialCollection
 }
 ```
 
-#Passing material collection to view
-This class implements ```\samson\core\iModuleViewable``` for giving ability
-to pass this object to views immediately after creation, also prefixes can
-be used to get access to multiple MaterialCollections while rendering one view.
-```php
-m()->view('product/catalog')->items(new MaterialCollection())
-```
-And then rendered version of this ```MaterialCollection``` or its ancestor class
-will be available via ```items_html``` view variable.
