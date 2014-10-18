@@ -20,10 +20,8 @@ and should be implemented. It is responsible for filling the collection of your 
 ancestors. 
 
 Main purpose of this class is to give ability for quick creation of backend for showing some blocks with materials,
-which must be filtered and showed with some logic dependently on specific project. For this purposes class
-has two rendering fields(so we have *blocks* which consists of *items*):
-* ```indexView``` - Path to block index view file
-* ```itemView``` - Path to material item index view file
+which must be filtered and showed with some logic dependently on specific project. For this purposes our class
+has another abstract method ```render()```
 
 ##Passing material collection to view
 This class implements ```\samson\core\iModuleViewable``` for giving ability
@@ -34,6 +32,18 @@ m()->view('product/catalog')->items(new MaterialCollection())
 ```
 And then rendered version of this ```MaterialCollection``` or its ancestor class
 will be available via ```items_html``` view variable.
+
+##Generic implementation
+Created hundreds of projects we have added generic implementation for ```MaterialCollection``` and called it
+```GenericMaterialCollection```, we advice you to use it in your projects as it has all benefits that you can use.
+> We have figured out that in most cases we have *blocks* which consists of *items* and we need to show them in some
+way in project
+
+This class has two additional fields:
+* ```indexView``` - path to block view file
+* ```itemRenderer``` - external callable which is responsible for rendering block item, item object is passed to it
+ by reference.
+ Also this class has implementation of ```render()``` method which is covering most of the cases. 
 
 ##Real world example
 Example of custom MaterialCollection implementation which is creating collection of ```Product``` who is
@@ -69,14 +79,14 @@ class CategoryProductCollection extends \samson\cms\GenericMaterialCollection
         $this->category = $category;
 
         // Call parent constructor
-        parent::__construct($indexView);
+        parent::__construct($indexView, array('Product','render'));
     }
 
     public function dbQueryHelper(&$query)
     {
         // Perform CMSMaterial request with handlers
         $query = $query->join('gallery')
-            ->group_by( 'НомерКартинки' )
+            ->group_by('Number')
             ->notnull('gallery_Src')
             ->limit($this->limit);
     }
@@ -88,7 +98,7 @@ class CategoryProductCollection extends \samson\cms\GenericMaterialCollection
     public function fill()
     {
         // Perform cms material retrieval
-        if (\samson\cms\CMS::getMaterialsByStructures($this->category, $this->collection, '\purpurino\Product', array($this, 'dbQueryHelper'))) {
+        if (\samson\cms\CMS::getMaterialsByStructures($this->category, $this->collection, 'Product', array($this, 'dbQueryHelper'))) {
             // Handle
         }
 

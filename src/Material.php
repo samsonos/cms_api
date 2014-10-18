@@ -5,6 +5,6 @@
  */
 namespace samson\cms;
 
-class Material extends samson\activerecord\material {
+class Material extends \samson\activerecord\material {
 
 } 
