@@ -14,8 +14,8 @@ namespace samson\cms;
  */
 class GenericMaterialCollection extends MaterialCollection
 {
-    /** @var string Path to collection block view */
-    protected $indexView;
+    /** @var callable External handler for rendering material block */
+    protected $indexRenderer;
 
     /** @var callable External handler for rendering material item in block */
     protected $itemRenderer;
@@ -23,9 +23,9 @@ class GenericMaterialCollection extends MaterialCollection
     /**
      * Generic collection constructor
      */
-    public function __construct($indexView, $itemRenderer)
+    public function __construct($indexRenderer, $itemRenderer)
     {
-        $this->indexView = $indexView;
+        $this->indexRenderer = $indexRenderer;
 
         $this->itemRenderer = $itemRenderer;
 
@@ -49,7 +49,7 @@ class GenericMaterialCollection extends MaterialCollection
                 $html .= call_user_func_array($this->itemRenderer, array(&$item));
             }
             // Render block view
-            $html = m()->view($this->indexView)->items($html)->output();
+            $html = call_user_func_array($this->indexRenderer, array(&$html));
         }
 
         return $html;
