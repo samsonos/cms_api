@@ -49,7 +49,7 @@ we need to show this block differently in two places.
 ```php
 namespace mynamespace;
 
-class CategoryProductCollection extends \samson\cms\MaterialCollection
+class CategoryProductCollection extends \samson\cms\GenericMaterialCollection
 {
     /** @var int Collection maximum size */
     protected $limit = 4;
