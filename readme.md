@@ -3,6 +3,9 @@
 
 > This is core classes to interact with SamsonCMS database structure
 
+Read module documentation:
+* [Material collection](https://github.com/samsonos/cms_api/blob/master/docs/MaterialCollection.md)
+
 # Class Filter
 This class has static methods to work with `filter` table. They are:
 * createFilter() method allows you to create new row in `filter` table;
