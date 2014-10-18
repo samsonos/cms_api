@@ -39,8 +39,12 @@ will be available via ```items_html``` view variable.
 Example of custom MaterialCollection implementation which is creating collection of ```Product``` who is
 actually ```samson\cms\Material``` ancestor with two available parameters:
 * ```category``` - Which is ```samson\cms\Navigation``` identifier to filter material collection.
-* ```limit``` - Maximum size of collection, in real projects you always need to show blocks with limited
-materials as needed by design.
+* ```limit``` - Maximum size of collection, in real projects you always need to show blocks with limited amount of items
+* ```indexView``` - We added this parameter to make our custom material collection even more flexible, in our project
+we need to show this block differently in two places.
+
+> So, if you block *database* logic is equivalent but view differs, dont be shy and parametrize this by adding
+> view parameter.
  
 ```php
 namespace mynamespace;
