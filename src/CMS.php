@@ -577,7 +577,20 @@ class CMS extends CompressableService
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield`       ADD INDEX (`FieldID`)');
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure_relation`  ADD INDEX (`parent_id`)');
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure_relation`  ADD INDEX (`child_id`)');
+    }
 
+    // Add system fields
+    public function migrate_10_to_11()
+    {
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` ADD `system` INT(1) NOT NULL DEFAULT 0');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure` ADD `system` INT(1) NOT NULL DEFAULT 0');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field` ADD `system` INT(1) NOT NULL DEFAULT 0');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'user` ADD `system` INT(1) NOT NULL DEFAULT 0');
+
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` DROP `locale`');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` DROP `Teaser`');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` DROP `Keywords`');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` DROP `Description`');
     }
 
     /**
