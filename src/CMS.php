@@ -572,7 +572,7 @@ class CMS extends CompressableService
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure`           ADD INDEX (`UserID`)');
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure`           ADD INDEX (`MaterialID`)');
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field`               ADD INDEX (`UserID`)');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field`               ADD INDEX (`ParentID`');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field`               ADD INDEX (`ParentID`)');
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structurefield`      ADD INDEX (`FieldID`)');
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield`       ADD INDEX (`FieldID`)');
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure_relation`  ADD INDEX (`parent_id`)');
