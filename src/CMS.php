@@ -180,7 +180,7 @@ class CMS extends CompressableService
 		  `TS` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 		  `Active` int(11) NOT NULL,
 		  PRIMARY KEY (`GroupRightID`),
-		  KEY `GroupID` (`GroupID`)
+		  KEY `GroupID` (`GroupID`),
 		  KEY `RightID` (`RightID`)
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;";
 
@@ -221,7 +221,7 @@ class CMS extends CompressableService
 		  `Active` int(11) NOT NULL DEFAULT '1',
 		  `structure_id` int(11) NOT NULL,
 		PRIMARY KEY (`MaterialID`),
-		KEY `Url` (`Url`)
+		KEY `Url` (`Url`),
 		KEY `UserID` (`UserID`),
 		KEY `structure_id` (`structure_id`)
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
@@ -303,7 +303,9 @@ class CMS extends CompressableService
 		  `structure_relation_id` int(11) NOT NULL AUTO_INCREMENT,
 		  `parent_id` int(11) NOT NULL,
 		  `child_id` int(11) NOT NULL,
-		  PRIMARY KEY (`structure_relation_id`)
+		  PRIMARY KEY (`structure_relation_id`),
+		  KEY `parent_id` (`parent_id` ),
+		  KEY `child_id` (`child_id`)
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL table for storing database version
@@ -575,14 +577,22 @@ class CMS extends CompressableService
     /* added index key**/
     public function migrate_9_to_10()
     {
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'user` ADD INDEX (`GroupID`)');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'gallery` ADD INDEX (`MaterialID`)');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'groupright` ADD INDEX (`GroupID`, `RightID`)');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` ADD INDEX (`UserID`, `structure_id`)');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure` ADD INDEX (`ParentID`, `UserID`, `MaterialID`)');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field` ADD INDEX (`ParentID`, `UserID`)');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structurefield` ADD INDEX (`FieldID`)');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield` ADD INDEX (`FieldID`)');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'user`                ADD INDEX (`GroupID`)');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'gallery`             ADD INDEX (`MaterialID`)');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'groupright`          ADD INDEX (`GroupID`)');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'groupright`          ADD INDEX (`RightID`)');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material`            ADD INDEX (`structure_id`)');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material`            ADD INDEX (`UserID`)');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure`           ADD INDEX (`ParentID`)');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure`           ADD INDEX (`UserID`)');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure`           ADD INDEX (`MaterialID`)');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field`               ADD INDEX (`UserID`)');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field`               ADD INDEX (`ParentID`');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structurefield`      ADD INDEX (`FieldID`)');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield`       ADD INDEX (`FieldID`)');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure_relation`  ADD INDEX (`parent_id`)');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure_relation`  ADD INDEX (`child_id`)');
+
     }
 
     /**
