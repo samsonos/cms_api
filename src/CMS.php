@@ -127,7 +127,7 @@ class CMS extends CompressableService
     {
         // SQL команда на добавление таблицы пользователей
         $sql_user = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."user` (
-		  `UserID` int(11) NOT NULL AUTO_INCREMENT,
+              `UserID` int(11) NOT NULL AUTO_INCREMENT,
 		  `FName` varchar(255) NOT NULL,
 		  `SName` varchar(255) NOT NULL,
 		  `TName` varchar(255) NOT NULL,
@@ -558,6 +558,18 @@ class CMS extends CompressableService
         db()->simple_query($sql_filter);
 
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field` ADD  `filtered` INT( 10 ) NOT NULL AFTER  `local`');
+    }
+    /* added index key**/
+    public function migrate_9_to_10()
+    {
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'user` ADD INDEX (`GroupID`)');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'gallery` ADD INDEX (`MaterialID`)');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'groupright` ADD INDEX (`GroupID`, `RightID`)');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` ADD INDEX (`UserID`, `structure_id`)');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure` ADD INDEX (`ParentID`, `UserID`, `MaterialID`)');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field` ADD INDEX (`ParentID`, `UserID`)');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structurefield` ADD INDEX (`FieldID`)');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield` ADD INDEX (`FieldID`)');
     }
 
     /**
