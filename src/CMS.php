@@ -50,7 +50,7 @@ class CMS extends CompressableService
                 }
             }
         }
-		foreach ($selectors as $select) {
+        foreach ($selectors as $select) {
             unset($results[$select]);
         }
 
@@ -141,8 +141,7 @@ class CMS extends CompressableService
 		  `Active` int(11) NOT NULL,
 		  `Online` int(11) NOT NULL,
 		  `LastLogin` datetime NOT NULL,
-		  PRIMARY KEY (`UserID`),
-		  KEY `GroupID` (`GroupID`)
+		  PRIMARY KEY (`UserID`)
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы пользователей
@@ -157,8 +156,7 @@ class CMS extends CompressableService
 		  `Description` text NOT NULL,
 		  `Name` varchar(255) NOT NULL,
 		  `Active` int(11) NOT NULL,
-		  PRIMARY KEY (`PhotoID`),
-		  KEY `MaterialID` (`MaterialID`)
+		  PRIMARY KEY (`PhotoID`)
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы групп пользователей
@@ -179,9 +177,7 @@ class CMS extends CompressableService
 		  `Ban` int(10) NOT NULL,
 		  `TS` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 		  `Active` int(11) NOT NULL,
-		  PRIMARY KEY (`GroupRightID`),
-		  KEY `GroupID` (`GroupID`),
-		  KEY `RightID` (`RightID`)
+		  PRIMARY KEY (`GroupRightID`)
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;";
 
         // SQL команда на добавление таблицы прав пользователей
@@ -221,9 +217,7 @@ class CMS extends CompressableService
 		  `Active` int(11) NOT NULL DEFAULT '1',
 		  `structure_id` int(11) NOT NULL,
 		PRIMARY KEY (`MaterialID`),
-		KEY `Url` (`Url`),
-		KEY `UserID` (`UserID`),
-		KEY `structure_id` (`structure_id`)
+		KEY `Url` (`Url`)
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы навигации
@@ -239,10 +233,7 @@ class CMS extends CompressableService
 		  `PriorityNumber` int(11) NOT NULL,
 		  `Active` int(11) NOT NULL DEFAULT '1',
 		PRIMARY KEY (`StructureID`),
-		KEY `Url` (`Url`),
-		KEY `ParentID` (`ParentID`),
-		KEY `UserID` (`UserID`),
-		KEY `MaterialID` (`MaterialID`)
+		KEY `Url` (`Url`)
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL комманда на создание таблицы связей навигации и материалов
@@ -269,9 +260,7 @@ class CMS extends CompressableService
 		  `Created` datetime NOT NULL,
 		  `Modyfied` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 		  `Active` int(11) NOT NULL,
-		  PRIMARY KEY (`FieldID`),
-		  KEY `ParentID` (`ParentID`),
-		  KEY `UserID` (`UserID`)
+		  PRIMARY KEY (`FieldID`)
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы связей ЄНС с полями
@@ -282,8 +271,7 @@ class CMS extends CompressableService
 		  `Modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 		  `Active` int(11) NOT NULL,
 		  PRIMARY KEY (`StructureFieldID`),
-		  KEY `StructureID` (`StructureID`),
-		  KEY `FieldID` (`FieldID`)
+		  KEY `StructureID` (`StructureID`)
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL комманда на создание таблицы связей материалов и полей
@@ -294,8 +282,7 @@ class CMS extends CompressableService
 		  `Value` text NOT NULL,
 		  `Active` int(11) NOT NULL,
 		  PRIMARY KEY (`MaterialFieldID`),
-		  KEY `MaterialID` (`MaterialID`),
-		  KEY `FieldID` (`FieldID`)
+		  KEY `MaterialID` (`MaterialID`)
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL комманда на создание таблицы связей между структурами
@@ -303,9 +290,7 @@ class CMS extends CompressableService
 		  `structure_relation_id` int(11) NOT NULL AUTO_INCREMENT,
 		  `parent_id` int(11) NOT NULL,
 		  `child_id` int(11) NOT NULL,
-		  PRIMARY KEY (`structure_relation_id`),
-		  KEY `parent_id` (`parent_id` ),
-		  KEY `child_id` (`child_id`)
+		  PRIMARY KEY (`structure_relation_id`)
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL table for storing database version
