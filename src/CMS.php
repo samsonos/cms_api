@@ -14,10 +14,11 @@ class CMS extends CompressableService
      * Get materials count grouped by structure selectors
      * @param mixed  $selectors Collection of structures selectors to group materials
      * @param string $selector  Selector to find structures, [Url] is used by default
+     * @param callable $handler  External handler
      *
      * @return \integer[] Collection where key is structure selector and value is materials count
      */
-    public static function getMaterialsCountByStructures($selectors, $selector = 'Url')
+    public static function getMaterialsCountByStructures($selectors, $selector = 'Url', $handler = null)
     {
         // If not array is passed
         if(!is_array($selectors)) {
@@ -31,8 +32,7 @@ class CMS extends CompressableService
         /** @var Navigation[] $countData */
         $countData = null;
 
-        // Perform db request to get materials count by passed structure selectors
-        if (dbQuery('structure')
+        $query = dbQuery('structure')
             ->cond($selector, $selectors)
             ->add_field('Count(material.materialid)', '__Count', false)
             ->join('structurematerial')
@@ -40,8 +40,13 @@ class CMS extends CompressableService
             ->cond('material_Active', 1)
             ->cond('material_Published', 1)
             ->cond('material_Draft', 0)
-            ->group_by('structureid')
-            ->exec($countData)) {
+            ->group_by('structureid');
+
+        if (is_callable($handler)) {
+            call_user_func($handler, array(& $query));
+        }
+        // Perform db request to get materials count by passed structure selectors
+        if ($query->exec($countData)) {
             foreach ($countData as $result) {
                 // Check if we have this structure in results array
                 if (isset($results[$result->Url])) {
