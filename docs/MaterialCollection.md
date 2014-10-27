@@ -34,8 +34,8 @@ And then rendered version of this ```MaterialCollection``` or its ancestor class
 will be available via ```items_html``` view variable.
 
 ##Generic implementation
-Created hundreds of projects we have added generic implementation for ```MaterialCollection``` and called it
-```GenericMaterialCollection```, we advice you to use it in your projects as it has all benefits that you can use.
+Created hundreds of projects we have added implementation for ```GenericMaterialCollection``` and called it
+```MaterialCollection```, we advice you to use it in your projects as it has all benefits that you can use.
 > We have figured out that in most cases we have *blocks* which consists of *items* and we need to show them in some
 way in project
 
@@ -64,7 +64,7 @@ So we have created two classes:
 ```php
 namespace mynamespace;
 
-class ProductCollection extends \samson\cms\GenericMaterialCollection
+class ProductCollection extends \samson\cms\MaterialCollection
 {
     /** @var string Block view file */
     protected $indexView;

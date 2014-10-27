@@ -3,63 +3,108 @@
  * Created by PhpStorm.
  * User: egorov
  * Date: 18.10.2014
- * Time: 18:02
+ * Time: 11:44
  */
-
 namespace samson\cms;
 
+use samson\core\iModuleViewable;
+
 /**
- * Commonly used MaterialCollection implementation
+ * This class is a generic approach for rendering catalogs and lists
+ * of materials, it should be extended to match needs of specific
+ * project.
+ *
  * @package samson\cms
  */
-class GenericMaterialCollection extends MaterialCollection
+abstract class GenericMaterialCollection implements \Iterator, iModuleViewable
 {
-    /** @var callable External handler for rendering material block */
-    protected $indexRenderer;
-
-    /** @var callable External handler for rendering material item in block */
-    protected $itemRenderer;
-
-    /**
-     * Generic collection constructor
-     */
-    public function __construct($indexRenderer, $itemRenderer)
-    {
-        $this->indexRenderer = $indexRenderer;
-
-        $this->itemRenderer = $itemRenderer;
-
-        // Call parent constructor
-        parent::__construct();
-    }
+    /** @var Material[] Collection of products */
+    protected $collection = array();
 
     /**
      * Render material collection block
      * @return string Rendered material collection block
      */
-    public function render()
-    {
-        $html = '';
-
-        // Do not render block if there is no items
-        if (sizeof($this->collection)) {
-            // Render all block items
-            foreach ($this->collection as &$item) {
-                // Call external block item renderer and pass item to it
-                $html .= call_user_func_array($this->itemRenderer, array(&$item));
-            }
-            // Render block view
-            $html = call_user_func_array($this->indexRenderer, array(&$html));
-        }
-
-        return $html;
-    }
+    public abstract function render();
 
     /**
      * Fill collection with items
      * @return Material[] Collection of product items
      */
-    public function fill(){
-        return $this->collection;
+    public abstract function fill();
+
+    /**
+     * Render products collection block
+     */
+    public function toView($prefix = null, array $restricted = array())
+    {
+        return array($prefix.'html' => $this->render());
     }
-} 
+
+    /**
+     * Generic collection constructor
+     */
+    public function __construct()
+    {
+        // Call internal method to fill collection
+        $this->collection = call_user_func_array(array($this, 'fill'), func_get_args());
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.0.0)<br/>
+     * Return the current element
+     * @link http://php.net/manual/en/iterator.current.php
+     * @return mixed Can return any type.
+     */
+    public function current()
+    {
+        return current($this->collection);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.0.0)<br/>
+     * Move forward to next element
+     * @link http://php.net/manual/en/iterator.next.php
+     * @return void Any returned value is ignored.
+     */
+    public function next()
+    {
+        return next($this->collection);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.0.0)<br/>
+     * Return the key of the current element
+     * @link http://php.net/manual/en/iterator.key.php
+     * @return mixed scalar on success, or null on failure.
+     */
+    public function key()
+    {
+        return key($this->collection);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.0.0)<br/>
+     * Checks if current position is valid
+     * @link http://php.net/manual/en/iterator.valid.php
+     * @return boolean The return value will be casted to boolean and then evaluated.
+     * Returns true on success or false on failure.
+     */
+    public function valid()
+    {
+        $key = key($this->collection);
+
+        return ( $key !== NULL && $key !== FALSE);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.0.0)<br/>
+     * Rewind the Iterator to the first element
+     * @link http://php.net/manual/en/iterator.rewind.php
+     * @return void Any returned value is ignored.
+     */
+    public function rewind()
+    {
+        reset($this->collection);
+    }
+}
