@@ -530,6 +530,60 @@ class CMS extends CompressableService
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` DROP `locale`');
     }
 
+    /**
+     * This migration creates new structure called "SEO" and three new additional fields Description, Title, Keywords
+     * and moves all materials columns values to this new additional fields and then removes columns from
+     * material table
+     */
+    public function migrate_11_to_12()
+    {
+        $this->materialColumnToField('Description', 'seo');
+
+        $structure = null;
+        if(dbQuery('structure')->Name('material')->first($structure)) {
+            $structure->system = 1;
+            $structure->save();
+        }
+
+        $structure = null;
+        if(dbQuery('structure')->Name('seo')->first($structure)) {
+            $structure->system = 1;
+            $structure->save();
+        }
+
+        $field = null;
+        if(dbQuery('field')->Name('Content')->first($field)) {
+            $field->system = 1;
+            $field->save();
+        }
+
+        $field = null;
+        if(dbQuery('field')->Name('Teaser')->first($field)) {
+            $field->system = 1;
+            $field->save();
+        }
+    }
+
+    /**
+     * This migration creates new structure called "SEO" and three new additional fields Description, Title, Keywords
+     * and moves all materials columns values to this new additional fields and then removes columns from
+     * material table
+     */
+    public function migrate_12_to_13()
+    {
+        $this->materialColumnToField('Keywords', 'seo');
+    }
+
+    /**
+     * This migration creates new structure called "SEO" and three new additional fields Description, Title, Keywords
+     * and moves all materials columns values to this new additional fields and then removes columns from
+     * material table
+     */
+    public function migrate_13_to_14()
+    {
+        $this->materialColumnToField('Title', 'seo');
+    }
+
     public function materialColumnToField($column, $structure)
     {
         // Find first user
@@ -606,42 +660,6 @@ class CMS extends CompressableService
         }
 
         db()->simple_query('ALTER TABLE  `material` DROP  `'.$column.'`');
-    }
-
-    /**
-     * This migration creates new structure called "SEO" and three new additional fields Description, Title, Keywords
-     * and moves all materials columns values to this new additional fields and then removes columns from
-     * material table
-     */
-    public function migrate_11_to_12()
-    {
-        $this->materialColumnToField('Description', 'seo');
-        $this->materialColumnToField('Keywords', 'seo');
-        $this->materialColumnToField('Title', 'seo');
-
-        $structure = null;
-        if(dbQuery('structure')->Name('material')->first($structure)) {
-            $structure->system = 1;
-            $structure->save();
-        }
-
-        $structure = null;
-        if(dbQuery('structure')->Name('seo')->first($structure)) {
-            $structure->system = 1;
-            $structure->save();
-        }
-
-        $field = null;
-        if(dbQuery('field')->Name('Content')->first($field)) {
-            $field->system = 1;
-            $field->save();
-        }
-
-        $field = null;
-        if(dbQuery('field')->Name('Teaser')->first($field)) {
-            $field->system = 1;
-            $field->save();
-        }
     }
 
     /**
