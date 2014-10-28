@@ -368,14 +368,13 @@ class CMS extends CompressableService
     public function migrator($to_version = null)
     {
         // If something passed - change database version to it
-        if( func_num_args() )
-        {
+        if( func_num_args() ) {
             // Save current version to special db table
             db()->simple_query("ALTER TABLE  `".dbMySQLConnector::$prefix."cms_version` CHANGE  `version`  `version` VARCHAR( 15 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT  '".$to_version."';");
+            die('Database successfully migrated to ['.$to_version.']');
         }
         // Return current database version
-        else
-        {
+        else {
             $version_row = db()->query('SHOW COLUMNS FROM `'.dbMySQLConnector::$prefix.'cms_version`');
             return $version_row[0]['Default'];
         }
@@ -402,8 +401,8 @@ class CMS extends CompressableService
         db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'uamaterialfield');
 
         elapsed('Removing old group/right tables if they exists table');
-        db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'group');
-        db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'right');
+        db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'`group`');
+        db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'`right`');
         db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'groupright');
         db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'mem_cache');
 
@@ -449,11 +448,12 @@ class CMS extends CompressableService
     public function migrate_4_to_5()
     {
         $this->materialColumnToField('Content', 'material');
-        $this->materialColumnToField('Teaser', 'material');
     }
 
     public function migrate_5_to_6()
     {
+        $this->materialColumnToField('Teaser', 'material');
+
         // Convert all old "date" fields to numeric for fixing db requests
         if (dbQuery('field')->Type(3)->fields('id',$fields)) {
             foreach (dbQuery('materialfield')->FieldID($fields)->exec() as $mf) {
@@ -461,7 +461,6 @@ class CMS extends CompressableService
                 $mf->save();
             }
         }
-
     }
 
     public function migrate_6_to_7()
@@ -532,6 +531,7 @@ class CMS extends CompressableService
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` DROP `Teaser`');
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` DROP `Keywords`');
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` DROP `Description`');
+        die();
     }
 
     public function materialColumnToField($column, $structure)
