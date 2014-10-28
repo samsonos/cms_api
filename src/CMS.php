@@ -385,7 +385,27 @@ class CMS extends CompressableService
     public function migrate_1_to_2()
     {
         elapsed('Removing `Relations` table');
-        db()->simple_query('DROP TABLE '.dbMySQLConnector::$prefix.'relations');
+        db()->simple_query('DROP TABLE IF EXISTS'.dbMySQLConnector::$prefix.'relations');
+
+        elapsed('Removing old localized tables if they exists table');
+        db()->simple_query('DROP TABLE IF EXISTS'.dbMySQLConnector::$prefix.'enstructure');
+        db()->simple_query('DROP TABLE IF EXISTS'.dbMySQLConnector::$prefix.'enstructurematerial');
+        db()->simple_query('DROP TABLE IF EXISTS'.dbMySQLConnector::$prefix.'enstructurefield');
+        db()->simple_query('DROP TABLE IF EXISTS'.dbMySQLConnector::$prefix.'enfield');
+        db()->simple_query('DROP TABLE IF EXISTS'.dbMySQLConnector::$prefix.'enmaterial');
+        db()->simple_query('DROP TABLE IF EXISTS'.dbMySQLConnector::$prefix.'enmaterialfield');
+        db()->simple_query('DROP TABLE IF EXISTS'.dbMySQLConnector::$prefix.'uastructure');
+        db()->simple_query('DROP TABLE IF EXISTS'.dbMySQLConnector::$prefix.'uastructurematerial');
+        db()->simple_query('DROP TABLE IF EXISTS'.dbMySQLConnector::$prefix.'uastructurefield');
+        db()->simple_query('DROP TABLE IF EXISTS'.dbMySQLConnector::$prefix.'uafield');
+        db()->simple_query('DROP TABLE IF EXISTS'.dbMySQLConnector::$prefix.'uamaterial');
+        db()->simple_query('DROP TABLE IF EXISTS'.dbMySQLConnector::$prefix.'uamaterialfield');
+
+        elapsed('Removing old group/right tables if they exists table');
+        db()->simple_query('DROP TABLE IF EXISTS'.dbMySQLConnector::$prefix.'group');
+        db()->simple_query('DROP TABLE IF EXISTS'.dbMySQLConnector::$prefix.'right');
+        db()->simple_query('DROP TABLE IF EXISTS'.dbMySQLConnector::$prefix.'groupright');
+        db()->simple_query('DROP TABLE IF EXISTS'.dbMySQLConnector::$prefix.'mem_cache');
 
         elapsed('Adding `numeric_value` field into `materialfield` table');
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield` ADD  `numeric_value` INT( 255 ) NOT NULL AFTER  `Value`');
@@ -629,7 +649,7 @@ class CMS extends CompressableService
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure`           ADD INDEX (`ParentID`)');
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure`           ADD INDEX (`UserID`)');
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure`           ADD INDEX (`MaterialID`)');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field`               ADD INDEX (`UserID`)');
+        //db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field`               ADD INDEX (`UserID`)');
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field`               ADD INDEX (`ParentID`)');
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structurefield`      ADD INDEX (`FieldID`)');
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield`       ADD INDEX (`FieldID`)');
