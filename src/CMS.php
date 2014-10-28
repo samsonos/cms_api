@@ -528,10 +528,6 @@ class CMS extends CompressableService
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'user` ADD `system` INT(1) NOT NULL DEFAULT 0');
 
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` DROP `locale`');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` DROP `Teaser`');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` DROP `Keywords`');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` DROP `Description`');
-        die();
     }
 
     public function materialColumnToField($column, $structure)
