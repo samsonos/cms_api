@@ -560,6 +560,7 @@ class CMS extends CompressableService
             $dbField->Name = $column;
             $dbField->Type = 8;
             $dbField->Active = 1;
+            $dbField->system = 1;
             $dbField->save();
         }
 
@@ -632,6 +633,18 @@ class CMS extends CompressableService
         if(dbQuery('structure')->Name('seo')->first($structure)) {
             $structure->system = 1;
             $structure->save();
+        }
+
+        $field = null;
+        if(dbQuery('field')->Name('Content')->first($field)) {
+            $field->system = 1;
+            $field->save();
+        }
+
+        $field = null;
+        if(dbQuery('field')->Name('Teaser')->first($field)) {
+            $field->system = 1;
+            $field->save();
         }
     }
 
