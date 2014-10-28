@@ -416,44 +416,6 @@ class CMS extends CompressableService
         elapsed('Removing `Draftmaterial` field from `material` table');
         db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` DROP `Draftmaterial`');
 
-        /*
-
-        // Create additional fields to move
-        $fields = array('Content','Teaser','Keywords','Description','Title');
-        $ids = array();
-        foreach ( $fields as $f)
-        {
-            $field = new \samson\activerecord\field( false );
-            $field->Name = $f;
-            $field->save();
-
-            // Save field id
-            $ids[ $f ] = $field->id;
-        }
-
-        // Iterate existing materials and create material field
-        if( dbQuery('material')->exec( $db_materials ) ) foreach ( $db_materials as $db_material )
-        {
-            foreach ( $ids as $f => $fid )
-            {
-                // Create materialfield entry
-                $mf = new \samson\activerecord\materialfield( false );
-                $mf->MaterialID = $db_material->id;
-                $mf->FieldID = $fid;
-                $mf->Value = $db_material->$f;
-                $mf->save();
-            }
-        }
-        */
-        /*
-        elapsed('Removing data fields from `material` table');
-        db()->simple_query('ALTER TABLE `material` DROP `Teaser`');
-        db()->simple_query('ALTER TABLE `material` DROP `Keywords`');
-        db()->simple_query('ALTER TABLE `material` DROP `Description`');
-        db()->simple_query('ALTER TABLE `material` DROP `Content`');
-        db()->simple_query('ALTER TABLE `material` DROP `Title`');
-        */
-
         elapsed('Changing `'.dbMySQLConnector::$prefix.'material` table columns order');
         db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `Teaser` TEXT AFTER `Content`');
         db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `Published` INT(1) UNSIGNED AFTER `Draft`');
@@ -587,6 +549,7 @@ class CMS extends CompressableService
         }
 
         db()->simple_query('ALTER TABLE  `material` DROP  `Content`');
+        db()->simple_query('ALTER TABLE  `material` DROP  `Teaser`');
     }
 
     public function migrate_5_to_6()
