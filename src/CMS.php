@@ -550,6 +550,7 @@ class CMS extends CompressableService
             $db_structure->Url = '__'.$structure;
             $db_structure->Active = 1;
             $db_structure->UserID = $user->id;
+            $db_structure->system = 1;
             $db_structure->save();
         }
 
@@ -620,6 +621,18 @@ class CMS extends CompressableService
         $this->materialColumnToField('Description', 'seo');
         $this->materialColumnToField('Keywords', 'seo');
         $this->materialColumnToField('Title', 'seo');
+
+        $structure = null;
+        if(dbQuery('structure')->Name('material')->first($structure)) {
+            $structure->system = 1;
+            $structure->save();
+        }
+
+        $structure = null;
+        if(dbQuery('structure')->Name('seo')->first($structure)) {
+            $structure->system = 1;
+            $structure->save();
+        }
     }
 
     /**
