@@ -507,11 +507,11 @@ class CMS extends CompressableService
         // Create Content additional field
         $contentField = null;
         if(!dbQuery('field')->Name('Content')->first($contentField)) {
-            $db_field = new \samson\activerecord\field(false);
-            $db_field->Name = 'Content';
-            $db_field->Type = 8;
-            $db_field->Active = 1;
-            $db_field->save();
+            $contentField = new \samson\activerecord\field(false);
+            $contentField->Name = 'Content';
+            $contentField->Type = 8;
+            $contentField->Active = 1;
+            $contentField->save();
 
             // Create structure field relations
             $db_sf = null;
@@ -527,11 +527,11 @@ class CMS extends CompressableService
         // Create teaser additional field
         $teaserField = null;
         if(!dbQuery('field')->Name('Teaser')->first($teaserField)) {
-            $db_field = new \samson\activerecord\field(false);
-            $db_field->Name = 'Teaser';
-            $db_field->Type = 8;
-            $db_field->Active = 1;
-            $db_field->save();
+            $teaserField = new \samson\activerecord\field(false);
+            $teaserField->Name = 'Teaser';
+            $teaserField->Type = 8;
+            $teaserField->Active = 1;
+            $teaserField->save();
 
             // Create structure field relations
             $db_sf = null;
