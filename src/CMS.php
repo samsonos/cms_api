@@ -459,56 +459,109 @@ class CMS extends CompressableService
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field` ADD  `local` int( 10 ) NOT NULL AFTER  `Type` ;');
     }
 
+    /**
+     * This migration creates new structure called "Материал" and two new additional fields Content and Teaser
+     * and moves all materials columns values to this new additional fields and then removes columns from
+     * material table
+     */
     public function migrate_4_to_5()
     {
-        if(!dbQuery('field')->Name('Content')->first($db_field))
-        {
-            $db_field = new \samson\activerecord\field(false);
-            $db_field->Name = 'Content';
-            $db_field->Type = 8;
-            $db_field->Active = 1;
-            $db_field->save();
+        // Find first user
+        $user = null;
+        if(dbQuery('user')->first($user)) {
+
         }
 
         // Create structure for all materials
+        $db_structure = null;
         if(!dbQuery('structure')->Url('__material')->Active(1)->first($db_structure))
         {
             $db_structure = new \samson\activerecord\structure(false);
             $db_structure->Name = 'Материал';
             $db_structure->Url = '__material';
             $db_structure->Active = 1;
-            if(dbQuery('user')->first($db_user)) $db_structure->UserID = $db_user->id;
+            $db_structure->UserID = $user->id;
             $db_structure->save();
         }
 
-        if(!dbQuery('structurefield')->FieldID($db_field->id)->StructureID($db_structure->id)->Active(1)->first($db_sf))
-        {
-            $db_structurefield = new \samson\activerecord\structurefield(false);
-            $db_structurefield->FieldID = $db_field->id;
-            $db_structurefield->StructureID = $db_structure->id;
-            $db_structurefield->Active = 1;
-            $db_structurefield->save();
+        // Create Content additional field
+        $contentField = null;
+        if(!dbQuery('field')->Name('Content')->first($contentField)) {
+            $db_field = new \samson\activerecord\field(false);
+            $db_field->Name = 'Content';
+            $db_field->Type = 8;
+            $db_field->Active = 1;
+            $db_field->save();
+
+            // Create structure field relations
+            $db_sf = null;
+            if (!dbQuery('structurefield')->FieldID($contentField->id)->StructureID($db_structure->id)->Active(1)->first($db_sf)) {
+                $db_structurefield = new \samson\activerecord\structurefield(false);
+                $db_structurefield->FieldID = $contentField->id;
+                $db_structurefield->StructureID = $db_structure->id;
+                $db_structurefield->Active = 1;
+                $db_structurefield->save();
+            }
         }
 
-        if (dbQuery('material')->Active(1)->Draft(0)->exec($db_materials))
-        {
-            foreach ($db_materials as $db_material) {
-                //if(isset($db_material->Content{0}))
-                {
-                    if (!dbQuery('materialfield')->MaterialID($db_material->id)->FieldID($db_field->id)->Active(1)->first($db_mf)) {
-                        $db_mf = new \samson\activerecord\materialfield(false);
-                        $db_mf->MaterialID = $db_material->id;
-                        $db_mf->FieldID = $db_field->id;
-                        $db_mf->Active = 1;
-                        $db_mf->Value = $db_material->Content;
-                        $db_mf->save();
+        // Create teaser additional field
+        $teaserField = null;
+        if(!dbQuery('field')->Name('Teaser')->first($teaserField)) {
+            $db_field = new \samson\activerecord\field(false);
+            $db_field->Name = 'Teaser';
+            $db_field->Type = 8;
+            $db_field->Active = 1;
+            $db_field->save();
 
-                        $db_sm =new \samson\activerecord\structurematerial(false);
-                        $db_sm->StructureID = $db_structure->id;
-                        $db_sm->MaterialID = $db_material->id;
-                        $db_sm->Active = 1;
-                        $db_sm->save();
-                    }
+            // Create structure field relations
+            $db_sf = null;
+            if(!dbQuery('structurefield')->FieldID($teaserField->id)->StructureID($db_structure->id)->Active(1)->first($db_sf))
+            {
+                $db_structurefield = new \samson\activerecord\structurefield(false);
+                $db_structurefield->FieldID = $teaserField->id;
+                $db_structurefield->StructureID = $db_structure->id;
+                $db_structurefield->Active = 1;
+                $db_structurefield->save();
+            }
+        }
+
+        // Iterate all existing materials
+        $db_materials = array();
+        if (dbQuery('material')->Active(1)->Draft(0)->exec($db_materials)) {
+            foreach ($db_materials as $db_material) {
+
+                // If current material has no connection with new structure
+                $db_sm = null;
+                if (!dbQuery('structurematerial')->StructureID($db_structure->id)->MaterialID($db_material->id)->first($db_sm)) {
+                    // Create this connection
+                    $db_sm = new \samson\activerecord\structurematerial(false);
+                    $db_sm->StructureID = $db_structure->id;
+                    $db_sm->MaterialID = $db_material->id;
+                    $db_sm->Active = 1;
+                    $db_sm->save();
+                }
+
+                // If this material has no Content field right now
+                $db_mf = null;
+                if (!dbQuery('materialfield')->MaterialID($db_material->id)->FieldID($contentField->id)->Active(1)->first($db_mf)) {
+                    // Create Content additional field
+                    $db_mf = new \samson\activerecord\materialfield(false);
+                    $db_mf->MaterialID = $db_material->id;
+                    $db_mf->FieldID = $contentField->id;
+                    $db_mf->Active = 1;
+                    $db_mf->Value = $db_material->Content;
+                    $db_mf->save();
+                }
+
+                // If this material has no Content field right now
+                if (!dbQuery('materialfield')->MaterialID($db_material->id)->FieldID($teaserField->id)->Active(1)->first($db_mf)) {
+                    // Create Content additional field
+                    $db_mf = new \samson\activerecord\materialfield(false);
+                    $db_mf->MaterialID = $db_material->id;
+                    $db_mf->FieldID = $teaserField->id;
+                    $db_mf->Active = 1;
+                    $db_mf->Value = $db_material->Teaser;
+                    $db_mf->save();
                 }
             }
         }
