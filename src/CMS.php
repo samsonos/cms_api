@@ -592,6 +592,7 @@ class CMS extends CompressableService
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` ADD `parent_id` INT(11) NOT NULL DEFAULT 0 AFTER `MaterialID`');
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` ADD `type` INT(1) NOT NULL DEFAULT 0 AFTER `Draft`');
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure` ADD `type` INT(1) NOT NULL DEFAULT 0 AFTER `PriorityNumber`');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field` ADD `UserID` INT(11) NOT NULL DEFAULT 0 AFTER `PriorityNumber`');
     }
 
     public function materialColumnToField($column, $structure)
