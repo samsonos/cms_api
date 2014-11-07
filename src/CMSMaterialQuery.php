@@ -103,9 +103,9 @@ class CMSMaterialQuery extends \samson\activerecord\dbQuery
     	$this
     		->cond( 'Active', 1 )  
     		//->cond( 'locale', locale())  
-    		->join( 'samson\cms\cmsgallery')
+    		->join( 'samson\cms\CMSGallery')
     		->join( 'user')
-    		->join( 'samson\cms\cmsnavmaterial');
+    		->join( 'samson\cms\CMSNavMaterial');
     	//->own_group_by('material.MaterialID');
     }
 }
