@@ -101,7 +101,7 @@ class CMS extends CompressableService
         $ids = array();
         if ($query->fieldsNew('MaterialID', $ids)) {
             // Perform CMSMaterial request with handlers
-            if (dbQuery($className)->cond('MaterialID', $ids)->join('samson\cms\cmsgallery')->exec($materials)) {
+            if (dbQuery($className)->cond('MaterialID', $ids)->join('samson\cms\CMSGallery')->exec($materials)) {
                 return true;
             }
         }

@@ -57,7 +57,7 @@ class CMSMaterial extends Material implements iModuleViewable
         $query = dbQuery($class_name)
         ->cond('Active', 1)
         //->cond('locale', locale())
-        ->join('samson\cms\cmsgallery')
+        ->join('samson\cms\CMSGallery')
         ->join('user')
         ->join('samson\cms\CMSNavMaterial')
         //->own_group_by('material.MaterialID')
