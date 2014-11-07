@@ -730,7 +730,7 @@ class CMS extends CompressableService
         if( $field == 'id' ) $field = 'StructureID';
 
         // Build classname with PHP < 5.3 compatibility
-        $classname = ns_classname('cmsnav', 'samson\cms');
+        $classname = \samson\core\AutoLoader::className('CMSNav', 'samson\cms');
 
         // If instance of CMSNav passed - just return it
         if( is_a( $selector, $classname)) return $selector;
