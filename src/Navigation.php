@@ -107,7 +107,7 @@ class Navigation extends structure implements  \Iterator
     {
         $fields = array();
 
-        if( dbQuery('samson\cms\cmsnavfield')->StructureID($this->id)->Active(1)->exec( $db_fields ) )
+        if( dbQuery('samson\cms\CMSNavField')->StructureID($this->id)->Active(1)->exec( $db_fields ) )
         {
             $id = array();
             foreach ( $db_fields as $db_field ) $id[] = $db_field->FieldID;

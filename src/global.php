@@ -86,17 +86,17 @@ function ifcmsmat( $selector, & $cmsmat = NULL, $field = 'Url' )
 /** @return \samson\cms\Query */
 function cmsquery(){ return new samson\cms\CMSMaterialQuery(); }
 
-/** @return dbQuery */
-function _cmsmaterial(){ return new dbQuery('samson\cms\cmsmaterial'); }
+/** @deprecated @return dbQuery */
+function _cmsmaterial(){ return new dbQuery('samson\cms\CMSMaterial'); }
 
-/** @return dbQuery */
-function _cmsmaterialfield(){	return new dbQuery('samson\cms\cmsmaterialfield'); }
+/** @deprecated @return dbQuery */
+function _cmsmaterialfield(){	return new dbQuery('samson\cms\CMSMaterialField'); }
 
-/** @return dbQuery */
+/** @deprecated @return dbQuery */
 function _cmsnav(){ return new dbQuery('\samson\cms\CMSNav'); }
 
-/** @return dbQuery */
-function _cmsnavfield(){	return new dbQuery('samson\cms\cmsnavfield');}
+/** @deprecated @return dbQuery */
+function _cmsnavfield(){	return new dbQuery('samson\cms\CMSNavField');}
 
-/** @return dbQuery */
-function _cmsnavmaterial(){return new dbQuery('samson\cms\cmsnavmaterial');}
+/** @deprecated @return dbQuery */
+function _cmsnavmaterial(){return new dbQuery('samson\cms\CMSNavMaterial');}
