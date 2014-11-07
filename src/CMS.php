@@ -76,13 +76,13 @@ class CMS extends CompressableService
      *
      * @return bool True if materials ancestors has been found
      */
-    public static function getMaterialsByStructures($structures, & $materials = array(), $className = 'samson\cms\cmsmaterial', $handler = null, array $handlerParams = array())
+    public static function getMaterialsByStructures($structures, & $materials = array(), $className = 'samson\cms\CMSMaterial', $handler = null, array $handlerParams = array())
     {
         // If not array of structures is passed - create it
         $structures = is_array($structures) ? $structures : array($structures);
 
         // Create query to get materials for current structure
-        $query = dbQuery('samson\cms\cmsnavmaterial')
+        $query = dbQuery('samson\cms\CMSNavMaterial')
             ->cond('StructureID', $structures)
             ->join('material')
             ->cond('material_Active', 1)
@@ -741,9 +741,9 @@ class CMS extends CompressableService
             ->cond('Active',1)
             ->cond( $field, $selector )
             ->join('children_relations')
-            ->join('children', '\samson\cms\cmsnav')
+            ->join('children', '\samson\cms\CMSNav')
             ->join('parents_relations')
-            ->join('parents', '\samson\cms\cmsnav')
+            ->join('parents', '\samson\cms\CMSNav')
             ->first( $cmsnav )) {
             $cmsnav->prepare();
         }
@@ -767,7 +767,7 @@ class CMS extends CompressableService
         {
             // Get material ids from structure materials records
             $ids = array();
-            if(dbQuery('samson\cms\cmsnavmaterial')->cond( 'StructureID', $db_nav->id )->fields( 'MaterialID', $ids ))
+            if(dbQuery('samson\cms\CMSNavMaterial')->cond( 'StructureID', $db_nav->id )->fields( 'MaterialID', $ids ))
             {
                 // Create material db query
                 $q = cmsquery()->id($ids);
@@ -803,33 +803,33 @@ class CMS extends CompressableService
 
     public function buildNavigation()
     {
-        dbRecord::$instances['samson\cms\cmsnav'] = array();
+        dbRecord::$instances['samson\cms\CMSNav'] = array();
 
         CMSNav::$top = new CMSNav( false );
         CMSNav::$top->Name = 'Корень навигации';
         CMSNav::$top->Url = 'NAVIGATION_BASE';
         CMSNav::$top->StructureID = 0;
         // Try load navigation cache from memmory cache
-        //if( ! CacheTable::ifget('cms_navigation_cache', dbRecord::$instances['samson\cms\cmsnav'] ) )
+        //if( ! CacheTable::ifget('cms_navigation_cache', dbRecord::$instances['samson\cms\CMSNav'] ) )
         {
             // Perform request to db
-            $cmsnavs = dbQuery('samson\cms\cmsnav')->cond('Active',1)
+            $cmsnavs = dbQuery('samson\cms\CMSNav')->cond('Active',1)
                 //->cond('locale', locale())
                 ->order_by('PriorityNumber','asc')->exec();
 
             foreach ( $cmsnavs as $cmsnav )
             {
-                dbRecord::$instances['samson\cms\cmsnav'][ $cmsnav->Url ] = $cmsnav;
+                dbRecord::$instances['samson\cms\CMSNav'][ $cmsnav->Url ] = $cmsnav;
             }
 
             // Save all array to memmory cache
-            //CacheTable::set( 'cms_navigation_cache', dbRecord::$instances['samson\cms\cmsnav'] );
+            //CacheTable::set( 'cms_navigation_cache', dbRecord::$instances['samson\cms\CMSNav'] );
         }
 
-        //trace(dbRecord::$instances['samson\cms\cmsnav']);
+        //trace(dbRecord::$instances['samson\cms\CMSNav']);
 
         // Build navigation tree
-        CMSNav::build( CMSNav::$top, dbRecord::$instances['samson\cms\cmsnav'] );
+        CMSNav::build( CMSNav::$top, dbRecord::$instances['samson\cms\CMSNav'] );
 
         //trace($cmsnavs);
     }
@@ -889,7 +889,7 @@ class CMS extends CompressableService
         $this->afterCompress();
 
         // Create cache collection
-        dbRecord::$instances[ "samson\cms\cmsmaterial" ] = array();
+        dbRecord::$instances[ "samson\cms\CMSMaterial" ] = array();
     }
 
     /** Constructor */

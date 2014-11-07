@@ -51,7 +51,7 @@ class CMSMaterial extends Material implements iModuleViewable
     ) {
         $db_materials = array();
         if (!isset($class_name)) {
-            $class_name = 'samson\cms\cmsmaterial';
+            $class_name = 'samson\cms\CMSMaterial';
         }
         // Create db request
         $query = dbQuery($class_name)
@@ -59,7 +59,7 @@ class CMSMaterial extends Material implements iModuleViewable
         //->cond('locale', locale())
         ->join('samson\cms\cmsgallery')
         ->join('user')
-        ->join('samson\cms\cmsnavmaterial')
+        ->join('samson\cms\CMSNavMaterial')
         //->own_group_by('material.MaterialID')
         ;
 
@@ -124,7 +124,7 @@ class CMSMaterial extends Material implements iModuleViewable
             foreach ($db_materials as & $db_material) {
                 //unset($GLOBALS['show_sql']);
                 // Save instance to cache by URL
-                dbRecord::$instances[ 'samson\cms\cmsmaterial' ][ $db_material->Url ] = $db_material;
+                dbRecord::$instances[ 'samson\cms\CMSMaterial' ][ $db_material->Url ] = $db_material;
 
                 // Pointer to user data
                 $db_material->user = $db_material->onetoone['_user'];

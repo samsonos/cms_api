@@ -38,7 +38,7 @@ class CMSMaterialQuery extends \samson\activerecord\dbQuery
 			//trace($db_material);
 			
 			// Save instance to cache by URL
-			dbRecord::$instances[ 'samson\cms\cmsmaterial' ][ $db_material->Url ] = $db_material;
+			dbRecord::$instances[ 'samson\cms\CMSMaterial' ][ $db_material->Url ] = $db_material;
 				
 			// Pointer to user data
 			$db_material->user = $db_material->onetoone['_user'];
@@ -97,7 +97,7 @@ class CMSMaterialQuery extends \samson\activerecord\dbQuery
     /** Constructor */
     public function __construct()
     {	
-    	parent::__construct( 'samson\cms\cmsmaterial' );
+    	parent::__construct( 'samson\cms\CMSMaterial' );
     	
     	// Create db request
     	$this
