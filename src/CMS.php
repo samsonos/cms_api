@@ -155,8 +155,6 @@ class CMS extends CompressableService
 		  `MaterialID` int(11) NOT NULL,
 		  `Path` varchar(255) NOT NULL,
 		  `Src` varchar(255) NOT NULL,
-		  `Thumbpath` varchar(255) NOT NULL,
-		  `Thumbsrc` varchar(255) NOT NULL,
 		  `Loaded` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 		  `Description` text NOT NULL,
 		  `Name` varchar(255) NOT NULL,
