@@ -599,11 +599,15 @@ class CMS extends CompressableService
      * Gallery table changed:
      * Added `size` field
      * Added `priority` field
+     * Delete `Thumbpath` field
+     * Delete `Thumbsrc` field
      */
     public function migrate_15_to_16()
     {
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'gallery` ADD `priority` INT(11) NOT NULL DEFAULT 0 AFTER `MaterialID`');
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'gallery` ADD `size` INT(11) NOT NULL DEFAULT 0 AFTER `Src`');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'gallery` DROP `Thumbpath`');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'gallery` DROP `Thumbsrc`');
     }
 
     public function materialColumnToField($column, $structure)
