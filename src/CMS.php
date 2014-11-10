@@ -595,6 +595,17 @@ class CMS extends CompressableService
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field` ADD `UserID` INT(11) NOT NULL DEFAULT 0 AFTER `PriorityNumber`');
     }
 
+    /**
+     * Gallery table changed:
+     * Added `size` field
+     * Added `priority` field
+     */
+    public function migrate_15_to_16()
+    {
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'gallery` ADD `priority` INT(11) NOT NULL DEFAULT 0 AFTER `MaterialID`');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'gallery` ADD `size` INT(11) NOT NULL DEFAULT 0 AFTER `Src`');
+    }
+
     public function materialColumnToField($column, $structure)
     {
         // Find first user
