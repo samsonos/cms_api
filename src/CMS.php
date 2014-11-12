@@ -608,6 +608,14 @@ class CMS extends CompressableService
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'gallery` DROP `Thumbsrc`');
     }
 
+    /**
+     * Security improvements - removed password field from user table
+     */
+    public function migrate_16_to_17()
+    {
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'user` DROP `Password`');
+    }
+
     public function materialColumnToField($column, $structure)
     {
         // Find first user
