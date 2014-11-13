@@ -155,24 +155,12 @@ class CMSMaterial extends Material implements iModuleViewable
 
     /**
      * @param null $clone Material for cloning
-     * @param string $url New material url
-     * @param int $type New material type
      * @param array $excludedFields excluded from materialfield fields identifiers
      */
-    public function __cloneMaterial(& $clone = null, $url = '', $type = 2, $excludedFields = array())
+    public function __cloneMaterial(& $clone = null, $excludedFields = array())
     {
         if (!isset($clone)) {
-            $clone = new CMSMaterial(false);
-            $clone->type = $type;
-            if ($type == 2) {
-                $clone->parent_id = $this->id;
-            } else {
-                $clone->parent_id = 0;
-            }
-            $clone->Active = 1;
-            $clone->Url = $url;
-            $clone->Name = $this->Name;
-            $clone->save();
+            $clone = clone $this;
         }
 
         $parentWithRelation = dbQuery('\samson\cms\CMSMaterial')
