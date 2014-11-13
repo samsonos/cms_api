@@ -157,7 +157,7 @@ class CMSMaterial extends Material implements iModuleViewable
      * @param null $clone Material for cloning
      * @param array $excludedFields excluded from materialfield fields identifiers
      */
-    public function __cloneMaterial(& $clone = null, $excludedFields = array())
+    public function copy(& $clone = null, $excludedFields = array())
     {
         if (!isset($clone)) {
             $clone = clone $this;
