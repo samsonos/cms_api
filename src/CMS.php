@@ -76,7 +76,7 @@ class CMS extends CompressableService
      *
      * @return bool True if materials ancestors has been found
      */
-    public static function getMaterialsByStructures($structures, & $materials = array(), $className = 'samson\cms\CMSMaterial', $handler = null, array $handlerParams = array())
+    public static function getMaterialsByStructures($structures, & $materials = array(), $className = 'samson\cms\CMSMaterial', $handler = null, array $handlerParams = array(), $innerHandler = null)
     {
         // If not array of structures is passed - create it
         $structures = is_array($structures) ? $structures : array($structures);
@@ -100,8 +100,20 @@ class CMS extends CompressableService
         // Perform request to find all matched material ids
         $ids = array();
         if ($query->fieldsNew('MaterialID', $ids)) {
+            // Create inner query
+            $innerQuery = dbQuery($className)->cond('MaterialID', $ids)->join('samson\cms\CMSGallery');
+
+            // Set inner query handler if passed
+            if (is_callable($innerHandler)) {
+                // Call external query handler
+                if (call_user_func_array($innerHandler, array_merge(array(&$innerQuery))) === false) {
+                    // Someone else has failed my lord
+                    return false;
+                }
+            }
+
             // Perform CMSMaterial request with handlers
-            if (dbQuery($className)->cond('MaterialID', $ids)->join('samson\cms\CMSGallery')->exec($materials)) {
+            if ($innerQuery->exec($materials)) {
                 return true;
             }
         }
