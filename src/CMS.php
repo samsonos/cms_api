@@ -76,7 +76,7 @@ class CMS extends CompressableService
      *
      * @return bool True if materials ancestors has been found
      */
-    public static function getMaterialsByStructures($structures, & $materials = array(), $className = 'samson\cms\CMSMaterial', $handler = null, array $handlerParams = array(), $innerHandler = null)
+    public static function getMaterialsByStructures($structures, & $materials = array(), $className = 'samson\cms\CMSMaterial', $handlers = null, array $handlerParams = array(), $innerHandler = null)
     {
         // If not array of structures is passed - create it
         $structures = is_array($structures) ? $structures : array($structures);
@@ -88,10 +88,19 @@ class CMS extends CompressableService
             ->cond('material_Active', 1)
             ->group_by('MaterialID');
 
-        // If external request handler is passed - use it
-        if (is_callable($handler)) {
+        // Convert external handler to array of handlers for backward compatibility
+        $handlers = is_callable($handlers) ? array($handlers) : $handlers;
+
+        // Iterate all handlers
+        for ($i=0, $size=sizeof($handlers); $i < $size; $i++) {
+            // Create parameters collection
+            $params = array_merge(
+                array($handlers[$i]), // First element is callable array or string
+                isset($handlerParams[$i]) ? $handlerParams[$i] : array() // Possible additional callable parameters
+            );
+
             // Call external query handler
-            if (call_user_func_array($handler, array_merge(array(&$query), $handlerParams)) === false) {
+            if (call_user_func_array(array($query, 'handler'), $params) === false) {
                 // Someone else has failed my lord
                 return false;
             }
