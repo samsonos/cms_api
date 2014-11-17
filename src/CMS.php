@@ -640,7 +640,7 @@ class CMS extends CompressableService
     /**
      * Fill new fields
      */
-    public function migrate_16_to_17()
+    public function migrate_17_to_18()
     {
         /** @var \samson\activerecord\gallery $images */
         $images = null;
