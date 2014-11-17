@@ -153,6 +153,61 @@ class CMSMaterial extends Material implements iModuleViewable
         return $db_materials;
     }
 
+    /**
+     * @param null $clone Material for cloning
+     * @param array $excludedFields excluded from materialfield fields identifiers
+     */
+    public function copy(& $clone = null, $excludedFields = array())
+    {
+        if (!isset($clone)) {
+            $clone = clone $this;
+        }
+
+        $parentWithRelation = dbQuery('\samson\cms\CMSMaterial')
+                            ->id($this->MaterialID)
+                            ->join('samson\cms\CMSMaterialField')
+                            ->join('samson\cms\CMSGallery')
+                            ->join('samson\cms\CMSNavMaterial')
+                    ->first();
+
+        // Create structurematerial relations
+        foreach ($parentWithRelation->onetomany['_structurematerial'] as $cmsnav) {
+            $structurematerial = new \samson\activerecord\structurematerial(false);
+            $structurematerial->MaterialID = $clone->id;
+            $structurematerial->StructureID = $cmsnav->StructureID;
+            $structurematerial->Active = 1;
+            $structurematerial->save();
+        }
+
+        // Create materialfield relaions
+        foreach ($parentWithRelation->onetomany['_materialfield'] as $matfield) {
+            $materialfield = new \samson\activerecord\materialfield(false);
+            $materialfield->MaterialID = $clone->id;
+            $materialfield->FieldID = $matfield->FieldID;
+            if (in_array($materialfield->FieldID, $excludedFields)) {
+                $materialfield->Value = '';
+            } else {
+                $materialfield->Value = $matfield->Value;
+            }
+            $materialfield->numeric_value = $matfield->numeric_value;
+            $materialfield->locale = $matfield->locale;
+            $materialfield->Active = $matfield->Active;
+            $materialfield->save();
+        }
+
+        // Create gallery
+        foreach ($parentWithRelation->onetomany['_gallery'] as $cmsgallery) {
+            $gallery = new \samson\activerecord\gallery(false);
+            $gallery->MaterialID = $clone->id;
+            $gallery->Path = $cmsgallery->Path;
+            $gallery->Src = $cmsgallery->Src;
+            $gallery->Name = $cmsgallery->Name;
+            $gallery->Description = $cmsgallery->Description;
+            $gallery->Active = $cmsgallery->Active;
+            $gallery->save();
+        }
+    }
+
 
     /** Collection of images for material */
     public $gallery;

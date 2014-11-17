@@ -76,7 +76,7 @@ class CMS extends CompressableService
      *
      * @return bool True if materials ancestors has been found
      */
-    public static function getMaterialsByStructures($structures, & $materials = array(), $className = 'samson\cms\CMSMaterial', $handler = null, array $handlerParams = array())
+    public static function getMaterialsByStructures($structures, & $materials = array(), $className = 'samson\cms\CMSMaterial', $handlers = null, array $handlerParams = array(), $innerHandler = null)
     {
         // If not array of structures is passed - create it
         $structures = is_array($structures) ? $structures : array($structures);
@@ -88,10 +88,19 @@ class CMS extends CompressableService
             ->cond('material_Active', 1)
             ->group_by('MaterialID');
 
-        // If external request handler is passed - use it
-        if (is_callable($handler)) {
+        // Convert external handler to array of handlers for backward compatibility
+        $handlers = is_callable($handlers) ? array($handlers) : $handlers;
+
+        // Iterate all handlers
+        for ($i=0, $size=sizeof($handlers); $i < $size; $i++) {
+            // Create parameters collection
+            $params = array_merge(
+                array($handlers[$i]), // First element is callable array or string
+                isset($handlerParams[$i]) ? $handlerParams[$i] : array() // Possible additional callable parameters
+            );
+
             // Call external query handler
-            if (call_user_func_array($handler, array_merge(array(&$query), $handlerParams)) === false) {
+            if (call_user_func_array(array($query, 'handler'), $params) === false) {
                 // Someone else has failed my lord
                 return false;
             }
@@ -100,8 +109,20 @@ class CMS extends CompressableService
         // Perform request to find all matched material ids
         $ids = array();
         if ($query->fieldsNew('MaterialID', $ids)) {
+            // Create inner query
+            $innerQuery = dbQuery($className)->cond('MaterialID', $ids)->join('samson\cms\CMSGallery');
+
+            // Set inner query handler if passed
+            if (is_callable($innerHandler)) {
+                // Call external query handler
+                if (call_user_func_array($innerHandler, array_merge(array(&$innerQuery))) === false) {
+                    // Someone else has failed my lord
+                    return false;
+                }
+            }
+
             // Perform CMSMaterial request with handlers
-            if (dbQuery($className)->cond('MaterialID', $ids)->join('samson\cms\CMSGallery')->exec($materials)) {
+            if ($innerQuery->exec($materials)) {
                 return true;
             }
         }
@@ -315,8 +336,8 @@ class CMS extends CompressableService
         db()->simple_query($sql_relation_material);
         db()->simple_query($sql_gallery);
         db()->simple_query( $sql_structure_relation);
-        db()->simple_query("INSERT INTO `".dbMySQLConnector::$prefix."user` (`UserID`, `FName`, `SName`, `TName`, `Email`, `Password`, `md5_Email`, `md5_Password`, `Created`, `Modyfied`, `GroupID`, `Active`, `Online`, `LastLogin`) VALUES
-	 (1, 'Виталий', 'Егоров', 'Игоревич', 'admin', 'vovan123', '21232f297a57a5a743894a0e4a801fc3', 'fa9bb23b40db7ccff9ccfafdac0f647c', '2011-10-25 14:59:06', '2013-05-22 11:52:38', 1, 1, 1, '2013-05-22 14:52:38')
+        db()->simple_query("INSERT INTO `".dbMySQLConnector::$prefix."user` (`UserID`, `FName`, `SName`, `TName`, `Email`, `md5_Email`, `md5_Password`, `Created`, `Modyfied`, `GroupID`, `Active`, `Online`, `LastLogin`) VALUES
+	 (1, 'Виталий', 'Егоров', 'Игоревич', 'admin', '21232f297a57a5a743894a0e4a801fc3', 'fa9bb23b40db7ccff9ccfafdac0f647c', '2011-10-25 14:59:06', '2013-05-22 11:52:38', 1, 1, 1, '2013-05-22 14:52:38')
 			ON DUPLICATE KEY UPDATE Active=1");
 
         // Initiate migration mechanism
@@ -606,6 +627,14 @@ class CMS extends CompressableService
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'gallery` ADD `size` INT(11) NOT NULL DEFAULT 0 AFTER `Src`');
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'gallery` DROP `Thumbpath`');
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'gallery` DROP `Thumbsrc`');
+    }
+
+    /**
+     * Security improvements - removed password field from user table
+     */
+    public function migrate_16_to_17()
+    {
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'user` DROP `Password`');
     }
 
     /**
