@@ -608,6 +608,25 @@ class CMS extends CompressableService
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'gallery` DROP `Thumbsrc`');
     }
 
+    /**
+     * Fill new fields
+     */
+    public function migrate_16_to_17()
+    {
+        /** @var \samson\activerecord\gallery $images */
+        $images = null;
+        dbQuery('gallery')->cond('Path', '')->exec($images);
+        foreach($images as $image) {
+            $oldPath = $image->Src;
+            $image->Path = dirname($oldPath) . '/';
+            $image->Src = basename($oldPath);
+            if (file_exists($oldPath)) {
+                $image->Size = filesize($oldPath);
+            }
+            $image->save();
+        }
+    }
+
     public function materialColumnToField($column, $structure)
     {
         // Find first user
