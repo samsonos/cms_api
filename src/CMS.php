@@ -110,7 +110,7 @@ class CMS extends CompressableService
         $ids = array();
         if ($query->fieldsNew('MaterialID', $ids)) {
             // Create inner query
-            $innerQuery = dbQuery($className)->cond('MaterialID', $ids)->join('samson\cms\CMSGallery');
+            $innerQuery = dbQuery($className)->cond('MaterialID', $ids);
 
             // Set inner query handler if passed
             if (is_callable($innerHandler)) {
