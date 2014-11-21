@@ -18,7 +18,7 @@ class Material extends \samson\activerecord\material
      * @param null $clone Material for cloning
      * @param array $excludedFields excluded from materialfield fields identifiers
      */
-    public function copy(& $clone = null, $excludedFields = array())
+    public function & copy(& $clone = null, $excludedFields = array())
     {
         // If no object is passed - create new instance by clonning
         $clone = !isset($clone) ? clone $this : $clone;
