@@ -136,7 +136,7 @@ class CMSMaterial extends Material implements iModuleViewable
                     usort($db_material->onetomany['_gallery'], '\samson\cms\CMSMaterial::usortGallery');
 
                     foreach ($db_material->onetomany['_gallery'] as $db_gallery) {
-                        $db_material->gallery[] = $db_gallery->Src;
+                        $db_material->gallery[] = $db_gallery->Path.$db_gallery->Src;
                     }
                 }
 
