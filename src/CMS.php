@@ -656,6 +656,12 @@ class CMS extends CompressableService
         }
     }
 
+    /** Added "remains" field to material table */
+    public function migrate_18_to_19()
+    {
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` ADD `remains` FLOAT NOT NULL DEFAULT 0 AFTER `system`');
+    }
+
     public function materialColumnToField($column, $structure)
     {
         // Find first user
@@ -845,57 +851,6 @@ class CMS extends CompressableService
         return $result;
     }
 
-    public function e404()
-    {
-        $selector = url()->last();
-
-        s()->active( $this );
-
-        if( ifcmsmat( $selector, $db_material ))
-        {
-            $this->title = $db_material->Name;
-            $this->keywords = $db_material->Keywords;
-            $this->description = $db_material->Description;
-
-            $this->set( $db_material );
-
-            cmsapi_template();
-        }
-    }
-
-    public function buildNavigation()
-    {
-        dbRecord::$instances['samson\cms\CMSNav'] = array();
-
-        CMSNav::$top = new CMSNav( false );
-        CMSNav::$top->Name = 'Корень навигации';
-        CMSNav::$top->Url = 'NAVIGATION_BASE';
-        CMSNav::$top->StructureID = 0;
-        // Try load navigation cache from memmory cache
-        //if( ! CacheTable::ifget('cms_navigation_cache', dbRecord::$instances['samson\cms\CMSNav'] ) )
-        {
-            // Perform request to db
-            $cmsnavs = dbQuery('samson\cms\CMSNav')->cond('Active',1)
-                //->cond('locale', locale())
-                ->order_by('PriorityNumber','asc')->exec();
-
-            foreach ( $cmsnavs as $cmsnav )
-            {
-                dbRecord::$instances['samson\cms\CMSNav'][ $cmsnav->Url ] = $cmsnav;
-            }
-
-            // Save all array to memmory cache
-            //CacheTable::set( 'cms_navigation_cache', dbRecord::$instances['samson\cms\CMSNav'] );
-        }
-
-        //trace(dbRecord::$instances['samson\cms\CMSNav']);
-
-        // Build navigation tree
-        CMSNav::build( CMSNav::$top, dbRecord::$instances['samson\cms\CMSNav'] );
-
-        //trace($cmsnavs);
-    }
-
     /** @see \samson\core\CompressableExternalModule::afterCompress() */
     public function afterCompress( & $obj = null, array & $code = null )
     {
@@ -944,9 +899,6 @@ class CMS extends CompressableService
     /** @see \samson\core\ExternalModule::init() */
     public function init( array $params = array() )
     {
-        // Build navigation tree
-        //$this->buildNavigation();
-
         // Change static class data
         $this->afterCompress();
 
@@ -955,8 +907,8 @@ class CMS extends CompressableService
     }
 
     /** Constructor */
-    public function __construct( $path = null )
+    public function __construct($path = null)
     {
-        parent::__construct( $path );
+        parent::__construct($path);
     }
 }

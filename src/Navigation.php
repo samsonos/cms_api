@@ -11,44 +11,10 @@ use samson\activerecord\structure;
  * SamsonCMS Navigation element
  * @author Vitaly Egorov <egorov@samsonos.com>
  * @copyright 2014 SamsonOS
- * @version 0.0.1
  */
-class Navigation extends structure implements  \Iterator
+class Navigation extends structure implements \Iterator
 {
-    public static function build( CMSNav & $parent, array & $records, $level = 0 )
-    {
-        foreach ($records as & $record )
-        {
-            if( $record->StructureID == $parent->StructureID ) continue;
 
-            if( $record->ParentID == $parent->StructureID )
-            {
-                $record->parent = & $parent;
-
-                $current = & $record;
-
-                $url_base = '';
-
-                while( isset( $current ) )
-                {
-                    $record->parents[] = & $current;
-
-                    $url_base = trim($current->Url.'/'.$url_base);
-
-                    $record->url_base[ $current->StructureID ] = $url_base;
-                    $record->url_base[ $current->StructureID.'_'.locale() ] = locale().'/'.$url_base;
-
-                    $current = & $current->parent;
-                }
-
-                $record->level = $level;
-
-                $parent->children[ 'id_'.$record->StructureID ] = $record;
-
-                self::build( $record, $records, ( $level + 1 ) );
-            }
-        }
-    }
 
 
     public static $top;
