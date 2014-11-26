@@ -142,4 +142,33 @@ class CMSNav extends Navigation
         }
         return FALSE;
     }
+
+
+    public function __call( $name, $arguments )
+    {
+        if( isset( $this[ $name ] ) || $this->$name )
+        {
+            $html = $this->$name;
+
+            if( isset($_SESSION['__CMS_EDITOR__']) )
+                $html = m('cmsapi')
+                    ->set('field',$name)
+                    ->set('id',$this->id)
+                    ->set('value',$this->$name)
+                    ->set('entity','cmsnav')
+                    ->output('app/view/editor/material.php');
+
+            echo $html;
+        }
+    }
+
+    /** Serialize handler */
+    public function __sleep()
+    {
+        // TODO: WTF? What is this for?
+        $_attributes = null;
+        eval('$_attributes = '.get_class($this).'::$_attributes;');
+
+        return $_attributes;
+    }
 }

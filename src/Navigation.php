@@ -173,23 +173,11 @@ class Navigation extends structure implements \Iterator
         return false;
     }
 
-    public function __call( $name, $arguments )
-    {
-        if( isset( $this[ $name ] ) || $this->$name )
-        {
-            $html = $this->$name;
+    // TODO: Functions lower to this line should be rewritten by kotenko@samsonos.com
 
-            if( isset($_SESSION['__CMS_EDITOR__']) )
-                $html = m('cmsapi')
-                    ->set('field',$name)
-                    ->set('id',$this->id)
-                    ->set('value',$this->$name)
-                    ->set('entity','cmsnav')
-                    ->output('app/view/editor/material.php');
-
-            echo $html;
-        }
-    }
+    /**
+     * WTF?
+     */
     public function prepare()
     {
         $this->base = true;
@@ -271,21 +259,36 @@ class Navigation extends structure implements \Iterator
             }
         }
         //elapsed('endBaseChildren');
-        return$this->children;
+        return $this->children;
     }
 
-    /** Serialize handler */
-    public function __sleep()
+    public function rewind()
     {
-        $_attributes = null;
-        eval('$_attributes = '.get_class($this).'::$_attributes;');
-
-        return $_attributes;
+        $this->base();
+        reset( $this->children );
     }
-    public function rewind(){$this->base(); reset( $this->children );	}
-    public function next(){$this->base();	return next( $this->children );	}
-    public function current(){$this->base(); return current( $this->children );	}
-    public function key(){$this->base();return key( $this->children );	}
-    public function valid(){$this->base(); $key = key( $this->children );	return ( $key !== NULL && $key !== FALSE );	}
+
+    public function next()
+    {
+        $this->base();
+        return next( $this->children );
+    }
+
+    public function current()
+    {
+        $this->base();
+        return current( $this->children );
+    }
+    public function key()
+    {
+        $this->base();
+        return key( $this->children );
+    }
+
+    public function valid()
+    {
+        $this->base();
+        $key = key( $this->children );
+        return ($key !== null && $key !== false);
+    }
 }
- 
