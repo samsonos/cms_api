@@ -8,6 +8,34 @@ namespace samson\cms;
  */
 class CMSNav extends Navigation
 {
+    public static $top;
+
+    public $parent = NULL;
+
+    protected $level = 0;
+
+    protected $parents = array();
+
+    protected $url_base = '';
+
+    /**
+     * Find $count random material for this CMSNav
+     * @param number $count Materials count
+     * @deprecated
+     * @return array Collection of CMSMaterial
+     */
+    public function random_materials( $count = 1 )
+    {
+        return CMSMaterial::get( NULL, $this, 0, 1, array( 'RAND()', ''), array( 0, $count) );
+    }
+
+    public function url( CMSNav & $parent = NULL )
+    {
+        if( ! isset($parent) ) $parent = & $this;
+
+        echo (isset($this->url_base[ $parent->id ]) ? $this->url_base[ $parent->id ]:'');
+    }
+
     public static function build(CMSNav & $parent, array & $records, $level = 0)
     {
         // Iterate all items on current level
@@ -170,5 +198,52 @@ class CMSNav extends Navigation
         eval('$_attributes = '.get_class($this).'::$_attributes;');
 
         return $_attributes;
+    }
+
+    public function tree(){
+        $tree = array();
+        $s_rs = array();
+        //Get all structure telations
+        if(dbQuery('structure_relation')->exec($s_r)){
+
+        }
+    }
+
+    public function priority( $direction = NULL )
+    {
+        if( isset($this->parent) )
+        {
+            $p_index = 0;
+
+            foreach ( $this->parent as $id => $child )
+            {
+                if( $child->PriorityNumber != $p_index)
+                {
+                    $child->PriorityNumber = $p_index;
+
+                    $child->save();
+                }
+
+                $p_index++;
+            }
+
+            $children = array_values( $this->parent->children );
+
+            $old_index = $this->PriorityNumber;
+
+            $new_index =  $old_index - $direction;
+            $new_index = $new_index == sizeof($children) ? 0 : $new_index;
+            $new_index = $new_index == -1 ? sizeof($children) - 1 : $new_index;
+
+            if( isset($children[ $new_index ] ) )
+            {
+                $second_nav = $children[ $new_index ];
+                $second_nav->PriorityNumber = $old_index;
+                $second_nav->save();
+
+                $this->PriorityNumber = $new_index;
+                $this->save();
+            }
+        }
     }
 }

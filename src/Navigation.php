@@ -14,80 +14,81 @@ use samson\activerecord\structure;
  */
 class Navigation extends structure implements \Iterator
 {
-    public static $top;
-
-    public $parent = NULL;
-
-    public $parentsnav = array();
-
-
-    protected $parents = array();
-
-
-    public $children = array();
-
     /** @var string Navigation string identifier */
     public $Url;
 
-    protected $url_base = '';
+    /** @var \samson\cms\Navigation[] Collection of child items */
+    public $children = array();
 
-    protected $level = 0;
+    /** @var array WTF?? */
+    public $parentsnav = array();
 
+    /** @var bool WTF??? */
     protected $base = false;
 
-    public function tree(){
-        $tree = array();
-        $s_rs = array();
-        //Get all structure telations
-        if(dbQuery('structure_relation')->exec($s_r)){
+    /**
+     * Override standard view passing
+     * @param string $prefix Prefix
+     * @param array $restricted Collection of ignored entity fields
+     * @return array Filled collection of key => values for view
+     */
+    public function toView($prefix = '', array $restricted = array())
+    {
+        return parent::toView($prefix, $restricted = array('parent','parents','children'));
+    }
 
+    /**
+     * Get all related materials
+     * @return array Collection of related materials
+     */
+    public function & materials()
+    {
+        /** @var \samson\cms\Material[] $materials Get related materials collection */
+        $materials = array();
+        // Perform generic material retrieval
+        if (CMS::getMaterialsByStructures(array($this->id), $materials)) {
+            // Handle
         }
+
+        return $materials;
     }
 
-
-    public function toView( $key_prefix = '', array $restricted = array() )
-    {
-        return parent::toView( $key_prefix, array( 'parent','parents','children', ) );
-    }
-
-
     /**
-     * Find materials for this CMSNav
-     * @param array $order_by Sorting order of materials
-     * @return array Collection of CMSMaterial
+     * Get all related fields
+     * @return \samson\cms\Field[] Collection of related fields
      */
-    public function materials( array $order_by = NULL ){ return CMSMaterial::get( NULL, $this, 0, 1, $order_by ); }
-
-    /**
-     * Find $count random material for this CMSNav
-     * @param number $count Materials count
-     * @return array Collection of CMSMaterial
-     */
-    public function random_materials( $count = 1 ){ return CMSMaterial::get( NULL, $this, 0, 1, array( 'RAND()', ''), array( 0, $count) ); }
-
-
-    public function fields()
+    public function & fields()
     {
+        // Prepare db request to get related fields
+        $query = dbQuery('samson\cms\NavigationField')
+            ->join('samson\cms\Field')
+            ->code('StructureID', $this->id)
+            ->cond('Active', 1);
+
+        /** @var \samson\cms\NavigationField[] $fields Get collection of related navigation fields */
         $fields = array();
+        if ($query->exec($fields)) {
+            // Return one-to-many related fields collection
+            return $fields->onetomany['_field'];
+        }
+    }
 
-        if( dbQuery('samson\cms\CMSNavField')->StructureID($this->id)->Active(1)->exec( $db_fields ) )
-        {
-            $id = array();
-            foreach ( $db_fields as $db_field ) $id[] = $db_field->FieldID;
-
-            $fields = dbQuery('field')->FieldID( $id )->exec();
+    /**
+     * Get default Material object
+     * @return \samson\cms\Material|bool Default Material object, otherwise false
+     */
+    public function def()
+    {
+        // If this naviagtion has default material identifier specified
+        if (isset($this->MaterialID) && $this->MaterialID > 0) {
+            // Perform db query to get this material
+            return dbQuery('samson\cms\Material')->id($this->MaterialID)->first();
         }
 
-        return $fields;
+        return false;
     }
 
-
-    public function url( CMSNav & $parent = NULL )
-    {
-        if( ! isset($parent) ) $parent = & $this;
-
-        echo (isset($this->url_base[ $parent->id ]) ? $this->url_base[ $parent->id ]:'');
-    }
+    // TODO: Functions lower to this line should be rewritten by kotenko@samsonos.com
 
     public function parents( CMSNav & $bound = NULL)
     {
@@ -118,62 +119,6 @@ class Navigation extends structure implements \Iterator
         $this->base();
         return $this->parent;
     }
-
-
-    public function priority( $direction = NULL )
-    {
-        if( isset($this->parent) )
-        {
-            $p_index = 0;
-
-            foreach ( $this->parent as $id => $child )
-            {
-                if( $child->PriorityNumber != $p_index)
-                {
-                    $child->PriorityNumber = $p_index;
-
-                    $child->save();
-                }
-
-                $p_index++;
-            }
-
-            $children = array_values( $this->parent->children );
-
-            $old_index = $this->PriorityNumber;
-
-            $new_index =  $old_index - $direction;
-            $new_index = $new_index == sizeof($children) ? 0 : $new_index;
-            $new_index = $new_index == -1 ? sizeof($children) - 1 : $new_index;
-
-            if( isset($children[ $new_index ] ) )
-            {
-                $second_nav = $children[ $new_index ];
-                $second_nav->PriorityNumber = $old_index;
-                $second_nav->save();
-
-                $this->PriorityNumber = $new_index;
-                $this->save();
-            }
-        }
-    }
-
-    /**
-     * Get default Material object
-     * @return \samson\cms\Material|bool Default Material object, otherwise false
-     */
-    public function def()
-    {
-        // If this naviagtion has default material identifier specified
-        if (isset($this->MaterialID) && $this->MaterialID > 0) {
-            // Perform db query to get this material
-            return dbQuery('samson\cms\Material')->id($this->MaterialID)->first();
-        }
-
-        return false;
-    }
-
-    // TODO: Functions lower to this line should be rewritten by kotenko@samsonos.com
 
     /**
      * WTF?
