@@ -96,7 +96,7 @@ class CMS extends CompressableService
             // Create parameters collection
             $params = array_merge(
                 array($handlers[$i]), // First element is callable array or string
-                isset($handlerParams[$i]) ? $handlerParams[$i] : array() // Possible additional callable parameters
+                isset($handlerParams[$i]) ? array($handlerParams[$i]) : array() // Possible additional callable parameters
             );
 
             // Call external query handler
