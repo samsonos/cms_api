@@ -15,14 +15,14 @@ class Material extends \samson\activerecord\material
 {
     /**
      * Create copy of current object
-     * @param null $clone Material for cloning
+     * @param mixed $clone Material for cloning
      * @param array $excludedFields excluded from materialfield fields identifiers
      * @returns void
      */
     public function & copy(& $clone = null, $excludedFields = array())
     {
-        // If no object is passed - create new instance by cloning
-        $clone = !isset($clone) ? clone $this : $clone;
+        // Create new instance by copying
+        $clone = parent::copy($clone);
 
         // Get all related tables data
         $parentWithRelation = dbQuery('\samson\cms\CMSMaterial')
@@ -36,7 +36,9 @@ class Material extends \samson\activerecord\material
         if (isset($parentWithRelation->onetomany['_structurematerial'])) {
             foreach ($parentWithRelation->onetomany['_structurematerial'] as $cmsNavigation) {
                 /** @var \samson\activerecord\Record $cmsNavigation */
-                $cmsNavigation->copy();
+                $copy = $cmsNavigation->copy();
+                $copy->MaterialID = $clone->id;
+                $copy->save();
             }
         }
 
@@ -48,7 +50,9 @@ class Material extends \samson\activerecord\material
                 // Check if field is NOT excluded from copying
                 if (!in_array($pMaterialField->FieldID, $excludedFields)) {
                     /** @var \samson\activerecord\dbRecord $materialField Copy instance */
-                    $pMaterialField->copy();
+                    $copy = $pMaterialField->copy();
+                    $copy->MaterialID = $clone->id;
+                    $copy->save();
                 }
             }
         }
@@ -59,7 +63,9 @@ class Material extends \samson\activerecord\material
             foreach ($parentWithRelation->onetomany['_gallery'] as $cmsGallery) {
                 /** @var \samson\activerecord\Record $cmsGallery */
                 // Copy them
-                $cmsGallery->copy();
+                $copy = $cmsGallery->copy();
+                $copy->MaterialID = $clone->id;
+                $copy->save();
             }
         }
 
