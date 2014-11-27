@@ -11,120 +11,85 @@ use samson\activerecord\structure;
  * SamsonCMS Navigation element
  * @author Vitaly Egorov <egorov@samsonos.com>
  * @copyright 2014 SamsonOS
- * @version 0.0.1
  */
-class Navigation extends structure implements  \Iterator
+class Navigation extends structure implements \Iterator
 {
-    public static function build( CMSNav & $parent, array & $records, $level = 0 )
-    {
-        foreach ($records as & $record )
-        {
-            if( $record->StructureID == $parent->StructureID ) continue;
-
-            if( $record->ParentID == $parent->StructureID )
-            {
-                $record->parent = & $parent;
-
-                $current = & $record;
-
-                $url_base = '';
-
-                while( isset( $current ) )
-                {
-                    $record->parents[] = & $current;
-
-                    $url_base = trim($current->Url.'/'.$url_base);
-
-                    $record->url_base[ $current->StructureID ] = $url_base;
-                    $record->url_base[ $current->StructureID.'_'.locale() ] = locale().'/'.$url_base;
-
-                    $current = & $current->parent;
-                }
-
-                $record->level = $level;
-
-                $parent->children[ 'id_'.$record->StructureID ] = $record;
-
-                self::build( $record, $records, ( $level + 1 ) );
-            }
-        }
-    }
-
-
-    public static $top;
-
-    public $parent = NULL;
-
-    public $parentsnav = array();
-
-
-    protected $parents = array();
-
-
-    public $children = array();
-
     /** @var string Navigation string identifier */
     public $Url;
 
-    protected $url_base = '';
+    /** @var \samson\cms\Navigation[] Collection of child items */
+    public $children = array();
 
-    protected $level = 0;
+    /** @var array WTF?? */
+    public $parentsnav = array();
 
+    /** @var bool WTF??? */
     protected $base = false;
 
-    public function tree(){
-        $tree = array();
-        $s_rs = array();
-        //Get all structure telations
-        if(dbQuery('structure_relation')->exec($s_r)){
+    /**
+     * Override standard view passing
+     * @param string $prefix Prefix
+     * @param array $restricted Collection of ignored entity fields
+     * @return array Filled collection of key => values for view
+     */
+    public function toView($prefix = '', array $restricted = array())
+    {
+        return parent::toView($prefix, $restricted = array('parent','parents','children'));
+    }
 
+    /**
+     * Get all related materials
+     * @return array Collection of related materials
+     */
+    public function & materials()
+    {
+        /** @var \samson\cms\Material[] $materials Get related materials collection */
+        $materials = array();
+        // Perform generic material retrieval
+        if (CMS::getMaterialsByStructures(array($this->id), $materials)) {
+            // Handle
         }
+
+        return $materials;
     }
 
-
-    public function toView( $key_prefix = '', array $restricted = array() )
-    {
-        return parent::toView( $key_prefix, array( 'parent','parents','children', ) );
-    }
-
-
     /**
-     * Find materials for this CMSNav
-     * @param array $order_by Sorting order of materials
-     * @return array Collection of CMSMaterial
+     * Get all related fields
+     * @return \samson\cms\Field[] Collection of related fields
      */
-    public function materials( array $order_by = NULL ){ return CMSMaterial::get( NULL, $this, 0, 1, $order_by ); }
-
-    /**
-     * Find $count random material for this CMSNav
-     * @param number $count Materials count
-     * @return array Collection of CMSMaterial
-     */
-    public function random_materials( $count = 1 ){ return CMSMaterial::get( NULL, $this, 0, 1, array( 'RAND()', ''), array( 0, $count) ); }
-
-
-    public function fields()
+    public function & fields()
     {
+        // Prepare db request to get related fields
+        $fieldIDs = dbQuery('structurefield')
+            ->join('field')
+            ->cond('StructureID', $this->id)
+            ->cond('Active', 1)
+            ->fieldsNew('FieldID');
+
+        /** @var \samson\cms\NavigationField[] $fields Get collection of related navigation fields */
         $fields = array();
+        if (dbQuery('samson\cms\Field')->id($fieldIDs)->exec($fields)) {
+            // Return one-to-many related fields collection
+            return $fields;
+        }
+    }
 
-        if( dbQuery('samson\cms\CMSNavField')->StructureID($this->id)->Active(1)->exec( $db_fields ) )
-        {
-            $id = array();
-            foreach ( $db_fields as $db_field ) $id[] = $db_field->FieldID;
-
-            $fields = dbQuery('field')->FieldID( $id )->exec();
+    /**
+     * Get default Material object
+     * @return \samson\cms\Material|bool Default Material object, otherwise false
+     */
+    public function def()
+    {
+        // If this naviagtion has default material identifier specified
+        if (isset($this->MaterialID) && $this->MaterialID > 0) {
+            // Perform db query to get this material
+            return dbQuery('samson\cms\Material')->id($this->MaterialID)->first();
         }
 
-        return $fields;
+        return false;
     }
 
-
-    public function url( CMSNav & $parent = NULL )
-    {
-        if( ! isset($parent) ) $parent = & $this;
-
-        echo (isset($this->url_base[ $parent->id ]) ? $this->url_base[ $parent->id ]:'');
-    }
+    // TODO: Functions lower to this line should be rewritten by kotenko@samsonos.com
 
     public function parents( CMSNav & $bound = NULL)
     {
@@ -156,170 +121,9 @@ class Navigation extends structure implements  \Iterator
         return $this->parent;
     }
 
-
-    public function priority( $direction = NULL )
-    {
-        if( isset($this->parent) )
-        {
-            $p_index = 0;
-
-            foreach ( $this->parent as $id => $child )
-            {
-                if( $child->PriorityNumber != $p_index)
-                {
-                    $child->PriorityNumber = $p_index;
-
-                    $child->save();
-                }
-
-                $p_index++;
-            }
-
-            $children = array_values( $this->parent->children );
-
-            $old_index = $this->PriorityNumber;
-
-            $new_index =  $old_index - $direction;
-            $new_index = $new_index == sizeof($children) ? 0 : $new_index;
-            $new_index = $new_index == -1 ? sizeof($children) - 1 : $new_index;
-
-            if( isset($children[ $new_index ] ) )
-            {
-                $second_nav = $children[ $new_index ];
-                $second_nav->PriorityNumber = $old_index;
-                $second_nav->save();
-
-                $this->PriorityNumber = $new_index;
-                $this->save();
-            }
-        }
-    }
-
     /**
-     * Render CMSNav tree as HTML ul>li
-     *
-     * @param CMSNav    $parent Pointer to parent CMSNav
-     * @param string    $view   Path to external view for rendering tree element
-     * @param integer   $limit  Maximal depth
-     * @param int       $level  Current nesting level
-     * @param string    $html   Current
-     * @param function  $counterFunc  Callable function
-     *
-     * @return bool|string
+     * WTF?
      */
-    public function toHTML( & $parent = NULL, $view = NULL, $limit = null, $ulClass = null, $liClass = null, $counterFunc = null, $level = -1, & $html = '' )
-    {
-        // If no parent passed - consider current CMSNav as parent
-        if (!isset( $parent )) {
-            $parent = & $this;
-        }
-
-        // If nesting limit is specified
-        if(($limit > $level) || !isset($limit)) {
-            $last = isset($limit)?($limit-$level):0;
-            // Get all CMSNav children
-            if ($level != -1) {
-                if ($parent->base || ($last == 1)){
-                    $children = $parent->children();
-                } else {
-                    $children = $parent->baseChildren();
-                }
-            } else {
-                $children = $parent->baseChildren();
-            }
-
-
-            // If we have children
-            if (sizeof($children)) {
-                $level++;
-                //trace(sizeof($children).' - ');
-
-
-                // Open container block and pass specified class
-                $html .= '<ul class="'.$ulClass.' level-'.$level.'")>';
-
-                // Iterate all CMSNav children
-                foreach ( $children as $id => $child )
-                {
-                    // Open inner container block
-
-                    $currClass = '';
-
-                    // set current
-                    if (url()->last == '') {
-                        $currClass = 'currentSamsonCMS';
-                    }
-
-                    $html .= '<li class="'.$liClass.' '.$currClass.'">';
-
-                    // count how much materials in current structure
-                    $counter = 0;
-                    if (is_callable($counterFunc)) { $counter = call_user_func($counterFunc, $child); }
-                    // If external view is passed - render it
-                    if (isset($view)) {
-                        $html .= m()->view($view)
-                            ->counter($counter)
-                            ->cmsmaterial($child)
-                            ->output()
-                        ;
-                    } else { // Only output CMSNav name
-                        $html .= $child->Name;
-                    }
-
-                    if (!isset($level) || $level < $limit) {
-                        // Go deeper into recursion
-                        $this->toHTML( $child, $view, $limit, $ulClass, $liClass, null, $level, $html );
-                    }
-
-                    // Close inner container block
-                    $html .= '</li>';
-                }
-
-                // Close container block
-                $html .='</ul>';
-            }
-        }
-
-        return $html;
-    }
-
-
-    public function & def()
-    {
-        $db_cmsmat = null;
-
-        if( ! ifcmsmat( $this->MaterialID, $db_cmsmat, 'id') )
-        {
-        }
-
-        return $db_cmsmat;
-    }
-
-    public function isCurrent( $output = '' ){
-        if( in_array( url()->text().'/', $this->url_base) ) {
-            echo $output; return TRUE;
-        }
-        return FALSE;
-    }
-
-
-    public function __call( $name, $arguments )
-    {
-        if( isset( $this[ $name ] ) || $this->$name )
-        {
-            $html = $this->$name;
-
-            if( isset($_SESSION['__CMS_EDITOR__']) )
-                $html = m('cmsapi')
-                    ->set('field',$name)
-                    ->set('id',$this->id)
-                    ->set('value',$this->$name)
-                    ->set('entity','cmsnav')
-                    ->output('app/view/editor/material.php');
-
-            echo $html;
-        }
-    }
     public function prepare()
     {
         $this->base = true;
@@ -401,21 +205,36 @@ class Navigation extends structure implements  \Iterator
             }
         }
         //elapsed('endBaseChildren');
-        return$this->children;
+        return $this->children;
     }
 
-    /** Serialize handler */
-    public function __sleep()
+    public function rewind()
     {
-        $_attributes = null;
-        eval('$_attributes = '.get_class($this).'::$_attributes;');
-
-        return $_attributes;
+        $this->base();
+        reset( $this->children );
     }
-    public function rewind(){$this->base(); reset( $this->children );	}
-    public function next(){$this->base();	return next( $this->children );	}
-    public function current(){$this->base(); return current( $this->children );	}
-    public function key(){$this->base();return key( $this->children );	}
-    public function valid(){$this->base(); $key = key( $this->children );	return ( $key !== NULL && $key !== FALSE );	}
+
+    public function next()
+    {
+        $this->base();
+        return next( $this->children );
+    }
+
+    public function current()
+    {
+        $this->base();
+        return current( $this->children );
+    }
+    public function key()
+    {
+        $this->base();
+        return key( $this->children );
+    }
+
+    public function valid()
+    {
+        $this->base();
+        $key = key( $this->children );
+        return ($key !== null && $key !== false);
+    }
 }
- 
