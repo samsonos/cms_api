@@ -24,32 +24,23 @@ class Material extends \samson\activerecord\material
         // Create new instance by copying
         $clone = parent::copy($clone);
 
-        // Get all related tables data
-        $parentWithRelation = dbQuery('\samson\cms\CMSMaterial')
-            ->id($this->MaterialID)
-            ->join('samson\cms\CMSMaterialField')
-            ->join('samson\cms\CMSGallery')
-            ->join('samson\cms\CMSNavMaterial')
-            ->first();
-
-        // Create structure material relations
-        if (isset($parentWithRelation->onetomany['_structurematerial'])) {
-            foreach ($parentWithRelation->onetomany['_structurematerial'] as $cmsNavigation) {
-                /** @var \samson\activerecord\Record $cmsNavigation */
+        /** @var \samson\activerecord\structurematerial[] $objects Create structure material relations */
+        $objects = array();
+        if (dbQuery('structurematerial')->cond('MaterialID', $this->MaterialID)->exec($objects)) {
+            foreach ($objects as $cmsNavigation) {
+                /** @var \samson\activerecord\Record $copy */
                 $copy = $cmsNavigation->copy();
                 $copy->MaterialID = $clone->id;
                 $copy->save();
             }
         }
-
-        // Create material field relations
-        if (isset($parentWithRelation->onetomany['_materialfield'])) {
-            foreach ($parentWithRelation->onetomany['_materialfield'] as $pMaterialField) {
-                /** @var \samson\activerecord\Record $pMaterialField */
-
+        /** @var \samson\activerecord\materialfield[] $objects Create material field relations */
+        $objects = array();
+        if (dbQuery('materialfield')->cond('MaterialID', $this->MaterialID)->exec($objects)) {
+            foreach ($objects as $pMaterialField) {
                 // Check if field is NOT excluded from copying
                 if (!in_array($pMaterialField->FieldID, $excludedFields)) {
-                    /** @var \samson\activerecord\dbRecord $materialField Copy instance */
+                    /** @var \samson\activerecord\dbRecord $copy Copy instance */
                     $copy = $pMaterialField->copy();
                     $copy->MaterialID = $clone->id;
                     $copy->save();
@@ -57,12 +48,11 @@ class Material extends \samson\activerecord\material
             }
         }
 
-        // If parent has gallery
-        if (isset($parentWithRelation->onetomany['_gallery'])) {
-            // Iterate all records
-            foreach ($parentWithRelation->onetomany['_gallery'] as $cmsGallery) {
-                /** @var \samson\activerecord\Record $cmsGallery */
-                // Copy them
+        /** @var \samson\activerecord\gallery[] $objects Create gallery field relations */
+        $objects = array();
+        if (dbQuery('gallery')->cond('MaterialID', $this->MaterialID)->exec($objects)) {
+            foreach ($objects as $cmsGallery) {
+                /** @var \samson\activerecord\Record $copy */
                 $copy = $cmsGallery->copy();
                 $copy->MaterialID = $clone->id;
                 $copy->save();
