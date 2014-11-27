@@ -52,9 +52,13 @@ class Material extends \samson\activerecord\material
             $materialfield->save();
         }
 
-        // Create gallery
-        foreach ($parentWithRelation->onetomany['_gallery'] as $cmsgallery) {
-            $cmsgallery->copy();
+        // If parent has gallery
+        if (isset($parentWithRelation->onetomany['_gallery'])) {
+            // Iterate all records
+            foreach ($parentWithRelation->onetomany['_gallery'] as $cmsgallery) {
+                // Copy them
+                $cmsgallery->copy();
+            }
         }
     }
 } 
