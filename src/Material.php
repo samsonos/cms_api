@@ -17,10 +17,11 @@ class Material extends \samson\activerecord\material
      * Create copy of current object
      * @param null $clone Material for cloning
      * @param array $excludedFields excluded from materialfield fields identifiers
+     * @returns void
      */
     public function & copy(& $clone = null, $excludedFields = array())
     {
-        // If no object is passed - create new instance by clonning
+        // If no object is passed - create new instance by cloning
         $clone = !isset($clone) ? clone $this : $clone;
 
         // Get all related tables data
@@ -31,34 +32,35 @@ class Material extends \samson\activerecord\material
             ->join('samson\cms\CMSNavMaterial')
             ->first();
 
-        // Create structurematerial relations
-        foreach ($parentWithRelation->onetomany['_structurematerial'] as $cmsnav) {
-            $cmsnav->copy();
+        // Create structure material relations
+        if (isset($parentWithRelation->onetomany['_structurematerial'])) {
+            foreach ($parentWithRelation->onetomany['_structurematerial'] as $cmsNavigation) {
+                /** @var \samson\activerecord\Record $cmsNavigation */
+                $cmsNavigation->copy();
+            }
         }
 
-        // Create materialfield relaions
-        foreach ($parentWithRelation->onetomany['_materialfield'] as $matfield) {
-            $materialfield = $matfield->copy();
+        // Create material field relations
+        if (isset($parentWithRelation->onetomany['_materialfield'])) {
+            foreach ($parentWithRelation->onetomany['_materialfield'] as $pMaterialField) {
+                /** @var \samson\activerecord\Record $pMaterialField */
 
-            // Check if field is ecluded from copying
-            if (in_array($materialfield->FieldID, $excludedFields)) {
-                $materialfield->Value = '';
-                $materialfield->numeric_value = 0;
-            } else {
-                $materialfield->Value = $matfield->Value;
-                $materialfield->numeric_value = $matfield->numeric_value;
+                // Check if field is NOT excluded from copying
+                if (!in_array($pMaterialField->FieldID, $excludedFields)) {
+                    /** @var \samson\activerecord\dbRecord $materialField Copy instance */
+                    $pMaterialField->copy();
+                }
             }
-
-            $materialfield->save();
         }
 
         // If parent has gallery
         if (isset($parentWithRelation->onetomany['_gallery'])) {
             // Iterate all records
-            foreach ($parentWithRelation->onetomany['_gallery'] as $cmsgallery) {
+            foreach ($parentWithRelation->onetomany['_gallery'] as $cmsGallery) {
+                /** @var \samson\activerecord\Record $cmsGallery */
                 // Copy them
-                $cmsgallery->copy();
+                $cmsGallery->copy();
             }
         }
     }
-} 
+}
