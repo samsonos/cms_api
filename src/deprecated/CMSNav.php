@@ -10,7 +10,7 @@ class CMSNav extends Navigation
 {
     public static $top;
 
-    public $parent = NULL;
+    public $parent = null;
 
     protected $level = 0;
 
