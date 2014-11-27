@@ -1,6 +1,4 @@
 <?php
 namespace samson\cms;
 
-use samson\activerecord\field;
-
-class CMSField extends field {}
+class CMSField extends \samson\activerecord\field {}
