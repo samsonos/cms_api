@@ -18,6 +18,7 @@ class Material extends \samson\activerecord\material
     public static $_sql_select = array();
     public static $_sql_from = array();
     public static $_own_group = array();
+    public static $_map = array();
 
     /**
      * Create copy of current object

@@ -867,6 +867,7 @@ class CMS extends CompressableService
         CMSMaterial::$_sql_select = \samson\activerecord\material::$_sql_select;
         CMSMaterial::$_sql_from = \samson\activerecord\material::$_sql_from;
         CMSMaterial::$_own_group = \samson\activerecord\material::$_own_group;
+        CMSMaterial::$_map = \samson\activerecord\material::$_map;
 
         // Perform db query to get all possible material fields
         if( dbQuery('field')->Active(1)->Name('', dbRelation::NOT_EQUAL)->exec($this->material_fields)) foreach ($this->material_fields as $db_field)
