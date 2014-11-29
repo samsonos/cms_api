@@ -13,6 +13,12 @@ namespace samson\cms;
  */
 class Material extends \samson\activerecord\material
 {
+    /** Override table attributes for late static binding */
+    public static $_attributes = array();
+    public static $_sql_select = array();
+    public static $_sql_from = array();
+    public static $_own_group = array();
+
     /**
      * Create copy of current object
      * @param mixed $clone Material for cloning
