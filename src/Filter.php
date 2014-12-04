@@ -95,7 +95,7 @@ class Filter
         $query->cond($orCondition)->fields('MaterialID', $materialsIDs);
 
         /** @var \samson\activerecord\dbQuery $queryMaterials Query object to get Material objects */
-        $queryMaterials = dbQuery('material')->cond('MaterialID', $materialsIDs)->join('structurematerial');
+        $queryMaterials = dbQuery('\samson\cms\CMSMaterial')->cond('MaterialID', $materialsIDs)->join('structurematerial');
 
         // If structures were set add them to query
         if (!empty($structures)) {

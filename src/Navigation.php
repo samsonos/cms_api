@@ -61,17 +61,17 @@ class Navigation extends structure implements \Iterator
     {
         // Prepare db request to get related fields
         $fieldIDs = dbQuery('structurefield')
-            ->join('field')
             ->cond('StructureID', $this->id)
             ->cond('Active', 1)
             ->fieldsNew('FieldID');
 
         /** @var \samson\cms\NavigationField[] $fields Get collection of related navigation fields */
         $fields = array();
-        if (dbQuery('samson\cms\Field')->id($fieldIDs)->exec($fields)) {
-            // Return one-to-many related fields collection
-            return $fields;
+        if (sizeof($fieldIDs)) {
+            dbQuery('samson\cms\Field')->id($fieldIDs)->exec($fields);
         }
+
+        return $fields;
     }
 
     /**
