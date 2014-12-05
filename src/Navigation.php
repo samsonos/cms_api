@@ -38,6 +38,15 @@ class Navigation extends structure implements \Iterator
     }
 
     /**
+     * Material query injection
+     * @param \samson\activerecord\dbQuery $query Query object
+     */
+    public function materialsHandlers(&$query)
+    {
+        $query->join('gallery');
+    }
+
+    /**
      * Get all related materials
      * @return array Collection of related materials
      */
@@ -46,7 +55,13 @@ class Navigation extends structure implements \Iterator
         /** @var \samson\cms\Material[] $materials Get related materials collection */
         $materials = array();
         // Perform generic material retrieval
-        if (CMS::getMaterialsByStructures(array($this->id), $materials)) {
+        if (CMS::getMaterialsByStructures(
+            array($this->id),
+            $materials,
+            'samson\cms\CMSMaterial',
+            null,
+            null,
+            array($this, 'materialsHandlers'))) {
             // Handle
         }
 
