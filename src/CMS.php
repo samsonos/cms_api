@@ -661,6 +661,12 @@ class CMS extends CompressableService
     {
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` ADD `remains` FLOAT NOT NULL DEFAULT 0 AFTER `system`');
     }
+    
+    /** Added "access_token" field to user table */
+    public function migrate_19_to_20()
+    {
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'user` ADD `access_token` VARCHAR(256) NOT NULL DEFAULT 0');
+    }
 
     public function materialColumnToField($column, $structure)
     {
