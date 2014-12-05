@@ -48,7 +48,7 @@ class Navigation extends structure implements \Iterator
 
     /**
      * Get all related materials
-     * @return array Collection of related materials
+     * @return \samson\cms\CMSMaterial[] Collection of related materials
      */
     public function & materials()
     {
