@@ -60,7 +60,7 @@ class Navigation extends structure implements \Iterator
             $materials,
             'samson\cms\CMSMaterial',
             null,
-            null,
+            array(),
             array($this, 'materialsHandlers'))) {
             // Handle
         }
