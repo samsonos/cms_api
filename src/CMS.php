@@ -91,12 +91,20 @@ class CMS extends CompressableService
         // Convert external handler to array of handlers for backward compatibility
         $handlers = is_callable($handlers) ? array($handlers) : $handlers;
 
-        // Iterate all handlers
+         // Iterate all handlers
         for ($i=0, $size=sizeof($handlers); $i < $size; $i++) {
+
+            // Generic handler parameters array definition if we have parameters for i handle
+            $hParams = isset($handlerParams[$i]) ? $handlerParams[$i] : array();
+            // If this is an array of parameters
+            if (!is_array($hParams)) {
+                $hParams = array($handlerParams[$i]);
+            }
+
             // Create parameters collection
             $params = array_merge(
                 array($handlers[$i]), // First element is callable array or string
-                isset($handlerParams[$i]) ? array($handlerParams[$i]) : array() // Possible additional callable parameters
+                $hParams // Possible additional callable parameters
             );
 
             // Call external query handler
