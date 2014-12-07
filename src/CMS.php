@@ -91,12 +91,20 @@ class CMS extends CompressableService
         // Convert external handler to array of handlers for backward compatibility
         $handlers = is_callable($handlers) ? array($handlers) : $handlers;
 
-        // Iterate all handlers
+         // Iterate all handlers
         for ($i=0, $size=sizeof($handlers); $i < $size; $i++) {
+
+            // Generic handler parameters array definition if we have parameters for i handle
+            $hParams = isset($handlerParams[$i]) ? $handlerParams[$i] : array();
+            // If this is an array of parameters
+            if (!is_array($hParams)) {
+                $hParams = array($handlerParams[$i]);
+            }
+
             // Create parameters collection
             $params = array_merge(
                 array($handlers[$i]), // First element is callable array or string
-                isset($handlerParams[$i]) ? array($handlerParams[$i]) : array() // Possible additional callable parameters
+                $hParams // Possible additional callable parameters
             );
 
             // Call external query handler
@@ -660,6 +668,12 @@ class CMS extends CompressableService
     public function migrate_18_to_19()
     {
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` ADD `remains` FLOAT NOT NULL DEFAULT 0 AFTER `system`');
+    }
+    
+    /** Added "access_token" field to user table */
+    public function migrate_19_to_20()
+    {
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'user` ADD `access_token` VARCHAR(256) NOT NULL DEFAULT 0');
     }
 
     public function materialColumnToField($column, $structure)
