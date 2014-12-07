@@ -1,7 +1,16 @@
 {
 	"name":"samsonos/cms_api",
-	"author":"Vitaly Iegorov <egorov@samsonos.com>",
-    "description":"SamsonCMS API module",
+	"description":"SamsonCMS API module",
+	"authors":[
+		{
+            "name":"Vitaly Iegorov",
+            "email":"egorov@samsonos.com"
+        },
+        {
+            "name":"Nikita Kotenko",
+            "email":"kotenko@samsonos.com"
+        }
+    ],    
     "minimum-stability":"dev",
 	"require":
 	{
@@ -9,8 +18,7 @@
 	},
     "require-dev": {
         "satooshi/php-coveralls": "dev-master",
-        "squizlabs/php_codesniffer": "2.0.*@dev",
-        "phpunit/phpunit": "4.2.*"
+        "phpunit/phpunit": "4.*"
     },
     "license":"Open Software License (OSL) v 3.0",
 	"homepage":"http://samsonos.com/",
