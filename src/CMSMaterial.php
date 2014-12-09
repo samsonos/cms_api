@@ -320,4 +320,31 @@ class CMSMaterial extends Material implements iModuleViewable
 	
 		return $db_materials;
 	}
+
+    /**
+     * Function to delete CMSMaterial completely with it's materialfield records
+     */
+    public function deleteWithFields()
+    {
+        /** @var array $fields Array of materilfields of this material */
+        $fields = null;
+        /** @var \samson\activerecord\materialfield $field Variable to store materailfield object */
+        $field = null;
+        /** @var int $count Variable to store count of materialfields */
+        $count = 0;
+        /** @var string $queryString Query to delete all materialfields */
+        $queryString = 'DELETE FROM `'.\samson\activerecord\dbMySQLConnector::$prefix.'materialfield` WHERE';
+        if(dbQuery('materialfield')->cond('MaterialID', $this->MaterialID)->exec($fields)) {
+            $this->delete();
+            foreach ($fields as $field) {
+                $count++;
+                if ($count == count($fields)) {
+                    $queryString .= ' `MaterialFieldID`='.$field->MaterialFieldID;
+                } else {
+                    $queryString .= ' `MaterialFieldID`='.$field->MaterialFieldID.' OR';
+                }
+            }
+            db()->simple_query($queryString);
+        }
+    }
 }
