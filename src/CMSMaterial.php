@@ -324,24 +324,44 @@ class CMSMaterial extends Material implements iModuleViewable
     /**
      * Function to delete CMSMaterial completely with it's materialfield records
      */
-    public function deleteWithFields()
+    public function deleteWithRelations()
     {
         /** @var array $fields Array of materilfields of this material */
         $fields = null;
-        /** @var \samson\activerecord\materialfield $field Variable to store materailfield object */
-        $field = null;
         /** @var int $count Variable to store count of materialfields */
         $count = 0;
         /** @var string $queryString Query to delete all materialfields */
         $queryString = 'DELETE FROM `'.\samson\activerecord\dbMySQLConnector::$prefix.'materialfield` WHERE';
-        if(dbQuery('materialfield')->cond('MaterialID', $this->MaterialID)->exec($fields)) {
-            $this->delete();
+        /** @var int $materialId Current material identifier */
+        $materialId = $this->MaterialID;
+
+        $this->delete();
+
+        if (dbQuery('materialfield')->cond('MaterialID', $materialId)->exec($fields)) {
+            /** @var \samson\activerecord\materialfield $field Variable to store materailfield object */
             foreach ($fields as $field) {
                 $count++;
-                if ($count == count($fields)) {
+                if ($count >= count($fields)) {
                     $queryString .= ' `MaterialFieldID`='.$field->MaterialFieldID;
                 } else {
                     $queryString .= ' `MaterialFieldID`='.$field->MaterialFieldID.' OR';
+                }
+            }
+            db()->simple_query($queryString);
+        }
+
+        $queryString = 'DELETE FROM `'.\samson\activerecord\dbMySQLConnector::$prefix.'structurematerial` WHERE';
+        $count = 0;
+        /** @var array $structures Array of structurematerials of this material */
+        $structures = null;
+        if (dbQuery('structurematerial')->cond('MaterialID', $materialId)->exec($structures)) {
+            /** @var \samson\activerecord\structurematerial $structure Variable to store structurematerial object */
+            foreach ($structures as $structure) {
+                $count++;
+                if ($count >= count($structures)) {
+                    $queryString .= ' `StructureMaterialID`=' . $structure->StructureMaterialID;
+                } else {
+                    $queryString .= ' `StructureMaterialID`=' . $structure->StructureMaterialID . ' OR';
                 }
             }
             db()->simple_query($queryString);
