@@ -367,4 +367,73 @@ class CMSMaterial extends Material implements iModuleViewable
             db()->simple_query($queryString);
         }
     }
+    
+    /**
+     * Function to retrieve this material table by specified field
+     * @param string $tableSelector Selector to identify table structure
+     * @param string $field Database field by which search is performed
+     * @return array Collection of collections of table cells, represented as materialfield objects
+     */
+    public function getTable($tableSelector, $field = 'Url')
+    {
+        /** @var array $resultTable Collection of collections of field cells */
+        $resultTable = array();
+        /** @var array $tableStructureFields Array of table structure columns */
+        $tableStructureFields = array();
+        /** @var array $tableCells Collection of table materials (table rows) */
+        $tableCells = array();
+        /** @var array $tableMaterialsIds Temporary array to store material identifiers */
+        $tableMaterialsIds = array();
+        /** @var int $materialCount Count of rows */
+        $materialCount = 0;
+        /** @var array $tableFieldsIds Temporary array to store field identifiers */
+        $tableFieldsIds = array();
+        /** @var int $fieldCount Count of columns */
+        $fieldCount = 0;
+
+        /** If there is vale to search in database */
+        if (isset($tableSelector)) {
+            /** If this table has columns */
+            if (dbQuery('structurefield')
+                ->join('structure')
+                ->cond("structure.$field", $tableSelector)
+                ->fields('FieldID', $tableStructureFields)
+            ) {
+                /** If this table has cells */
+                if (dbQuery('materialfield')
+                    ->cond('FieldID', $tableStructureFields)
+                    ->join('material')
+                    ->cond('parent_id', $this->MaterialID)
+                    ->exec($tableCells)
+                ) {
+                    /** Iterate over collection of cells */
+                    /** @var \samson\activerecord\materialfield $tableCell Materialfield object (table cell) */
+                    foreach ($tableCells as $tableCell) {
+                        /** Build proper table */
+                        /** First store rows indexes, which are represented as MaterialID fields in database.
+                         * Now set proper indexes, starting from 0 */
+                        if (!isset($tableMaterialsIds[$tableCell->MaterialID])) {
+                            /** Add new array item, store old index as key and new one as it's value */
+                            $tableMaterialsIds[$tableCell->MaterialID] = $materialCount;
+                            /** Increase array index */
+                            $materialCount++;
+                        }
+                        /** Than store column indexes, which are represented as FieldID fields in database.
+                         * Now set proper indexes, starting from 0 */
+                        if (!isset($tableFieldsIds[$tableCell->FieldID])) {
+                            /** Add new array item, store old index as key and new one as it's value */
+                            $tableFieldsIds[$tableCell->FieldID] = $fieldCount;
+                            /** Increase array index */
+                            $fieldCount++;
+                        }
+                        /** Save sell value in proper place of collection of collections */
+                        $resultTable[$tableMaterialsIds[$tableCell->MaterialID]][$tableFieldsIds[$tableCell->FieldID]] =
+                            $tableCell->Value;
+                    }
+                }
+            }
+        }
+        /** return result table */
+        return $resultTable;
+    }
 }
