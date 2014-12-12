@@ -372,9 +372,10 @@ class CMSMaterial extends Material implements iModuleViewable
      * Function to retrieve this material table by specified field
      * @param string $tableSelector Selector to identify table structure
      * @param string $field Database field by which search is performed
+     * @param array $tableColumns Columns names list
      * @return array Collection of collections of table cells, represented as materialfield objects
      */
-    public function getTable($tableSelector, $field = 'Url')
+    public function getTable($tableSelector, $field = 'Url', &$tableColumns = null)
     {
         /** @var array $resultTable Collection of collections of field cells */
         $resultTable = array();
@@ -399,6 +400,11 @@ class CMSMaterial extends Material implements iModuleViewable
                 ->cond("structure.$field", $tableSelector)
                 ->fields('FieldID', $tableStructureFields)
             ) {
+                /** If column names are requested */
+                if (isset($tableColumns)) {
+                    /** Set them to array, which is returned by reference */
+                    $tableColumns = dbQuery('field')->cond('FieldID', $tableStructureFields)->fields('Name');
+                }
                 /** If this table has cells */
                 if (dbQuery('materialfield')
                     ->cond('FieldID', $tableStructureFields)
