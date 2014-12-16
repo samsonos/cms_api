@@ -676,6 +676,14 @@ class CMS extends CompressableService
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'user` ADD `access_token` VARCHAR(256) NOT NULL DEFAULT 0');
     }
 
+    /** Added `priority` field to `field` and `material` tables */
+    /** Required for materialtables */
+    public function migrate_20_to_21()
+    {
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field` ADD `priority` INT(11) NOT NULL DEFAULT 0 AFTER `ParentID`');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` ADD `priority` INT(11) NOT NULL DEFAULT 0 AFTER `parent_id`');
+    }
+
     public function materialColumnToField($column, $structure)
     {
         // Find first user

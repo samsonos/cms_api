@@ -379,68 +379,70 @@ class CMSMaterial extends Material implements iModuleViewable
     {
         /** @var array $resultTable Collection of collections of field cells */
         $resultTable = array();
-        /** @var array $tableStructureFields Array of table structure columns */
-        $tableStructureFields = array();
-        /** @var array $tableCells Collection of table materials (table rows) */
-        $tableCells = array();
-        /** @var array $tableMaterialsIds Temporary array to store material identifiers */
-        $tableMaterialsIds = array();
-        /** @var int $materialCount Count of rows */
-        $materialCount = 0;
-        /** @var array $tableFieldsIds Temporary array to store field identifiers */
-        $tableFieldsIds = array();
-        /** @var int $fieldCount Count of columns */
-        $fieldCount = 0;
+        /** @var array $dbTableFields Array of table structure columns */
+        $dbTableFields = array();
+        /** @var array $dbTableFieldsIds Array of table structure column identifiers */
+        $dbTableFieldsIds = array();
+        /** @var array $dbTableCells Collection of table materialfield objects (table cells) */
+        $dbTableCells = array();
+        /** @var array $tableRowIds Temporary array to store rows identifiers (key is material_id) */
+        $tableRowIds = array();
+        /** @var int $rowCount Count of rows */
+        $rowCount = 0;
+        /** @var array $tableColumnIds Temporary array to store column identifiers (key is field_id) */
+        $tableColumnIds = array();
+        /** @var int $columnCount Count of columns */
+        $columnCount = 0;
 
         /** If there is vale to search in database */
         if (isset($tableSelector)) {
             /** If this table has columns */
-            if (dbQuery('structurefield')
+            if (dbQuery('field')
+                ->order_by('field.priority')
+                ->join('structurefield')
                 ->join('structure')
                 ->cond("structure.$field", $tableSelector)
-                ->fields('FieldID', $tableStructureFields)
+                ->exec($dbTableFields)
             ) {
-                /** If column names are requested */
-                if (isset($tableColumns)) {
-                    /** Set them to array, which is returned by reference */
-                    $tableColumns = dbQuery('field')->cond('FieldID', $tableStructureFields)->fields('Name');
+                /** @var \samson\cms\CMSField $dbTableField Table column */
+                foreach ($dbTableFields as $dbTableField) {
+                    /** Form field identifiers array to use in query */
+                    $dbTableFieldsIds[] = $dbTableField->FieldID;
+                    /** Add table columns names */
+                    $tableColumns[] = $dbTableField->Name;
+                    /** Store proper column order */
+                    $tableColumnIds[$dbTableField->FieldID] = $columnCount;
+                    $columnCount++;
                 }
                 /** If this table has cells */
                 if (dbQuery('materialfield')
-                    ->cond('FieldID', $tableStructureFields)
+                    ->cond('FieldID', $dbTableFieldsIds)
                     ->join('material')
                     ->cond('parent_id', $this->MaterialID)
-                    ->exec($tableCells)
+                    ->order_by('material.priority')
+                    ->exec($dbTableCells)
                 ) {
                     /** Iterate over collection of cells */
-                    /** @var \samson\activerecord\materialfield $tableCell Materialfield object (table cell) */
-                    foreach ($tableCells as $tableCell) {
+                    /** @var \samson\activerecord\materialfield $dbTableCell Materialfield object (table cell) */
+                    foreach ($dbTableCells as $dbTableCell) {
                         /** Build proper table */
-                        /** First store rows indexes, which are represented as MaterialID fields in database.
+                        /** Store rows indexes, which are represented as MaterialID fields in database.
                          * Now set proper indexes, starting from 0 */
-                        if (!isset($tableMaterialsIds[$tableCell->MaterialID])) {
+                        if (!isset($tableRowIds[$dbTableCell->MaterialID])) {
                             /** Add new array item, store old index as key and new one as it's value */
-                            $tableMaterialsIds[$tableCell->MaterialID] = $materialCount;
+                            $tableRowIds[$dbTableCell->MaterialID] = $rowCount;
                             /** Increase array index */
-                            $materialCount++;
-                        }
-                        /** Than store column indexes, which are represented as FieldID fields in database.
-                         * Now set proper indexes, starting from 0 */
-                        if (!isset($tableFieldsIds[$tableCell->FieldID])) {
-                            /** Add new array item, store old index as key and new one as it's value */
-                            $tableFieldsIds[$tableCell->FieldID] = $fieldCount;
-                            /** Increase array index */
-                            $fieldCount++;
+                            $rowCount++;
                         }
                         /** If the value is not numeric set */
-                        if (!empty($tableCell->Value)) {
+                        if (!empty($dbTableCell->Value)) {
                             /** Save sell value in proper place of collection of collections */
-                            $resultTable[$tableMaterialsIds[$tableCell->MaterialID]][$tableFieldsIds[$tableCell->FieldID]] =
-                                $tableCell->Value;
+                            $resultTable[$tableRowIds[$dbTableCell->MaterialID]][$tableColumnIds[$dbTableCell->FieldID]] =
+                                $dbTableCell->Value;
                         } else {
                             /** Try to find it as numeric one */
-                            $resultTable[$tableMaterialsIds[$tableCell->MaterialID]][$tableFieldsIds[$tableCell->FieldID]] =
-                                $tableCell->numeric_value;
+                            $resultTable[$tableRowIds[$dbTableCell->MaterialID]][$tableColumnIds[$dbTableCell->FieldID]] =
+                                $dbTableCell->numeric_value;
                         }
                     }
                 }
