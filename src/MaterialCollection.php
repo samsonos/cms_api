@@ -22,6 +22,8 @@ class MaterialCollection extends GenericMaterialCollection
 
     /**
      * Generic collection constructor
+     * @param callback $indexRenderer Parent block render function
+     * @param callback $itemRenderer Inner block render function
      */
     public function __construct($indexRenderer, $itemRenderer)
     {
@@ -59,7 +61,8 @@ class MaterialCollection extends GenericMaterialCollection
      * Fill collection with items
      * @return Material[] Collection of product items
      */
-    public function fill(){
+    public function fill()
+    {
         return $this->collection;
     }
-} 
+}
