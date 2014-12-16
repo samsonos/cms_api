@@ -25,13 +25,13 @@ abstract class GenericMaterialCollection implements \Iterator, iModuleViewable
      * Render material collection block
      * @return string Rendered material collection block
      */
-    public abstract function render();
+    abstract public function render();
 
     /**
      * Fill collection with items
      * @return Material[] Collection of product items
      */
-    public abstract function fill();
+    abstract public function fill();
 
     /**
      * Render products collection block
@@ -69,7 +69,7 @@ abstract class GenericMaterialCollection implements \Iterator, iModuleViewable
      */
     public function next()
     {
-        return next($this->collection);
+        next($this->collection);
     }
 
     /**
@@ -94,7 +94,7 @@ abstract class GenericMaterialCollection implements \Iterator, iModuleViewable
     {
         $key = key($this->collection);
 
-        return ( $key !== NULL && $key !== FALSE);
+        return ($key !== null && $key !== false);
     }
 
     /**
