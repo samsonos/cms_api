@@ -432,9 +432,16 @@ class CMSMaterial extends Material implements iModuleViewable
                             /** Increase array index */
                             $fieldCount++;
                         }
-                        /** Save sell value in proper place of collection of collections */
-                        $resultTable[$tableMaterialsIds[$tableCell->MaterialID]][$tableFieldsIds[$tableCell->FieldID]] =
-                            $tableCell->Value;
+                        /** If the value is not numeric set */
+                        if (!empty($tableCell->Value)) {
+                            /** Save sell value in proper place of collection of collections */
+                            $resultTable[$tableMaterialsIds[$tableCell->MaterialID]][$tableFieldsIds[$tableCell->FieldID]] =
+                                $tableCell->Value;
+                        } else {
+                            /** Try to find it as numeric one */
+                            $resultTable[$tableMaterialsIds[$tableCell->MaterialID]][$tableFieldsIds[$tableCell->FieldID]] =
+                                $tableCell->numeric_value;
+                        }
                     }
                 }
             }
