@@ -1,6 +1,7 @@
 <?php 
 namespace samson\cms;
 
+use samson\activerecord\Condition;
 use samson\core\iModuleViewable;
 use samson\activerecord\dbConditionArgument;
 use samson\activerecord\dbConditionGroup;
@@ -373,9 +374,11 @@ class CMSMaterial extends Material implements iModuleViewable
      * @param string $tableSelector Selector to identify table structure
      * @param string $field Database field by which search is performed
      * @param array $tableColumns Columns names list
+     * @param string $externalHandler External handler to perform some extra code
+     * @param array $params External handler params
      * @return array Collection of collections of table cells, represented as materialfield objects
      */
-    public function getTable($tableSelector, $field = 'Url', &$tableColumns = null)
+    public function getTable($tableSelector, $selector = 'Url', &$tableColumns = null, $externalHandler = null, $params = array())
     {
         /** @var array $resultTable Collection of collections of field cells */
         $resultTable = array();
@@ -383,72 +386,79 @@ class CMSMaterial extends Material implements iModuleViewable
         $dbTableFields = array();
         /** @var array $dbTableFieldsIds Array of table structure column identifiers */
         $dbTableFieldsIds = array();
-        /** @var array $dbTableCells Collection of table materialfield objects (table cells) */
-        $dbTableCells = array();
-        /** @var array $tableRowIds Temporary array to store rows identifiers (key is material_id) */
-        $tableRowIds = array();
-        /** @var int $rowCount Count of rows */
-        $rowCount = 0;
         /** @var array $tableColumnIds Temporary array to store column identifiers (key is field_id) */
         $tableColumnIds = array();
         /** @var int $columnCount Count of columns */
         $columnCount = 0;
 
-        /** If there is vale to search in database */
-        if (isset($tableSelector)) {
-            /** If this table has columns */
-            if (dbQuery('field')
-                ->order_by('field.priority')
-                ->join('structurefield')
-                ->join('structure')
-                ->cond("structure.$field", $tableSelector)
-                ->exec($dbTableFields)
-            ) {
-                /** @var \samson\cms\CMSField $dbTableField Table column */
-                foreach ($dbTableFields as $dbTableField) {
-                    /** Form field identifiers array to use in query */
-                    $dbTableFieldsIds[] = $dbTableField->FieldID;
-                    /** Add table columns names */
-                    $tableColumns[] = $dbTableField->Name;
-                    /** Store proper column order */
-                    $tableColumnIds[$dbTableField->FieldID] = $columnCount;
-                    $columnCount++;
+        // Get structure object if we need to search it by other fields
+        if ($selector != 'StructureID') {
+            $structure = dbQuery('structure')->cond($selector, $tableSelector)->first();
+            $tableSelector = $structure->id;
+        }
+
+        /** If this table has columns */
+        if (dbQuery('structurefield')
+            ->cond("StructureID", $tableSelector)
+            ->fieldsNew('FieldID', $dbTableFieldsIds)
+        ) {
+
+            $localizedFields = array();
+            $unlocalizedFields = array();
+            /** @var \samson\cms\CMSField $dbTableField Table column */
+            foreach (dbQuery('field')->order_by('priority')->cond('FieldID', $dbTableFieldsIds)->exec() as $field) {
+                /** Add table columns names */
+                $tableColumns[] = $field->Name;
+                if ($field->local == 1) {
+                    $localizedFields[] = $field->id;
+                } else {
+                    $unlocalizedFields[] = $field->id;
                 }
-                /** If this table has cells */
-                if (dbQuery('materialfield')
-                    ->cond('FieldID', $dbTableFieldsIds)
-                    ->join('material')
-                    ->cond('parent_id', $this->MaterialID)
-                    ->order_by('material.priority')
-                    ->exec($dbTableCells)
-                ) {
-                    /** Iterate over collection of cells */
-                    /** @var \samson\activerecord\materialfield $dbTableCell Materialfield object (table cell) */
-                    foreach ($dbTableCells as $dbTableCell) {
-                        /** Build proper table */
-                        /** Store rows indexes, which are represented as MaterialID fields in database.
-                         * Now set proper indexes, starting from 0 */
-                        if (!isset($tableRowIds[$dbTableCell->MaterialID])) {
-                            /** Add new array item, store old index as key and new one as it's value */
-                            $tableRowIds[$dbTableCell->MaterialID] = $rowCount;
-                            /** Increase array index */
-                            $rowCount++;
-                        }
-                        /** If the value is not numeric set */
-                        if (!empty($dbTableCell->Value)) {
-                            /** Save sell value in proper place of collection of collections */
-                            $resultTable[$tableRowIds[$dbTableCell->MaterialID]][$tableColumnIds[$dbTableCell->FieldID]] =
-                                $dbTableCell->Value;
-                        } else {
-                            /** Try to find it as numeric one */
-                            $resultTable[$tableRowIds[$dbTableCell->MaterialID]][$tableColumnIds[$dbTableCell->FieldID]] =
-                                $dbTableCell->numeric_value;
-                        }
-                    }
+            }
+
+            // Query to get table rows(table materials)
+            $tableQuery = dbQuery('material')
+                ->cond('parent_id', $this->MaterialID)
+                ->cond('Active', '1')
+                ->join('structurematerial')
+                ->cond('structurematerial_StructureID', $tableSelector)
+                ->order_by('priority')
+                ;
+
+            // Call user function if exists
+            if (is_callable($externalHandler)) {
+                // Give it query as parameter
+                call_user_func_array($externalHandler, array_merge(array(&$tableQuery), $params));
+            }
+
+            //
+            $tableMaterialIds = array();
+            if ($tableQuery->fieldsNew('MaterialID', $tableMaterialIds)) {
+                //
+                $localizedFieldCond = new Condition('and');
+                $localizedFieldCond->add('materialfield_FieldID', $localizedFields)
+                    ->add('materialfield_locale', locale());
+
+                //
+                $localizationFieldCond = new Condition('or');
+                $localizationFieldCond->add($localizedFieldCond)
+                    ->add('materialfield_FieldID', $unlocalizedFields);
+
+                $materialFieldQuery = dbQuery('materialfield')
+                    ->cond('MaterialID', $tableMaterialIds)
+                    ->cond($localizationFieldCond);
+
+                // Flip field identifiers as keys
+                $tableColumnIds = array_flip($dbTableFieldsIds);
+
+                /** @var \samson\activerecord\material $dbTableRow Material object (table row) */
+                foreach ($materialFieldQuery->exec() as & $mf) {
+                    $resultTable[$mf['MaterialID']][$tableColumnIds[$mf->FieldID]] =
+                        !empty($mf->Value) ? $mf->Value : $mf->numeric_value;
                 }
             }
         }
-        /** return result table */
-        return $resultTable;
+
+        return array_values($resultTable);
     }
 }
