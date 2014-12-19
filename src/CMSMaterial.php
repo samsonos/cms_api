@@ -378,18 +378,12 @@ class CMSMaterial extends Material implements iModuleViewable
      * @param array $params External handler params
      * @return array Collection of collections of table cells, represented as materialfield objects
      */
-    public function getTable($tableSelector, $selector = 'Url', &$tableColumns = null, $externalHandler = null, $params = array())
+    public function getTable($tableSelector, $selector = 'StructureID', &$tableColumns = null, $externalHandler = null, $params = array())
     {
         /** @var array $resultTable Collection of collections of field cells */
         $resultTable = array();
-        /** @var array $dbTableFields Array of table structure columns */
-        $dbTableFields = array();
         /** @var array $dbTableFieldsIds Array of table structure column identifiers */
         $dbTableFieldsIds = array();
-        /** @var array $tableColumnIds Temporary array to store column identifiers (key is field_id) */
-        $tableColumnIds = array();
-        /** @var int $columnCount Count of columns */
-        $columnCount = 0;
 
         // Get structure object if we need to search it by other fields
         if ($selector != 'StructureID') {
@@ -402,7 +396,7 @@ class CMSMaterial extends Material implements iModuleViewable
             ->cond("StructureID", $tableSelector)
             ->fieldsNew('FieldID', $dbTableFieldsIds)
         ) {
-
+            // Get localized and not localized fields
             $localizedFields = array();
             $unlocalizedFields = array();
             /** @var \samson\cms\CMSField $dbTableField Table column */
@@ -431,22 +425,31 @@ class CMSMaterial extends Material implements iModuleViewable
                 call_user_func_array($externalHandler, array_merge(array(&$tableQuery), $params));
             }
 
-            //
+            // Get table row materials
             $tableMaterialIds = array();
             if ($tableQuery->fieldsNew('MaterialID', $tableMaterialIds)) {
-                //
-                $localizedFieldCond = new Condition('and');
-                $localizedFieldCond->add('materialfield_FieldID', $localizedFields)
-                    ->add('materialfield_locale', locale());
-
-                //
+                // Create field condition
                 $localizationFieldCond = new Condition('or');
-                $localizationFieldCond->add($localizedFieldCond)
-                    ->add('materialfield_FieldID', $unlocalizedFields);
 
+                // Create localized condition
+                if (sizeof($localizedFields)) {
+                    $localizedFieldCond = new Condition('and');
+                    $localizedFieldCond->add('materialfield_FieldID', $localizedFields)
+                        ->add('materialfield_locale', locale());
+                }
+                // Add this condition to condition group
+                $localizationFieldCond->add($localizedFieldCond);
+
+                // Create not localized condition
+                if (sizeof($unlocalizedFields)) {
+                    $localizationFieldCond->add('materialfield_FieldID', $unlocalizedFields);
+                }
+
+                // Create db query
                 $materialFieldQuery = dbQuery('materialfield')
                     ->cond('MaterialID', $tableMaterialIds)
-                    ->cond($localizationFieldCond);
+                    ->cond($localizationFieldCond)
+                ;
 
                 // Flip field identifiers as keys
                 $tableColumnIds = array_flip($dbTableFieldsIds);
