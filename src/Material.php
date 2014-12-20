@@ -45,6 +45,24 @@ class Material extends \samson\activerecord\material
     }
 
     /**
+     * Get select additional field text value
+     * @return string Select field text
+     */
+    public function selectText($fieldID)
+    {
+        /** @var \samson\activerecord\field $field */
+        $field = null;
+        if (isset($this[$fieldID]{0}) && dbQuery('field')->id($fieldID)->first($field)) {
+            $types = array();
+            foreach (explode(',', $field->Value) as $typeValue) {
+                $typeValue = explode(':', $typeValue);
+                $types[$typeValue[0]] = $typeValue[1];
+            }
+            return $types[$this[$fieldID]];
+        }
+    }
+
+    /**
      * Create copy of current object
      * @param mixed $clone Material for cloning
      * @param array $excludedFields excluded from materialfield fields identifiers
