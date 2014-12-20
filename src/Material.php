@@ -26,7 +26,7 @@ class Material extends \samson\activerecord\material
      * @param array|string $class Class for database query
      * @return \samson\cms\Material[] Collection of found materials
      */
-    public static function byId($identifier, $class = 'samson\cms\Material')
+    public static function byId($identifier, $class = 'samson\cms\CMSMaterial')
     {
         // Convert id to array
         $identifier = is_array($identifier) ? $identifier : array($identifier);
