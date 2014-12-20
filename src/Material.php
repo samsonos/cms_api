@@ -21,6 +21,30 @@ class Material extends \samson\activerecord\material
     public static $_map = array();
 
     /**
+     * Get materials by identifier(s)
+     * @param array|string $identifier Material identifier or collection
+     * @param array|string $class Class for database query
+     * @return \samson\cms\Material[] Collection of found materials
+     */
+    public static function byId($identifier, $class = 'samson\cms\Material')
+    {
+        // Convert id to array
+        $identifier = is_array($identifier) ? $identifier : array($identifier);
+
+        $result = array();
+
+        // If we have passed any identifier
+        if (sizeof($identifier)) {
+            // Perform db request and get materials
+            $result = dbQuery($class)
+                ->cond('MaterialID', $identifier)
+                ->exec();
+        }
+
+        return $result;
+    }
+
+    /**
      * Create copy of current object
      * @param mixed $clone Material for cloning
      * @param array $excludedFields excluded from materialfield fields identifiers
