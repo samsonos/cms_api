@@ -38,6 +38,29 @@ abstract class GenericCollection implements \Iterator, IViewSettable
      */
     abstract public function fill();
 
+    public function renderIndex($items)
+    {
+        return $this->renderer
+            ->view($this->indexView)
+            ->set('items', $items)
+            ->output();
+    }
+
+    public function renderItem($item)
+    {
+        return $this->renderer
+            ->view($this->itemView)
+            ->set($item, 'item')
+            ->output();
+    }
+
+    public function renderEmpty()
+    {
+        return $this->renderer
+            ->view($this->emptyView)
+            ->output();
+    }
+
     /**
      * Render material collection block
      * @return string Rendered material collection block
@@ -51,19 +74,13 @@ abstract class GenericCollection implements \Iterator, IViewSettable
             // Render all block items
             foreach ($this->collection as &$item) {
                 // Render item views
-                $html .= $this->renderer
-                    ->view($this->itemView)
-                    ->set($item, 'item')
-                    ->output();
+                $html .= $this->renderItem($item);
             }
             // Render block view
-            $html = $this->renderer
-                ->view($this->indexView)
-                ->set('items', $html)
-                ->output();
+            $html = $this->renderIndex($html);
 
         } elseif (isset($this->emptyView{0})) { // Render empty view
-            $html = $this->renderer->view($this->emptyView)->output();
+            $html = $this->renderEmpty();
         }
 
         return $html;
