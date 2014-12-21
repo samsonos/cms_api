@@ -38,6 +38,11 @@ abstract class GenericCollection implements \Iterator, IViewSettable
      */
     abstract public function fill();
 
+    /**
+     * Parent collection block render function
+     * @param string $items Rendered items
+     * @return string Rendered collection block
+     */
     public function renderIndex($items)
     {
         return $this->renderer
@@ -46,6 +51,11 @@ abstract class GenericCollection implements \Iterator, IViewSettable
             ->output();
     }
 
+    /**
+     * Render collection item block
+     * @param mixed $item Item to render
+     * @return string Rendered collection item block
+     */
     public function renderItem($item)
     {
         return $this->renderer
@@ -54,6 +64,10 @@ abstract class GenericCollection implements \Iterator, IViewSettable
             ->output();
     }
 
+    /**
+     * Empty collection block render function
+     * @return string Rendered empty collection block
+     */
     public function renderEmpty()
     {
         return $this->renderer
