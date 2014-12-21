@@ -27,8 +27,8 @@ class MaterialCollection extends GenericMaterialCollection
      */
     public function __construct($indexRenderer, $itemRenderer)
     {
+        // Store external renderers
         $this->indexRenderer = $indexRenderer;
-
         $this->itemRenderer = $itemRenderer;
 
         // Call parent constructor
@@ -48,10 +48,10 @@ class MaterialCollection extends GenericMaterialCollection
             // Render all block items
             foreach ($this->collection as &$item) {
                 // Call external block item renderer and pass item to it
-                $html .= call_user_func_array($this->itemRenderer, array(&$item));
+                $html .= call_user_func_array($this->itemRenderer, array(&$item, $this->itemView));
             }
             // Render block view
-            $html = call_user_func_array($this->indexRenderer, array(&$html));
+            $html = call_user_func_array($this->indexRenderer, array(&$html, $this->indexView));
         }
 
         return $html;
