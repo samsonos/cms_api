@@ -118,9 +118,9 @@ abstract class GenericCollection implements \Iterator, IViewSettable
      * Generic collection constructor
      * @var \samson\core\IViewable View render object
      */
-    public function __construct(& $renderer)
+    public function __construct($renderer)
     {
-        $this->renderer = & $renderer;
+        $this->renderer = clone $renderer;
     }
 
     /**
