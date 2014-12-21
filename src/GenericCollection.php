@@ -34,7 +34,7 @@ abstract class GenericCollection implements \Iterator, IViewSettable
 
     /**
      * Fill collection with items
-     * @return Material[] Collection of product items
+     * @return array Collection of items
      */
     abstract public function fill();
 
