@@ -52,14 +52,20 @@ class Material extends \samson\activerecord\material
     {
         /** @var \samson\activerecord\field $field */
         $field = null;
-        if (isset($this[$fieldID]{0}) && dbQuery('field')->id($fieldID)->first($field)) {
-            $types = array();
-            foreach (explode(',', $field->Value) as $typeValue) {
-                $typeValue = explode(':', $typeValue);
-                $types[$typeValue[0]] = $typeValue[1];
+        if (dbQuery('field')->id($fieldID)->first($field)) {
+            // If this entity has this field set
+            if (isset($this[$field->Name]{0})) {
+                $types = array();
+                foreach (explode(',', $field->Value) as $typeValue) {
+                    $typeValue = explode(':', $typeValue);
+                    $types[$typeValue[0]] = $typeValue[1];
+                }
+                return $types[$this[$field->Name]];
             }
-            return $types[$this[$fieldID]];
         }
+
+        // Value not set
+        return '';
     }
 
     /**
