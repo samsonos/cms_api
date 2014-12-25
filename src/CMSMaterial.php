@@ -437,9 +437,9 @@ class CMSMaterial extends Material implements iModuleViewable
                     $localizedFieldCond = new Condition('and');
                     $localizedFieldCond->add('materialfield_FieldID', $localizedFields)
                         ->add('materialfield_locale', locale());
+                    // Add this condition to condition group
+                    $localizationFieldCond->add($localizedFieldCond);
                 }
-                // Add this condition to condition group
-                $localizationFieldCond->add($localizedFieldCond);
 
                 // Create not localized condition
                 if (sizeof($unlocalizedFields)) {

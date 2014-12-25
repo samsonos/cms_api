@@ -21,6 +21,54 @@ class Material extends \samson\activerecord\material
     public static $_map = array();
 
     /**
+     * Get materials by identifier(s)
+     * @param array|string $identifier Material identifier or collection
+     * @param array|string $class Class for database query
+     * @return \samson\cms\Material[] Collection of found materials
+     */
+    public static function byId($identifier, $class = 'samson\cms\CMSMaterial')
+    {
+        // Convert id to array
+        $identifier = is_array($identifier) ? $identifier : array($identifier);
+
+        $result = array();
+
+        // If we have passed any identifier
+        if (sizeof($identifier)) {
+            // Perform db request and get materials
+            $result = dbQuery($class)
+                ->cond('MaterialID', $identifier)
+                ->exec();
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get select additional field text value
+     * @return string Select field text
+     */
+    public function selectText($fieldID)
+    {
+        /** @var \samson\activerecord\field $field */
+        $field = null;
+        if (dbQuery('field')->id($fieldID)->first($field)) {
+            // If this entity has this field set
+            if (isset($this[$field->Name]{0})) {
+                $types = array();
+                foreach (explode(',', $field->Value) as $typeValue) {
+                    $typeValue = explode(':', $typeValue);
+                    $types[$typeValue[0]] = $typeValue[1];
+                }
+                return $types[$this[$field->Name]];
+            }
+        }
+
+        // Value not set
+        return '';
+    }
+
+    /**
      * Create copy of current object
      * @param mixed $clone Material for cloning
      * @param array $excludedFields excluded from materialfield fields identifiers

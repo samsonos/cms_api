@@ -1,8 +1,6 @@
-#Material collections
+#Generic collections ```\samson\cms\GenericCollection```
 
-This class is a generic approach for rendering catalogs and lists
-of materials, it should be extended to match needs of specific
-project.
+This class is a generic approach for rendering catalogs and lists, it should be extended and overloaded to match needs of your specific project.
 
 ##Iterating material collection
 This class implements ```\Iterator``` interface for giving ability to iterate

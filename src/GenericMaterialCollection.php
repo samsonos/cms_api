@@ -15,6 +15,7 @@ use samson\core\iModuleViewable;
  * project.
  *
  * @package samson\cms
+ * @deprecated Use GenericCollection
  */
 abstract class GenericMaterialCollection implements \Iterator, iModuleViewable
 {
