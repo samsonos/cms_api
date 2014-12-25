@@ -238,11 +238,12 @@ class CMSMaterial extends Material implements iModuleViewable
 			{				
 				// Render editor value view
 				$html = m('cmsapi')
+                    ->view('app/view/editor/material.php')
 				->set('field',$name)
 				->set('id',$this->id)
 				->set('value',$this->$name)
 				->set('entity','cmsmaterial')
-				->output('app/view/editor/material.php');	
+				->output();
 			}
 			
 			// Echo or return
