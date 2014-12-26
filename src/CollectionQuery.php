@@ -25,8 +25,40 @@ class CollectionQuery
     /** @var array Collection of navigation filters */
     protected $navigation = array();
 
+    /** @var array Collection of query handlers */
+    protected $handlers = array();
+
+    /** @var callback External material handler */
+    protected $materialHandler = array();
+
     /** @var array Collection of field filters */
     protected $field = array();
+
+    /**
+     * Add external handler
+     * @param callback $handler
+     * @param array $params
+     * @return self Chaining
+     */
+    public function handler($handler, array $params)
+    {
+        $this->handlers[] = array($handler, $params);
+
+        return $this;
+    }
+
+    /**
+     * Set external material handler
+     * @param callback $handler
+     * @param array $params
+     * @return self Chaining
+     */
+    public function materialHandler($handler, array $params)
+    {
+        $this->materialHandler = array_merge(array($handler), $params);
+
+        return $this;
+    }
 
     /**
      * Filter collection using navigation entity or collection of them.
@@ -116,7 +148,7 @@ class CollectionQuery
            $query->cond('MaterialID', $this->materialIDs);
         }
 
-        // Iterate all applied navigation filters
+        // Iterate all applied field filters
         foreach ($this->field as $field) {
             // Get field
             $valueField = $field[0]->Type == 7 ? 'numeric_value' : 'value';
@@ -133,7 +165,24 @@ class CollectionQuery
             }
         }
 
+        // Call external handlers chain
+        foreach($this->handlers as $handler) {
+            $this->materialIDs = call_user_func_array(
+                $handler[0],
+                array_merge(array(&$this->materialIDs), $handler[1])
+            );
+        }
+
+
+        // Create final material query
+        $query = dbQuery('\samson\cms\CMSMaterial');
+
+        // Set external material query handler
+        if (is_callable($this->materialHandler[0])) {
+            call_user_func_array(array($query, 'handler'), $this->materialHandler);
+        }
+
         // Return final filtered material query result
-        return dbQuery('\samson\cms\CMSMaterial')->cond('MaterialID')->exec($collection);
+        return $query->cond('MaterialID')->exec($collection);
     }
 }
