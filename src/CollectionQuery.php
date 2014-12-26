@@ -12,6 +12,11 @@ namespace samson\cms;
 use samson\activerecord\Condition;
 use samson\activerecord\dbRelation;
 
+/**
+ * Collection query builder for filtering
+ * @package samson\cms
+ * @author Egorov Vitaly <egorov@samsonos.com>
+ */
 class CollectionQuery
 {
     /** @var array Collection for current filtered material identifiers */
@@ -39,11 +44,11 @@ class CollectionQuery
             $idOrUrl = new Condition('OR');
             $idOrUrl->add('StructureID', $navigation)->add('Url', $navigation);
 
-            /** @var \samson\activerecord\structure $navigation */
-            $navigation = null;
-            if (dbQuery('structure')->cond($idOrUrl)->exec($navigation)) {
+            /** @var array $navigationIds  */
+            $navigationIds = null;
+            if (dbQuery('structure')->cond($idOrUrl)->fieldsNew('StructureID', $navigationIds)) {
                 // Store all retrieved navigation elements as navigation collection filter
-                $this->navigation[] = $navigation;
+                $this->navigation[] = $navigationIds;
             }
         }
 
@@ -78,4 +83,57 @@ class CollectionQuery
         // Chaining
         return $this;
     }
-} 
+
+    /**
+     * Perform collection database retrieval using setted filters
+     * @param array $collection Return value
+     * @return bool|mixed
+     */
+    public function exec(& $collection = array())
+    {
+        // Create navigation material query
+        $query = dbQuery('structurematerial');
+
+        // Clear current materials identifiers list
+        $this->materialIDs = array();
+
+        // Iterate all applied navigation filters
+        foreach ($this->navigation as $navigation) {
+            // Perform request to get next portion of filtered material identifiers
+            if ($query->cond('StructureID', $navigation)->fieldsNew('MaterialID', $this->materialIDs)) {
+                // Apply retrieved material ids to next query
+                $query->cond('MaterialID', $this->materialIDs);
+            } else { // This filter applying failed
+                return false;
+            }
+        }
+
+        // Create navigation material query
+        $query = dbQuery('materialfield');
+
+        // Apply current filtered material identifiers
+        if (sizeof($this->materialIDs)) {
+           $query->cond('MaterialID', $this->materialIDs);
+        }
+
+        // Iterate all applied navigation filters
+        foreach ($this->field as $field) {
+            // Get field
+            $valueField = $field[0]->Type == 7 ? 'numeric_value' : 'value';
+            // Perform request to get next portion of filtered material identifiers
+            if ($query->cond('FieldID', $field[0]->id)
+                ->cond($valueField, $field[1], $field[2])
+                ->group_by('MaterialID')
+                ->fieldsNew('MaterialID', $this->materialIDs)
+            ) {
+                // Apply retrieved material ids to next query
+                $query->cond('MaterialID', $this->materialIDs);
+            } else { // This filter applying failed
+                return false;
+            }
+        }
+
+        // Return final filtered material query result
+        return dbQuery('\samson\cms\CMSMaterial')->cond('MaterialID')->exec($collection);
+    }
+}
