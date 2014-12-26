@@ -42,7 +42,7 @@ class CollectionQuery
             /** @var \samson\activerecord\structure $navigation */
             $navigation = null;
             if (dbQuery('structure')->cond($idOrUrl)->exec($navigation)) {
-                // Store all retrieved navigation elements ass navigation collection filter
+                // Store all retrieved navigation elements as navigation collection filter
                 $this->navigation[] = $navigation;
             }
         }
@@ -51,8 +51,31 @@ class CollectionQuery
         return $this;
     }
 
+    /**
+     * Filter collection using additional field entity.
+     *
+     * @param string|integer $field Additional field identifier or name
+     * @param mixed $value Additional field value for filtering
+     * @param string $relation Additional field relation for filtering
+     * @return self Chaining
+     */
     public function field($field, $value, $relation = dbRelation::EQUAL)
     {
+        // Do not allow empty strings
+        if(isset($field{0})) {
+            // Create id or URL condition
+            $idOrUrl = new Condition('OR');
+            $idOrUrl->add('FieldID', $field)->add('Name', $field);
 
+            /** @var \samson\activerecord\field $navigation */
+            $navigation = null;
+            if (dbQuery('field')->cond($idOrUrl)->first($field)) {
+                // Store retrieved field element and its value as field collection filter
+                $this->field[] = array($field, $value, $relation);
+            }
+        }
+
+        // Chaining
+        return $this;
     }
 } 
