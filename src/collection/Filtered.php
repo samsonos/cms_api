@@ -167,36 +167,30 @@ class Filtered extends Generic
     {
         // Check if we have any field collection filters
         if (sizeof($this->field)) {
-            // Create material-field query
-            $query = dbQuery('materialfield');
-
-            // If we have already filtered material identifiers
-            if (sizeof($filteredIds)) {
-                // Apply them to query
-                $query->cond('MaterialID', $filteredIds);
-            }
-
             // Iterate all applied field filters
             foreach ($this->field as $field) {
                 // Get field value column
                 $valueField = $field[0]->Type == 7 || $field[0]->Type == 3 ? 'numeric_value' : 'value';
 
+                // Create material-field query
+                $query = dbQuery('materialfield');
+
+                // If we have already filtered material identifiers
+                if (sizeof($filteredIds)) {
+                    // Apply them to query
+                    $query->cond('MaterialID', $filteredIds);
+                }
+
                 // Perform request to get next portion of filtered material identifiers
-                if ($query->cond('FieldID', $field[0]->id)
+                if (!$query->cond('FieldID', $field[0]->id)
                     ->cond($valueField, $field[1], $field[2])
                     ->group_by('MaterialID')
                     ->fieldsNew('MaterialID', $filteredIds)
                 ) {
-                    // Create material-field query
-                    $query = dbQuery('materialfield');
-
-                    // Apply retrieved material ids to next query
-                    $query->cond('MaterialID', $filteredIds);
-                } else { // This filter applying failed
+                    // This filter applying failed
                     return false;
                 }
             }
-
         }
 
         // We have no field collection filters
