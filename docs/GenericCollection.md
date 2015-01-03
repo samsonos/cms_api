@@ -7,6 +7,7 @@ class MyItemCollection extends \samson\cms\GenericCollection
     // Your code here
 }
 
+// We extend our project MyItemCollection to use specific generic this project logic 
 class MyFavouriteItemCollection extends MyItemCollection
 {
     // We change only path to index view, all other logic and things are used from MyItemCollection
