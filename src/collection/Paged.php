@@ -54,13 +54,15 @@ abstract class Paged extends Filtered
     /**
      * Constructor
      * @param \samson\core\IViewable $renderer View render object
-     * @param mixed $structure Collection of structures or single structure
      * @param int $page Current page number
      */
     public function __construct($renderer, $page = 1)
     {
         // Create pagination
         $this->pager = new Pager($page, $this->pageSize);
+
+        // Set pager db query injection
+        $this->entityHandler(array($this, 'pagerInjection'));
 
         // Call parents
         parent::__construct($renderer);
