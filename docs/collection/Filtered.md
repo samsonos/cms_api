@@ -98,6 +98,23 @@ class myItemCollection extends \samsonos\cms\collection\Filtered
   // Add Navigation #15 filter
   public $navigation = array(array(15));
   
+  public function entityQueryCallback(&$query, $param1, ... )
+  {
+    $query->cond('Published', '1');
+    
+    return true;
+  }
+  
+  public function identifierCallback(&$entityIds, $param1, ... )
+  {
+    if (sizeof($entityIds) >= 20) {
+      $entityIds = array_slice($entityIds, 10, 20);
+      return true;
+    }
+    
+    return false;
+  }
+  
   // Override constructor to add field filters
   public function __construct($renderer)
   {
@@ -105,7 +122,7 @@ class myItemCollection extends \samsonos\cms\collection\Filtered
     $this
       ->field('endDate', time(), dbRelation::GREATER_EQ)
       ->field('image', '', dbRelation::NOT_EQUAL)
-      ->handler;
+      ->handler();
 
     // Call parents
     parent::__construct($renderer);
