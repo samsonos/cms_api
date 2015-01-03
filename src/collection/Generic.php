@@ -39,6 +39,14 @@ abstract class Generic implements \Iterator, IViewSettable
     abstract public function fill();
 
     /**
+     * @return int Collection size
+     */
+    public function count()
+    {
+        return sizeof($this->collection);
+    }
+
+    /**
      * Parent collection block render function
      * @param string $items Rendered items
      * @return string Rendered collection block

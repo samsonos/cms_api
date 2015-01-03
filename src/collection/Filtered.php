@@ -134,7 +134,9 @@ class Filtered extends Generic
             $query = dbQuery('structurematerial')
                 ->cond('MaterialID', $filteredIds)
                 ->cond('StructureID', $navigation)
-                ->cond('Active', 1);
+                ->cond('Active', 1)
+                ->group_by('MaterialID')
+            ;
 
             // Perform request to get next portion of filtered material identifiers
             if (!$query->fieldsNew('MaterialID', $filteredIds)) {
