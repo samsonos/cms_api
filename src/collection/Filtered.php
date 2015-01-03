@@ -131,20 +131,13 @@ class Filtered extends Generic
         // Iterate all applied navigation filters
         foreach ($this->navigation as $navigation) {
             // Create navigation-material query
-            $query = dbQuery('structurematerial');
-
-            // If we have already filtered material identifiers
-            if (sizeof($filteredIds)) {
-                // Apply them to query
-                $query->cond('MaterialID', $filteredIds);
-            }
+            $query = dbQuery('structurematerial')
+                ->cond('MaterialID', $filteredIds)
+                ->cond('StructureID', $navigation)
+                ->cond('Active', 1);
 
             // Perform request to get next portion of filtered material identifiers
-            if (!$query
-                ->cond('StructureID', $navigation)
-                ->cond('Active', 1)
-                ->fieldsNew('MaterialID', $filteredIds)
-            ) {
+            if (!$query->fieldsNew('MaterialID', $filteredIds)) {
                 // This filter applying failed
                 return false;
             }
@@ -169,20 +162,15 @@ class Filtered extends Generic
             $valueField = $field[0]->Type == 7 || $field[0]->Type == 3 ? 'numeric_value' : 'value';
 
             // Create material-field query
-            $query = dbQuery('materialfield');
-
-            // If we have already filtered material identifiers
-            if (sizeof($filteredIds)) {
-                // Apply them to query
-                $query->cond('MaterialID', $filteredIds);
-            }
-
-            // Perform request to get next portion of filtered material identifiers
-            if (!$query->cond('FieldID', $field[0]->id)
+            $query = dbQuery('materialfield')
+                ->cond('MaterialID', $filteredIds)
+                ->cond('FieldID', $field[0]->id)
                 ->cond($valueField, $field[1], $field[2])
                 ->group_by('MaterialID')
-                ->fieldsNew('MaterialID', $filteredIds)
-            ) {
+            ;
+
+            // Perform request to get next portion of filtered material identifiers
+            if (!$query->fieldsNew('MaterialID', $filteredIds)) {
                 // This filter applying failed
                 return false;
             }
