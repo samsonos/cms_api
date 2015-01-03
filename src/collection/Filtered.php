@@ -5,9 +5,7 @@
  * Date: 26.12.2014
  * Time: 16:22
  */
-
 namespace samsonos\cms\collection;
-
 
 use samson\activerecord\Condition;
 use samson\activerecord\dbRelation;
@@ -17,7 +15,7 @@ use samson\activerecord\dbRelation;
  * @package samson\cms
  * @author Egorov Vitaly <egorov@samsonos.com>
  */
-class Query
+class Filtered extends Generic
 {
     /** @var array Collection for current filtered material identifiers */
     protected $materialIDs = array();
@@ -25,37 +23,42 @@ class Query
     /** @var array Collection of navigation filters */
     protected $navigation = array();
 
-    /** @var array Collection of query handlers */
-    protected $handlers = array();
-
-    /** @var array External material handler and params array */
-    protected $materialHandler = array();
-
     /** @var array Collection of field filters */
     protected $field = array();
 
+    /** @var array Collection of query handlers */
+    protected $idHandlers = array();
+
+    /** @var array External material handler and params array */
+    protected $entityHandlers = array();
+
+    /** @var string Collection entities class name */
+    protected $entityName = 'samson\cms\CMSMaterial';
+
     /**
-     * Add external handler
+     * Add external identifier filter handler
      * @param callback $handler
      * @param array $params
      * @return self Chaining
      */
     public function handler($handler, array $params)
     {
-        $this->handlers[] = array($handler, $params);
+        // Add callback with parameters to array
+        $this->idHandlers[] = array($handler, $params);
 
         return $this;
     }
 
     /**
-     * Set external material handler
+     * Set external entity handler
      * @param callback $handler
      * @param array $params
      * @return self Chaining
      */
-    public function materialHandler($handler, array $params)
+    public function entityHandler($handler, array $params)
     {
-        $this->materialHandler = array_merge(array($handler), $params);
+        // Add callback with parameters to array
+        $this->entityHandlers[] = array($handler, $params);
 
         return $this;
     }
@@ -121,7 +124,7 @@ class Query
      * @param array $collection Return value
      * @return bool|mixed
      */
-    public function exec(& $collection = array())
+    public function fill(& $collection = array())
     {
         // Create navigation material query
         $query = dbQuery('structurematerial');
@@ -166,7 +169,7 @@ class Query
         }
 
         // Call external handlers chain
-        foreach ($this->handlers as $handler) {
+        foreach ($this->idHandlers as $handler) {
             $this->materialIDs = call_user_func_array(
                 $handler[0],
                 array_merge(array(&$this->materialIDs), $handler[1])
@@ -174,14 +177,17 @@ class Query
         }
 
         // Create final material query
-        $query = dbQuery('\samson\cms\CMSMaterial');
+        $query = dbQuery($this->entityName);
 
-        // Set external material query handler
-        if (is_callable($this->materialHandler[0])) {
-            call_user_func_array(array($query, 'handler'), $this->materialHandler);
+        // Call external handlers chain
+        foreach ($this->entityHandlers as $handler) {
+            call_user_func_array(
+                $handler[0],
+                array_merge(array(&$query), $handler[1])
+            );
         }
 
-        // Return final filtered material query result
-        return $query->cond('MaterialID')->exec($collection);
+        // Return final filtered entity query result
+        return $query->cond('MaterialID', $this->materialIDs)->exec($collection);
     }
 }
