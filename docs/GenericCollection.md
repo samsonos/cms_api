@@ -9,7 +9,14 @@ class MyItemCollection extends \samson\cms\GenericCollection
 ```
 
 ##Filling collection
-First of all you should implement ```fill()``` function which is abstract. It is responsible for filling your collection with data. 
+First of all you should implement ```fill()``` function which is abstract. It is responsible for filling your collection with data. You are fully responsible for what will be in ```$collection```, at the beginning we thought that it should contain [```\samson\activerecord\Record```](https://github.com/samsonos/php_activerecord/wiki) ancestors, but really it can be anything you want. Because only decide how to work further with this data.
+The main purpuse of this function implementation is to fill ```$collection``` field:
+```php
+public function fill()
+{
+    return $this->collection = dbQuery('material')->id(array('1','2'))->exec();
+}
+```
 
 ##Iterating material collection
 This class implements ```\Iterator``` interface for giving ability to iterate this object immediately after creation as usual array. 
