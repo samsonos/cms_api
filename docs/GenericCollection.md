@@ -17,6 +17,7 @@ public function fill()
     return $this->collection = dbQuery('material')->id(array('1','2'))->exec();
 }
 ```
+In the example above we have filled our collection with ```material``` table database records which has identifier 1 or 2.
 
 ##Iterating material collection
 This class implements ```\Iterator``` interface for giving ability to iterate this object immediately after creation as usual array. 
