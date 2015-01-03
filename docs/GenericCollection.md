@@ -46,8 +46,6 @@ class Controller extends \samson\core\CompressableExternalModule
 }
 ```
 
-> *IMPORTANT* All rendering is should be done only throught ```$renderer```, no ```m(...)``` or ```$this``` should be used.
-
 ###Passing collection to view
 This class implements [```\samson\core\IViewSettable```](https://github.com/samsonos/php_core/wiki/2.4-View) so instance can be passed to view immediately after creation, this gives beautiness when you render collections and of course you can use  prefixes to get access to multiple GenericCollections while rendering one single view.
 ```php
@@ -61,6 +59,8 @@ After analyzing dozens of projects we have created generic view path fields and 
 * ```$indexView``` and ```renderIndex()``` - This is main block view path and renderer function
 * ```$itemView``` and ```renderItem()``` - This is single item block view path and renderer function
 * ```$emptyView``` and ```renderEmpty()``` - This is empty block view path and renderer function
+
+> *IMPORTANT* All collection rendering is should be done only throught ```$this->renderer```, no ```m(...)``` or ```$this``` should be used.
 
 If you want to change any of this view blocks render logic you mustshould only overload that render function in your class:
 ```php
