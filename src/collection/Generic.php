@@ -32,6 +32,9 @@ abstract class Generic implements \Iterator, IViewSettable
     /** @var \samson\core\IViewable View render object */
     protected $renderer;
 
+    /** @var  integer Collection size */
+    protected $count = 0;
+
     /**
      * Fill collection with items
      * @return array Collection of items
@@ -43,7 +46,7 @@ abstract class Generic implements \Iterator, IViewSettable
      */
     public function count()
     {
-        return sizeof($this->collection);
+        return $this->count;
     }
 
     /**

@@ -229,6 +229,9 @@ class Filtered extends Generic
         if ($this->applyFilter($this->materialIDs)) {
             // Now we have all possible material filters applied and final material identifiers collection
 
+            // Store filtered collection size
+            $this->count = sizeof($this->materialIDs);
+
             // Call material identifier handlers
             $this->callHandlers($this->idHandlers, array(&$this->materialIDs));
 
