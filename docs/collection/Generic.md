@@ -55,15 +55,15 @@ And then rendered version of this ```MyItemCollection``` or its ancestor class w
 
 If you need to change standard behaviour of how and what is passed to view you should overload ```toView(...)``` method:
 ```php
-    public function toView($prefix = null, array $restricted = array())
-    {
-        // Render show more button, if this is last page do nothing
-        $showMore = $this->pager->current_page < $this->pager->total
-            ? m()->view('list/showmore/index')->set('page', $this->pager->current_page + 1)->output()
-            : '';
+public function toView($prefix = null, array $restricted = array())
+{
+    // Render show more button, if this is last page do nothing
+    $showMore = $this->pager->current_page < $this->pager->total
+        ? m()->view('list/showmore/index')->set('page', $this->pager->current_page + 1)->output()
+        : '';
 
-        return array($prefix.'html' => $this->render().$showMore);
-    }
+    return array($prefix.'html' => $this->render().$showMore);
+}
 ```
 
 ### Generic rendering
