@@ -192,6 +192,29 @@ class Filtered extends Generic
     }
 
     /**
+     * Call handlers stack
+     * @param array $handlers Collection of callbacks with their parameters
+     * @param array $params External parameters to pass to callback at first
+     * @return bool True if all handlers succeeded
+     */
+    public function callHandlers(& $handlers = array(), $params = array())
+    {
+        // Call external handlers
+        foreach ($handlers as $handler) {
+            // Call external handlers chain
+            if (!call_user_func_array(
+                $handler[0],
+                array_merge($params, $handler[1]) // Merge params and handler params
+            )) {
+                // Stop - if one of external handlers has failed
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Perform collection database retrieval using set filters
      * @return array $collection Return value
      */
@@ -204,34 +227,14 @@ class Filtered extends Generic
         if ($this->applyFilter($this->materialIDs)) {
             // Now we have all possible material filters applied and final material identifiers collection
 
-            // Call external handlers
-            foreach ($this->idHandlers as $handler) {
-                // Call external handlers chain
-                if (!call_user_func_array(
-                    $handler[0],
-                    array_merge(array(&$this->materialIDs), $handler[1]) // Pass material identifiers
-                )) {
-                    // Stop - if one of external handlers has failed
-                    return array();
-                }
-            }
+            // Call material identifier handlers
+            $this->callHandlers($this->idHandlers, array(&$this->materialIDs));
 
             // Create final material query
-            $query = dbQuery($this->entityName);
+            $query = dbQuery($this->entityName)->cond('MaterialID', $this->materialIDs);
 
-            // If we have material id filter
-            if (sizeof($this->materialIDs)) {
-                // Add them to query
-                $query->cond('MaterialID', $this->materialIDs);
-            }
-
-            // Call external handlers chain
-            foreach ($this->entityHandlers as $handler) {
-                call_user_func_array(
-                    $handler[0],
-                    array_merge(array(&$query), $handler[1])
-                );
-            }
+            // Call material query handlers
+            $this->callHandlers($this->entityHandlers, array(&$query));
 
             // Return final filtered entity query result
             return $query->cond('Active', 1)->exec();
