@@ -5,7 +5,7 @@ This class is a generic approach for rendering catalogs and lists, it should be 
 ##Iterating material collection
 This class implements ```\Iterator``` interface for giving ability to iterate
 this object immediately after creation as usual array. 
-> This is reasonable only if collection is being filled(```$collection``` field) in constructor, due to differnt real tasks implementation and further needed query and parameters injection automating filling has been removed.
+> This is reasonable only if ```$collection``` is being filled in ```__construct()```, due to differnt real tasks implementation and further needed query and parameters injections, automating filling has been removed from ```__construct()```.
 
 ```php
 foreach (new \samson\cms\GenericCollection() as $element) {
@@ -13,7 +13,7 @@ foreach (new \samson\cms\GenericCollection() as $element) {
 }
 ```
 
-##Creating custom material collections
+##Creating custom collections
 This class is abstract and thought has only implementation of generic features and is designed to be
 extended and implemented in your specific projects. Main function is ```fill()``` which is abstract 
 and should be implemented. It is responsible for filling the collection of your ```samson\cms\Material```
@@ -24,13 +24,13 @@ which must be filtered and showed with some logic dependently on specific projec
 has another abstract method ```render()```
 
 ##Passing material collection to view
-This class implements ```\samson\core\iModuleViewable``` for giving ability
-to pass this object to views immediately after creation, also prefixes can
-be used to get access to multiple MaterialCollections while rendering one view.
+This class implements (```\samson\core\IViewSettable```)[https://github.com/samsonos/php_core/wiki/2.4-View] for giving ability
+to pass this object and it ancestors to views immediately after creation. also prefixes can
+be used to get access to multiple GenericCollections while rendering one single view.
 ```php
-m()->view('product/catalog')->items(new MaterialCollection())
+m()->view('product/catalog')->items(new GenericCollection())
 ```
-And then rendered version of this ```MaterialCollection``` or its ancestor class
+And then rendered version of this ```GenericCollection``` or its ancestor class
 will be available via ```items_html``` view variable.
 
 ##Generic implementation
