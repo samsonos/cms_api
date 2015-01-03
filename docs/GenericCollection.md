@@ -12,9 +12,6 @@ class MyFavouriteItemCollection extends MyItemCollection
 {
     // We change only path to index view, all other logic and things are used from MyItemCollection
     public $indexView = 'favourite/index';
-    
-    // And change pager page size(This is just example pager is not implemented in GenericCollection)
-    public $pageSize = 3;
 }
 ```
 
