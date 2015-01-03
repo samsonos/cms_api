@@ -165,31 +165,28 @@ class Filtered extends Generic
      */
     protected function applyFieldFilter(& $filteredIds = array())
     {
-        // Check if we have any field collection filters
-        if (sizeof($this->field)) {
-            // Iterate all applied field filters
-            foreach ($this->field as $field) {
-                // Get field value column
-                $valueField = $field[0]->Type == 7 || $field[0]->Type == 3 ? 'numeric_value' : 'value';
+        // Iterate all applied field filters
+        foreach ($this->field as $field) {
+            // Get field value column
+            $valueField = $field[0]->Type == 7 || $field[0]->Type == 3 ? 'numeric_value' : 'value';
 
-                // Create material-field query
-                $query = dbQuery('materialfield');
+            // Create material-field query
+            $query = dbQuery('materialfield');
 
-                // If we have already filtered material identifiers
-                if (sizeof($filteredIds)) {
-                    // Apply them to query
-                    $query->cond('MaterialID', $filteredIds);
-                }
+            // If we have already filtered material identifiers
+            if (sizeof($filteredIds)) {
+                // Apply them to query
+                $query->cond('MaterialID', $filteredIds);
+            }
 
-                // Perform request to get next portion of filtered material identifiers
-                if (!$query->cond('FieldID', $field[0]->id)
-                    ->cond($valueField, $field[1], $field[2])
-                    ->group_by('MaterialID')
-                    ->fieldsNew('MaterialID', $filteredIds)
-                ) {
-                    // This filter applying failed
-                    return false;
-                }
+            // Perform request to get next portion of filtered material identifiers
+            if (!$query->cond('FieldID', $field[0]->id)
+                ->cond($valueField, $field[1], $field[2])
+                ->group_by('MaterialID')
+                ->fieldsNew('MaterialID', $filteredIds)
+            ) {
+                // This filter applying failed
+                return false;
             }
         }
 
