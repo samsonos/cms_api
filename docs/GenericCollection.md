@@ -34,6 +34,23 @@ After analyzing dozens of projects we have created generic view path fields and 
 * ```$itemView``` and ```renderItem()``` - This is single item block view path and renderer function
 * ```$emptyView``` and ```renderEmpty()``` - This is empty block view path and renderer function
 
+Usually you can pass current active module as renderer(if you use controller procedural approach):
+```php 
+m()->items(new MyItemCollection(m()));
+```
+Or use [```\samson\core\ExternalModule```](https://github.com/samsonos/php_core/wiki/2.-Modules) ancestor(if you use OOP controller approach):
+```php
+namespace myproject\items;
+
+class Controller extends \samson\core\CompressableExternalModule
+{
+    public function __handler($url = null)
+    {
+        $this->view('index')->items(new MyItemCollection($this));
+    }
+}
+```
+
 ###Passing collection to view
 This class implements [```\samson\core\IViewSettable```](https://github.com/samsonos/php_core/wiki/2.4-View) so instance can be passed views immediately after creation, this gives beautiness when you render collections and of course you can use  prefixes to get access to multiple GenericCollections while rendering one single view.
 ```php
