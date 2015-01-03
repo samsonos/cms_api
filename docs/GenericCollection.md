@@ -4,7 +4,7 @@ This class is a generic approach for rendering catalogs and lists, it should be 
 ```php
 class MyItemCollection extends \samson\cms\GenericCollection 
 {
-    // Your cpde here
+    // Your code here
 }
 ```
 
