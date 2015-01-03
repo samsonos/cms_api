@@ -2,10 +2,8 @@
 This collection class is a child of [Generic collection class](Generic.md), the main purpose for this extension is to filter enitities collection using:
 * *navigation filter*
 * *additional field filter*
- 
-This filtered collection approach should be instead of old ```CMS::getMaterialByStructures(...)``` method and gives alot more abilities and OOP approaches.
 
-> If now filters is configured this collection acts like [Generic collection](Generic.md).
+> If no filters is configured this collection acts like [Generic collection](Generic.md).
 
 ## Filtering
 All filtering can be done using: 
@@ -13,12 +11,12 @@ All filtering can be done using:
 * method calling
 
 ##Navigation filtering
-All entities can be grouped using [Navigation](../Navigation.md) elements, every entity can be related to any amount of Navigation elements. 
+All entities can be grouped using [Navigation](../Navigation.md) elements, every entity can be related to any amount of Navigation elements. This filtered collection navigation filtering approach should be used instead of old ```CMS::getMaterialByStructures(...)``` method, because it gives a lot more abilities and OOP opportunities.
 
-Using this elements you have to create navigation filter groups(arrays of Navigation element identifiers) which forms navigation filters, each navigation filter will be applied one after another with passing only already filtered enitity identifiers:
+Using this navigation elements you have to create navigation filter groups(arrays of Navigation element identifiers) which forms navigation filters, each navigation filter will be applied one after another with passing only already filtered enitity identifiers:
 
 ### Class field definition
-```$navigation``` field should declared at child class:
+```$navigation``` field should be declared at child class:
 ```php
 // Collection of navigation filter groups
 public $navigation = array(
@@ -37,3 +35,22 @@ We also created ```navigation()``` chainable method to add navigation filter gro
 Method will automatically perform database query and create correct internal navigation filter elements for you.
 
 ## Field filtering
+Any entity can have any amount of [Additional fields](../AdditionalField.md) which is brought to it by corresponding [Navigation element](../Navigation.md). This filtering approach gives scalable OOP approach for filtering entities collection with this additional fields. 
+
+Field filtering is similair to navigation filtering and forms collection of field filter groups. Each group is array which consists of ```samson\activerecord\field``` database record object, it value for filtering and relation beetween field value and passed value(equal, greater and so on). 
+
+### Class field definition
+```$field``` field should be declared at child class:
+```php
+// Collection of field filter groups
+$this->field = array(
+  array($fieldDBRecord, 15, dbRelation::EQUAL), // First field filter group
+  array($otherFieldDBRecord, '', dbRelation::NOT_EQUAL) // Second field filter group
+);
+```
+
+### Method calls
+We also created ```field()``` chainable method to add field filter group:
+```php 
+$this->field('price', 1000, dbRelation::GREATER)->field('photo', '', dbRelation::NOT_EQUAL);
+```
