@@ -26,23 +26,31 @@ public function fill()
 ```
 In the example above we have filled our collection with ```material``` table database records which has identifier 1 or 2.
 
-##Iterating material collection
-This class implements ```\Iterator``` interface for giving ability to iterate this object immediately after creation as usual array. 
-> This is reasonable only if ```$collection``` is being filled in ```__construct()```, due to differnt real tasks implementation and further needed query and parameters injections, automating filling has been removed from ```__construct()```.
+##Rendering collection
+Generic collections was designed as universal tool so the main thing that they need to be rendered is an external ```$renderer```. Which is the only needed construcor parameter for collection creation. It must be and implementation of [```\samson\core\IViewable``` interface](https://github.com/samsonos/php_core/wiki/2.4-View) and is used in all view render functions.
 
-```php
-foreach (new \samson\cms\GenericCollection() as $element) {
-    ...
-}
-```
+After analyzing dozens of projects we have created generic view path fields and render functions for you:
+* ```$indexView``` and ```renderIndex()``` - This is main block view path and renderer function
+* ```$itemView``` and ```renderItem()``` - This is single item block view path and renderer function
+* ```$emptyView``` and ```renderEmpty()``` - This is empty block view path and renderer function
 
-##Passing collection to view
+###Passing collection to view
 This class implements [```\samson\core\IViewSettable```](https://github.com/samsonos/php_core/wiki/2.4-View) so instance can be passed views immediately after creation, this gives beautiness when you render collections and of course you can use  prefixes to get access to multiple GenericCollections while rendering one single view.
 ```php
 m()->view('product/catalog')->items(new GenericCollection())->favourites(new GenericCollection())
 ```
 And then rendered version of this ```GenericCollection``` or its ancestor class
 will be available via ```items_html``` and ```favourites_html``` view variables.
+
+##Iterating material collection
+This class implements ```\Iterator``` interface for giving ability to iterate this object immediately after creation as usual array. 
+> This is reasonable only if ```$collection``` is being filled in ```__construct()```, due to differnt real tasks implementation and further needed query and parameters injections, automating filling has been removed from ```__construct()```.
+
+```php
+foreach (new \samson\cms\GenericCollection(m()) as $element) {
+    ...
+}
+```
 
 ##Generic implementation
 Created hundreds of projects we have added implementation for ```GenericMaterialCollection``` and called it
