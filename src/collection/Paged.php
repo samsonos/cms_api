@@ -5,7 +5,7 @@
  * Date: 26.12.2014
  * Time: 16:10
  */
-namespace samsonos\cms\web;
+namespace samsonos\cms\collection;
 
 use samson\activerecord\dbRelation;
 use samson\cms\GenericCollection;
@@ -15,7 +15,7 @@ use samson\cms\GenericCollection;
  * @package samsonos\cms\web
  * @author Egorov Vitaly <egorov@samsonos.com>
  */
-class PagedCollection extends GenericCollection
+class Paged extends GenericCollection
 {
     /** @var array Collection of structure to filter entities */
     protected $structures = array(0);

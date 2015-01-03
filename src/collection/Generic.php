@@ -5,7 +5,7 @@
  * Date: 18.10.2014
  * Time: 11:44
  */
-namespace samson\cms;
+namespace samsonos\cms\collection;
 
 use samson\core\IViewSettable;
 
@@ -15,7 +15,7 @@ use samson\core\IViewSettable;
  *
  * @package samson\cms
  */
-abstract class GenericCollection implements \Iterator, IViewSettable
+abstract class Generic implements \Iterator, IViewSettable
 {
     /** @var array Collection */
     protected $collection = array();

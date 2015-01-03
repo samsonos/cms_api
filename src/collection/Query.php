@@ -6,7 +6,7 @@
  * Time: 16:22
  */
 
-namespace samson\cms;
+namespace samsonos\cms\collection;
 
 
 use samson\activerecord\Condition;
@@ -17,7 +17,7 @@ use samson\activerecord\dbRelation;
  * @package samson\cms
  * @author Egorov Vitaly <egorov@samsonos.com>
  */
-class CollectionQuery
+class Query
 {
     /** @var array Collection for current filtered material identifiers */
     protected $materialIDs = array();
