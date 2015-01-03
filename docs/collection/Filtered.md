@@ -71,7 +71,12 @@ This handler stack is executed when all filtering steps([Navigation](#navigation
 ```php
 public function identifierCallback(&$entityIds, $param1, ... )
 {
-  return true;
+    if (sizeof($entityIds) >= 20) {
+      $entityIds = array_slice($entityIds, 10, 20);
+      return true;
+    }
+    
+    return false;
 }
 ```
 > If any callback will return ```false``` empty collection will be returned.
@@ -83,6 +88,8 @@ This handler stack is executed after [Identifier handler stack](#identifier-hand
 ```php
 public function entityQueryCallback(&$query, $param1, ... )
 {
+  $query->cond('Published', '1');
+  
   return true;
 }
 ```
@@ -122,7 +129,8 @@ class myItemCollection extends \samsonos\cms\collection\Filtered
     $this
       ->field('endDate', time(), dbRelation::GREATER_EQ)
       ->field('image', '', dbRelation::NOT_EQUAL)
-      ->handler();
+      ->handler(array($this, 'identifierCallback'), array('param'))
+      ->entityHandler(array($this, 'entityQueryCallback'), array('param'));;
 
     // Call parents
     parent::__construct($renderer);
