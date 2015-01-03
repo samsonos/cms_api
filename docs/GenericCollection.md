@@ -23,8 +23,8 @@ Main purpose of this class is to give ability for quick creation of backend for 
 which must be filtered and showed with some logic dependently on specific project. For this purposes our class
 has another abstract method ```render()```
 
-##Passing material collection to view
-This class implements (```\samson\core\IViewSettable```)[https://github.com/samsonos/php_core/wiki/2.4-View] for giving ability
+##Passing collection to view
+This class implements [```\samson\core\IViewSettable```](https://github.com/samsonos/php_core/wiki/2.4-View) for giving ability
 to pass this object and it ancestors to views immediately after creation. also prefixes can
 be used to get access to multiple GenericCollections while rendering one single view.
 ```php
