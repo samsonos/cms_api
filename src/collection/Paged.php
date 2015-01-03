@@ -39,16 +39,15 @@ abstract class Paged extends Filtered
 
     /**
      * Pager db request handler
-     * @param \samson\activerecord\dbQuery $query
+     * @param array Collection of material identifiers
      */
-    public function pagerInjection(&$query)
+    public function pagerInjection(& $materialIds)
     {
         // Create count request to count pagination
-        $countQuery = clone $query;
-        $this->pager->update($countQuery->count());
+        $this->pager->update(sizeof($materialIds));
 
-        // Set current page query limits
-        $query->limit($this->pager->start, $this->pager->end);
+        // Cut only needed materials identifiers from array
+        $materialIds = array_slice($materialIds, $this->pager->start, $this->pager->end);
     }
 
     /**
@@ -62,7 +61,7 @@ abstract class Paged extends Filtered
         $this->pager = new Pager($page, $this->pageSize);
 
         // Set pager db query injection
-        $this->entityHandler(array($this, 'pagerInjection'));
+        $this->handler(array($this, 'pagerInjection'));
 
         // Call parents
         parent::__construct($renderer);
