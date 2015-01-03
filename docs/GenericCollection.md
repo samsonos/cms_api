@@ -46,6 +46,8 @@ class Controller extends \samson\core\CompressableExternalModule
 }
 ```
 
+> *IMPORTANT* All rendering is should be done only throught ```$renderer```, no ```m(...)``` or ```$this``` should be used.
+
 ###Passing collection to view
 This class implements [```\samson\core\IViewSettable```](https://github.com/samsonos/php_core/wiki/2.4-View) so instance can be passed to view immediately after creation, this gives beautiness when you render collections and of course you can use  prefixes to get access to multiple GenericCollections while rendering one single view.
 ```php
