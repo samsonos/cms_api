@@ -66,7 +66,7 @@ For maximum database perfomance we make all filter request low-level optimized s
 * Receiving final collection of entity instances - *Entity handler stack* can be used to manippulate this behaviour 
 
 ## Identifier handler stack
-This handlers stack is executed when all filtering steps([Navigation](#Navigation-filtering) and [Field](#Field-filtering)) is finished
+This handlers stack is executed when all filtering steps([Navigation](#navigation-filtering) and [Field](#field-filtering)) is finished
 
 # Example
 ```php
