@@ -1,10 +1,18 @@
 #Generic collections ```\samson\cms\GenericCollection```
 
-This class is a generic approach for rendering catalogs and lists, it should be extended and overloaded to match needs of your specific project.
+This class is a generic approach for rendering catalogs and lists, it should be extended and overloaded to match needs of your specific project. This class is ```abstract``` and thought has only implementation of generic features and is designed to be extended and implemented to meet your tasks and build your own collection classes tree further in your project.
+```php
+class MyItemCollection extends \samson\cms\GenericCollection 
+{
+    // Your cpde here
+}
+```
+
+##Filling collection
+First of all you should implement ```fill()``` function which is abstract. It is responsible for filling your collection with data. 
 
 ##Iterating material collection
-This class implements ```\Iterator``` interface for giving ability to iterate
-this object immediately after creation as usual array. 
+This class implements ```\Iterator``` interface for giving ability to iterate this object immediately after creation as usual array. 
 > This is reasonable only if ```$collection``` is being filled in ```__construct()```, due to differnt real tasks implementation and further needed query and parameters injections, automating filling has been removed from ```__construct()```.
 
 ```php
@@ -13,20 +21,8 @@ foreach (new \samson\cms\GenericCollection() as $element) {
 }
 ```
 
-##Creating custom collections
-This class is abstract and thought has only implementation of generic features and is designed to be
-extended and implemented in your specific projects. Main function is ```fill()``` which is abstract 
-and should be implemented. It is responsible for filling the collection of your ```samson\cms\Material```
-ancestors. 
-
-Main purpose of this class is to give ability for quick creation of backend for showing some blocks with materials,
-which must be filtered and showed with some logic dependently on specific project. For this purposes our class
-has another abstract method ```render()```
-
 ##Passing collection to view
-This class implements [```\samson\core\IViewSettable```](https://github.com/samsonos/php_core/wiki/2.4-View) for giving ability
-to pass this object and it ancestors to views immediately after creation. also prefixes can
-be used to get access to multiple GenericCollections while rendering one single view.
+This class implements [```\samson\core\IViewSettable```](https://github.com/samsonos/php_core/wiki/2.4-View) for giving ability to pass this object and it ancestors to views immediately after creation. also prefixes can be used to get access to multiple GenericCollections while rendering one single view.
 ```php
 m()->view('product/catalog')->items(new GenericCollection())
 ```
