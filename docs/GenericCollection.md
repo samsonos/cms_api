@@ -1,10 +1,19 @@
 #Generic collections ```\samson\cms\GenericCollection```
 
-This class is a generic approach for rendering catalogs and lists, it should be extended and overloaded to match needs of your specific project. This class is ```abstract``` and thought has only implementation of generic features and is designed to be extended and implemented to meet your tasks and build your own collection classes tree further in your project.
+This class is a generic approach for rendering catalogs and lists, it should be extended and overloaded to match needs of your specific project. This class is ```abstract``` and thought has only implementation of generic features and is designed to be extended and implemented to meet your tasks and build your own collection classes tree further in your project:
 ```php
 class MyItemCollection extends \samson\cms\GenericCollection 
 {
     // Your code here
+}
+
+class MyFavouriteItemCollection extends MyItemCollection
+{
+    // We change only path to index view, all other logic and things are used from MyItemCollection
+    public $indexView = 'favourite/index';
+    
+    // And change pager page size(This is just example pager is not implemented in GenericCollection)
+    public $pageSize = 3;
 }
 ```
 
