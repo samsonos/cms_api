@@ -159,7 +159,7 @@ class Filtered extends Generic
         // Iterate all applied field filters
         foreach ($this->field as $field) {
             // Get field value column
-            $valueField = $field[0]->Type == 7 || $field[0]->Type == 3 ? 'numeric_value' : 'value';
+            $valueField = in_array($field[0]->Type, array(3, 7)) ? 'numeric_value' : 'value';
 
             // Create material-field query
             $query = dbQuery('materialfield')
