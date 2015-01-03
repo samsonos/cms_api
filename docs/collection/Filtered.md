@@ -34,7 +34,7 @@ We also created ```navigation()``` chainable method to add navigation filter gro
 
 Method will automatically perform database query and create correct internal navigation filter elements for you.
 
-## Field filtering
+##Field filtering
 Any entity can have any amount of [Additional fields](../AdditionalField.md) which is brought to it by corresponding [Navigation element](../Navigation.md). This filtering approach gives scalable OOP approach for filtering entities collection with this additional fields. 
 
 Field filtering is similair to navigation filtering and forms collection of field filter groups. Each group is array which consists of ```samson\activerecord\field``` database record object, it value for filtering and relation beetween field value and passed value(equal, greater and so on). 
@@ -59,11 +59,14 @@ $this->field('price', 1000, dbRelation::GREATER)->field('photo', '', dbRelation:
 All filter logic is implemented in ```fill()``` method so you wont have to override it(we actually do not advice you to do so), but what if we need modify query, inject into it? For this purposes we have two special handler stacks:
 * identifier handler stack
 * entity handler stack
-* 
-## Identifier handler stack
+This is a array of external callbacks with additional parameters to be called at special algorithm places:
+
 For maximum database perfomance we make all filter request low-level optimized so they operate only with idetifiers and without unnecessary ```join``` and all process of filling the collection with filtered entities can be splitted in two stages:
-* Step-by-step filtering with passing enitity identifiers from one step to another
-* Receiving final collection of entity instances
+* Step-by-step filtering with passing enitity identifiers from one step to another - *Identifier handler stack* can be used to manippulate this behaviour 
+* Receiving final collection of entity instances - *Entity handler stack* can be used to manippulate this behaviour 
+
+## Identifier handler stack
+This handlers stack is executed when all filtering steps([Navigation](#Navigation-filtering) and [Field](#Field-filtering)) is finished
 
 # Example
 ```php
