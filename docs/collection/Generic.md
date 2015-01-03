@@ -92,7 +92,7 @@ class MyFavouriteItemCollection extends MyItemCollection
 
 ##Iterating material collection
 This class implements ```\Iterator``` interface so instance can be passed to ```foreach``` loop immediately after creation as usual array. 
-> This is reasonable only if ```$collection``` has been filled in ```__construct()```, due to differnt real tasks implementation and further needed query and parameters injections, automating filling has been removed from ```__construct()```.
+> This is reasonable only if ```$collection``` has been filled in ```__construct()```, automating filling has been removed from ```__construct()```.
 
 ```php
 foreach (new \samson\cms\MyItemCollection(m()) as $element) {
