@@ -28,7 +28,7 @@ class CollectionQuery
     /** @var array Collection of query handlers */
     protected $handlers = array();
 
-    /** @var callback External material handler */
+    /** @var array External material handler and params array */
     protected $materialHandler = array();
 
     /** @var array Collection of field filters */
@@ -71,7 +71,7 @@ class CollectionQuery
     public function navigation($navigation)
     {
         // Do not allow empty strings
-        if(isset($navigation{0})) {
+        if (isset($navigation{0})) {
             // Create id or URL condition
             $idOrUrl = new Condition('OR');
             $idOrUrl->add('StructureID', $navigation)->add('Url', $navigation);
@@ -99,13 +99,13 @@ class CollectionQuery
     public function field($field, $value, $relation = dbRelation::EQUAL)
     {
         // Do not allow empty strings
-        if(isset($field{0})) {
+        if (isset($field{0})) {
             // Create id or URL condition
             $idOrUrl = new Condition('OR');
             $idOrUrl->add('FieldID', $field)->add('Name', $field);
 
-            /** @var \samson\activerecord\field $navigation */
-            $navigation = null;
+            /** @var \samson\activerecord\field $field */
+            $field = null;
             if (dbQuery('field')->cond($idOrUrl)->first($field)) {
                 // Store retrieved field element and its value as field collection filter
                 $this->field[] = array($field, $value, $relation);
@@ -145,7 +145,7 @@ class CollectionQuery
 
         // Apply current filtered material identifiers
         if (sizeof($this->materialIDs)) {
-           $query->cond('MaterialID', $this->materialIDs);
+            $query->cond('MaterialID', $this->materialIDs);
         }
 
         // Iterate all applied field filters
@@ -166,13 +166,12 @@ class CollectionQuery
         }
 
         // Call external handlers chain
-        foreach($this->handlers as $handler) {
+        foreach ($this->handlers as $handler) {
             $this->materialIDs = call_user_func_array(
                 $handler[0],
                 array_merge(array(&$this->materialIDs), $handler[1])
             );
         }
-
 
         // Create final material query
         $query = dbQuery('\samson\cms\CMSMaterial');

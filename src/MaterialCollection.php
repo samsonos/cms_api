@@ -11,6 +11,7 @@ namespace samson\cms;
 /**
  * Commonly used MaterialCollection implementation
  * @package samson\cms
+ * @deprecated Use GenericCollection
  */
 class MaterialCollection extends GenericMaterialCollection
 {
