@@ -52,19 +52,19 @@ class Controller extends \samson\core\CompressableExternalModule
 ```
 
 ###Passing collection to view
-This class implements [```\samson\core\IViewSettable```](https://github.com/samsonos/php_core/wiki/2.4-View) so instance can be passed views immediately after creation, this gives beautiness when you render collections and of course you can use  prefixes to get access to multiple GenericCollections while rendering one single view.
+This class implements [```\samson\core\IViewSettable```](https://github.com/samsonos/php_core/wiki/2.4-View) so instance can be passed to view immediately after creation, this gives beautiness when you render collections and of course you can use  prefixes to get access to multiple GenericCollections while rendering one single view.
 ```php
-m()->view('product/catalog')->items(new GenericCollection())->favourites(new GenericCollection())
+m()->view('product/catalog')->items(new MyItemCollection(m()))->favourites(new MyFavouriteItemCollection(m()))
 ```
 And then rendered version of this ```GenericCollection``` or its ancestor class
 will be available via ```items_html``` and ```favourites_html``` view variables.
 
 ##Iterating material collection
-This class implements ```\Iterator``` interface for giving ability to iterate this object immediately after creation as usual array. 
-> This is reasonable only if ```$collection``` is being filled in ```__construct()```, due to differnt real tasks implementation and further needed query and parameters injections, automating filling has been removed from ```__construct()```.
+This class implements ```\Iterator``` interface so instance can be passed to ```foreach``` loop immediately after creation as usual array. 
+> This is reasonable only if ```$collection``` has been filled in ```__construct()```, due to differnt real tasks implementation and further needed query and parameters injections, automating filling has been removed from ```__construct()```.
 
 ```php
-foreach (new \samson\cms\GenericCollection(m()) as $element) {
+foreach (new \samson\cms\MyItemCollection(m()) as $element) {
     ...
 }
 ```
