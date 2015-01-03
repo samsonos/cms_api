@@ -128,27 +128,25 @@ class Filtered extends Generic
      */
     protected function applyNavigationFilter(& $filteredIds = array())
     {
-        // Check if we have any navigation collection filters
-        if (sizeof($this->navigation)) {
+        // Iterate all applied navigation filters
+        foreach ($this->navigation as $navigation) {
             // Create navigation-material query
             $query = dbQuery('structurematerial');
 
-            // Iterate all applied navigation filters
-            foreach ($this->navigation as $navigation) {
-                // Perform request to get next portion of filtered material identifiers
-                if ($query
-                    ->cond('StructureID', $navigation)
-                    ->cond('Active', 1)
-                    ->fieldsNew('MaterialID', $filteredIds)
-                ) {
-                    // Create navigation-material query
-                    $query = dbQuery('structurematerial');
+            // If we have already filtered material identifiers
+            if (sizeof($filteredIds)) {
+                // Apply them to query
+                $query->cond('MaterialID', $filteredIds);
+            }
 
-                    // Apply retrieved material ids to next query
-                    $query->cond('MaterialID', $filteredIds);
-                } else { // This filter applying failed
-                    return false;
-                }
+            // Perform request to get next portion of filtered material identifiers
+            if (!$query
+                ->cond('StructureID', $navigation)
+                ->cond('Active', 1)
+                ->fieldsNew('MaterialID', $filteredIds)
+            ) {
+                // This filter applying failed
+                return false;
             }
         }
 
