@@ -232,7 +232,7 @@ class Filtered extends Generic
             $query = dbQuery($this->entityName);
 
             // If we have material id filter
-            if (isset($this->materialIDs) && sizeof($this->materialIDs)) {
+            if (sizeof($this->materialIDs)) {
                 // Add them to query
                 $query->cond('MaterialID', $this->materialIDs);
             }
