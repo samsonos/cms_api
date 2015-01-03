@@ -1,8 +1,8 @@
-#Generic collections ```\samson\cms\GenericCollection```
+#Generic collections ```\samsonos\cms\collection\Generic```
 
 This class is a generic approach for rendering catalogs and lists, it should be extended and overloaded to match needs of your specific project. This class is ```abstract``` and thought has only implementation of generic features and is designed to be extended and implemented to meet your tasks and build your own collection classes tree further in your project:
 ```php
-class MyItemCollection extends \samson\cms\GenericCollection 
+class MyItemCollection extends \samsonos\cms\collection\Generic 
 {
     // Your code here
 }
@@ -47,11 +47,11 @@ class Controller extends \samson\core\CompressableExternalModule
 ```
 
 ###Passing collection to view
-This class implements [```\samson\core\IViewSettable```](https://github.com/samsonos/php_core/wiki/2.4-View) so instance can be passed to view immediately after creation, this gives beautiness when you render collections and of course you can use  prefixes to get access to multiple GenericCollections while rendering one single view.
+This class implements [```\samson\core\IViewSettable```](https://github.com/samsonos/php_core/wiki/2.4-View) so instance can be passed to view immediately after creation, this gives beautiness when you render collections and of course you can use  prefixes to get access to multiple collections while rendering one single view.
 ```php
 m()->view('product/catalog')->items(new MyItemCollection(m()))->favourites(new MyFavouriteItemCollection(m()))
 ```
-And then rendered version of this ```GenericCollection``` or its ancestor class
+And then rendered version of this ```MyItemCollection``` or its ancestor class
 will be available via ```items_html``` and ```favourites_html``` view variables.
 
 ### Generic rendering
