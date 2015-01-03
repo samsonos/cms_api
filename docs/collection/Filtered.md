@@ -57,16 +57,17 @@ $this->field('price', 1000, dbRelation::GREATER)->field('photo', '', dbRelation:
 
 # Filling filtered collection
 All filter logic is implemented in ```fill()``` method so you wont have to override it(we actually do not advice you to do so), but what if we need modify query, inject into it? For this purposes we have two special handler stacks:
-* identifier handler stack
-* entity handler stack
-This is a array of external callbacks with additional parameters to be called at special algorithm places:
+* [Identifier handler stack](#identifier-handler-stack)
+* [Entity handler stack](#entity-handler-stack)
+
+> Handler stack - is an array of callbacks with additional parameters to be called at special algorithm places
 
 For maximum database perfomance we make all filter request low-level optimized so they operate only with idetifiers and without unnecessary ```join``` and all process of filling the collection with filtered entities can be splitted in two stages:
 * Step-by-step filtering with passing enitity identifiers from one step to another - *Identifier handler stack* can be used to manippulate this behaviour 
 * Receiving final collection of entity instances - *Entity handler stack* can be used to manippulate this behaviour 
 
 ## Identifier handler stack
-This handlers stack is executed when all filtering steps([Navigation](#navigation-filtering) and [Field](#field-filtering)) is finished
+This handler stack is executed when all filtering steps([Navigation](#navigation-filtering) and [Field](#field-filtering)) is finished
 
 # Example
 ```php
