@@ -193,6 +193,17 @@ class Filtered extends Generic
     }
 
     /**
+     * Apply all possible material filters
+     * @param array $filteredIds Collection of material identifiers
+     * @return bool True if ALL filtering succeeded or there was no filtering at all otherwise false
+     */
+    public function applyFilter(& $filteredIds = array())
+    {
+        return $this->applyNavigationFilter($filteredIds)
+            && $this->applyFieldFilter($filteredIds);
+    }
+
+    /**
      * Perform collection database retrieval using set filters
      * @return array $collection Return value
      */
@@ -201,44 +212,41 @@ class Filtered extends Generic
         // Clear current materials identifiers list
         $this->materialIDs = array();
 
-        // Perform navigation collection filtering
-        if ($this->applyNavigationFilter($this->materialIDs)) {
-            // Perform field filtering
-            if ($this->applyFieldFilter($this->materialIDs)) {
-                // Now we have all possible material filters applied and final material identifiers collection
+        // Perform material filtering
+        if ($this->applyFilter($this->materialIDs)) {
+            // Now we have all possible material filters applied and final material identifiers collection
 
-                // Call external handlers
-                foreach ($this->idHandlers as $handler) {
-                    // Call external handlers chain
-                    if (!call_user_func_array(
-                        $handler[0],
-                        array_merge(array(&$this->materialIDs), $handler[1]) // Pass material identifiers
-                    )) {
-                        // Stop - if one of external handlers has failed
-                        return array();
-                    }
-                }
-
-                // Create final material query
-                $query = dbQuery($this->entityName);
-
-                // If we have material id filter
-                if (isset($this->materialIDs) && sizeof($this->materialIDs)) {
-                    // Add them to query
-                    $query->cond('MaterialID', $this->materialIDs);
-                }
-
+            // Call external handlers
+            foreach ($this->idHandlers as $handler) {
                 // Call external handlers chain
-                foreach ($this->entityHandlers as $handler) {
-                    call_user_func_array(
-                        $handler[0],
-                        array_merge(array(&$query), $handler[1])
-                    );
+                if (!call_user_func_array(
+                    $handler[0],
+                    array_merge(array(&$this->materialIDs), $handler[1]) // Pass material identifiers
+                )) {
+                    // Stop - if one of external handlers has failed
+                    return array();
                 }
-
-                // Return final filtered entity query result
-                return $query->cond('Active', 1)->exec();
             }
+
+            // Create final material query
+            $query = dbQuery($this->entityName);
+
+            // If we have material id filter
+            if (isset($this->materialIDs) && sizeof($this->materialIDs)) {
+                // Add them to query
+                $query->cond('MaterialID', $this->materialIDs);
+            }
+
+            // Call external handlers chain
+            foreach ($this->entityHandlers as $handler) {
+                call_user_func_array(
+                    $handler[0],
+                    array_merge(array(&$query), $handler[1])
+                );
+            }
+
+            // Return final filtered entity query result
+            return $query->cond('Active', 1)->exec();
         }
 
         // Something failed
