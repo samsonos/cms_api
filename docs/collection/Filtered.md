@@ -67,7 +67,29 @@ For maximum database perfomance we make all filter request low-level optimized s
 * Receiving final collection of entity instances - *Entity handler stack* can be used to manippulate this behaviour 
 
 ## Identifier handler stack
-This handler stack is executed when all filtering steps([Navigation](#navigation-filtering) and [Field](#field-filtering)) is finished
+This handler stack is executed when all filtering steps([Navigation](#navigation-filtering) and [Field](#field-filtering)) is finished and we have actually formed final array of entity identifiers and are ready for retrieving their database records and all realated data. This callbacks will received ```$entityIds``` collection by reference so that they can change it:
+```php
+public function identifierCallback(&$entityIds, $param1, ... )
+{
+  return true;
+}
+```
+> If any callback will return ```false``` empty collection will be returned.
+
+To add this callback chainable ```handler(...)``` should be used see [example](#example).
+
+## Entity handler stack
+This handler stack is executed after [Identifier handler stack](#identifier-handler-stack) has finished and entity database query is created and corresponding enitity identifiers filter is set. This callback receives ```$query``` - Database query object by reference, so any needed action can be performed with it:
+```php
+public function entityQueryCallback(&$query, $param1, ... )
+{
+  return true;
+}
+```
+
+> If no filters has been applied then only final entity query will be executed.
+
+To add this callback chainable ```entityHandler(...)``` should be used see [example](#example).
 
 # Example
 ```php
@@ -82,7 +104,8 @@ class myItemCollection extends \samsonos\cms\collection\Filtered
     // Add field filters
     $this
       ->field('endDate', time(), dbRelation::GREATER_EQ)
-      ->field('image', '', dbRelation::NOT_EQUAL);
+      ->field('image', '', dbRelation::NOT_EQUAL)
+      ->handler;
 
     // Call parents
     parent::__construct($renderer);
