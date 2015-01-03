@@ -29,11 +29,6 @@ In the example above we have filled our collection with ```material``` table dat
 ##Rendering collection
 Generic collections was designed as universal tool so the main thing that they need to be rendered is an external ```$renderer```. Which is the only needed construcor parameter for collection creation. It must be and implementation of [```\samson\core\IViewable``` interface](https://github.com/samsonos/php_core/wiki/2.4-View) and is used in all view render functions.
 
-After analyzing dozens of projects we have created generic view path fields and render functions for you:
-* ```$indexView``` and ```renderIndex()``` - This is main block view path and renderer function
-* ```$itemView``` and ```renderItem()``` - This is single item block view path and renderer function
-* ```$emptyView``` and ```renderEmpty()``` - This is empty block view path and renderer function
-
 Usually you can pass current active module as renderer(if you use controller procedural approach):
 ```php 
 m()->items(new MyItemCollection(m()));
@@ -58,6 +53,28 @@ m()->view('product/catalog')->items(new MyItemCollection(m()))->favourites(new M
 ```
 And then rendered version of this ```GenericCollection``` or its ancestor class
 will be available via ```items_html``` and ```favourites_html``` view variables.
+
+### Generic rendering
+After analyzing dozens of projects we have created generic view path fields and render functions for you:
+* ```$indexView``` and ```renderIndex()``` - This is main block view path and renderer function
+* ```$itemView``` and ```renderItem()``` - This is single item block view path and renderer function
+* ```$emptyView``` and ```renderEmpty()``` - This is empty block view path and renderer function
+
+If you want to change any of this view blocks render logic you mustshould only overload that render function in your class:
+```php
+class MyFavouriteItemCollection extends MyItemCollection
+{
+    // Some data or argumenent specific to this collection implementation
+    protected $something;
+    
+    // Overload only item rendering function because we really need it
+    public function renderItem($item)
+    {
+        return $this->renderer->view('favourite/item')->item($item)->something($this->something)
+    }
+}
+```
+> IMPORTANT! Before you will try to overload generic rendering functions - look at their code at first, maybe they already fit your needs.
 
 ##Iterating material collection
 This class implements ```\Iterator``` interface so instance can be passed to ```foreach``` loop immediately after creation as usual array. 
