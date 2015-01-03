@@ -185,7 +185,7 @@ class Filtered extends Generic
      * @param array $filteredIds Collection of material identifiers
      * @return bool True if ALL filtering succeeded or there was no filtering at all otherwise false
      */
-    public function applyFilter(& $filteredIds = array())
+    protected function applyFilter(& $filteredIds = array())
     {
         return $this->applyNavigationFilter($filteredIds)
             && $this->applyFieldFilter($filteredIds);
@@ -197,7 +197,7 @@ class Filtered extends Generic
      * @param array $params External parameters to pass to callback at first
      * @return bool True if all handlers succeeded
      */
-    public function callHandlers(& $handlers = array(), $params = array())
+    protected function callHandlers(& $handlers = array(), $params = array())
     {
         // Call external handlers
         foreach ($handlers as $handler) {
