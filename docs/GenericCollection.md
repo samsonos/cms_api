@@ -37,12 +37,12 @@ foreach (new \samson\cms\GenericCollection() as $element) {
 ```
 
 ##Passing collection to view
-This class implements [```\samson\core\IViewSettable```](https://github.com/samsonos/php_core/wiki/2.4-View) for giving ability to pass this object and it ancestors to views immediately after creation. also prefixes can be used to get access to multiple GenericCollections while rendering one single view.
+This class implements [```\samson\core\IViewSettable```](https://github.com/samsonos/php_core/wiki/2.4-View) so instance can be passed views immediately after creation, this gives beautiness when you render collections and of course you can use  prefixes to get access to multiple GenericCollections while rendering one single view.
 ```php
-m()->view('product/catalog')->items(new GenericCollection())
+m()->view('product/catalog')->items(new GenericCollection())->favourites(new GenericCollection())
 ```
 And then rendered version of this ```GenericCollection``` or its ancestor class
-will be available via ```items_html``` view variable.
+will be available via ```items_html``` and ```favourites_html``` view variables.
 
 ##Generic implementation
 Created hundreds of projects we have added implementation for ```GenericMaterialCollection``` and called it
