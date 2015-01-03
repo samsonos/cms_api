@@ -51,8 +51,20 @@ This class implements [```\samson\core\IViewSettable```](https://github.com/sams
 ```php
 m()->view('product/catalog')->items(new MyItemCollection(m()))->favourites(new MyFavouriteItemCollection(m()))
 ```
-And then rendered version of this ```MyItemCollection``` or its ancestor class
-will be available via ```items_html``` and ```favourites_html``` view variables.
+And then rendered version of this ```MyItemCollection``` or its ancestor class will be available via ```items_html``` and ```favourites_html``` view variables.
+
+If you need to change standard behaviour of how and what is passed to view you should overload ```toView(...)``` method:
+```php
+    public function toView($prefix = null, array $restricted = array())
+    {
+        // Render show more button, if this is last page do nothing
+        $showMore = $this->pager->current_page < $this->pager->total
+            ? m()->view('list/showmore/index')->set('page', $this->pager->current_page + 1)->output()
+            : '';
+
+        return array($prefix.'html' => $this->render().$showMore);
+    }
+```
 
 ### Generic rendering
 After analyzing dozens of projects we have created generic view path fields and render functions for you:
