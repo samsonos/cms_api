@@ -12,7 +12,7 @@ use samson\activerecord\dbRelation;
 
 /**
  * Collection query builder for filtering
- * @package samson\cms
+ * @package samsonos\cms\collection
  * @author Egorov Vitaly <egorov@samsonos.com>
  */
 class Filtered extends Generic

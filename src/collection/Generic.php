@@ -13,7 +13,7 @@ use samson\core\IViewSettable;
  * This class is a generic approach for rendering catalogs and lists,
  * it should be extended to match needs of specific project.
  *
- * @package samson\cms
+ * @package samsonos\cms\collection
  */
 abstract class Generic implements \Iterator, IViewSettable
 {

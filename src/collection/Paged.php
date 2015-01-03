@@ -11,7 +11,7 @@ use samson\pager\Pager;
 
 /**
  * Generic SamsonCMS entities collection with pages
- * @package samsonos\cms\web
+ * @package samsonos\cms\collection
  * @author Egorov Vitaly <egorov@samsonos.com>
  */
 abstract class Paged extends Filtered
