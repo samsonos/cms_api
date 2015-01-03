@@ -5,8 +5,10 @@ This class is a generic approach for rendering catalogs and lists, it should be 
 ##Iterating material collection
 This class implements ```\Iterator``` interface for giving ability to iterate
 this object immediately after creation as usual array. 
+> This is reasonable only if collection is being filled(```$collection``` field) in constructor, due to differnt real tasks implementation and further needed query and parameters injection automating filling has been removed.
+
 ```php
-foreach (new MaterialCollection() as $material) {
+foreach (new \samson\cms\GenericCollection() as $element) {
     ...
 }
 ```
