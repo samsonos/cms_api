@@ -104,6 +104,23 @@ class Navigation extends structure implements \Iterator
         return false;
     }
 
+    /**
+     * Get all children navigation elements default material object.
+     * This approach increases performance on large navigation tree branches.
+     */
+    public function childrenDef()
+    {
+        // Gather all default materials
+        $defaultMaterialIds =  array();
+
+        foreach ($this->children() as $child) {
+            $defaultMaterialIds[] = $child->MaterialID;
+        }
+
+        // Perform database query
+        return dbQuery('samson\cms\CMSMaterial')->cond('MaterialID', $defaultMaterialIds)->exec();
+    }
+
     // TODO: Functions lower to this line should be rewritten by kotenko@samsonos.com
 
     public function parents( CMSNav & $bound = NULL)
