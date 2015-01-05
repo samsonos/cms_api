@@ -99,3 +99,5 @@ foreach (new \samson\cms\MyItemCollection(m()) as $element) {
     ...
 }
 ```
+
+Now you get should get acquainted with more complex [Filtered collection](Filtered.md) implementation.
