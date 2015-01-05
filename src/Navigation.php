@@ -107,6 +107,7 @@ class Navigation extends structure implements \Iterator
     /**
      * Get all children navigation elements default material object.
      * This approach increases performance on large navigation tree branches.
+     * @return Material[] Collection of material objects
      */
     public function childrenDef()
     {
