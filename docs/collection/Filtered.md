@@ -137,3 +137,5 @@ class myItemCollection extends \samsonos\cms\collection\Filtered
   }
 }
 ```
+
+Now you get should get acquainted with next [Paged collection](Paged.md) implementation.
