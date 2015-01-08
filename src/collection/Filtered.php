@@ -132,13 +132,17 @@ class Filtered extends Generic
         foreach ($this->navigation as $navigation) {
             // Create navigation-material query
             $query = dbQuery('structurematerial')
-                ->cond('MaterialID', $filteredIds)
+
                 ->cond('StructureID', $navigation)
                 ->cond('Active', 1)
                 ->group_by('MaterialID')
             ;
 
-            // Perform request to get next portion of filtered material identifiers
+	        if (isset($filteredIds)) {
+		        $query->cond('MaterialID', $filteredIds);
+	        }
+
+	        // Perform request to get next portion of filtered material identifiers
             if (!$query->fieldsNew('MaterialID', $filteredIds)) {
                 // This filter applying failed
                 return false;
@@ -165,11 +169,13 @@ class Filtered extends Generic
 
             // Create material-field query
             $query = dbQuery('materialfield')
-                ->cond('MaterialID', $filteredIds)
                 ->cond('FieldID', $field[0]->id)
                 ->cond($valueField, $field[1], $field[2])
                 ->group_by('MaterialID')
             ;
+	        if (isset($filteredIds)) {
+		        $query->cond('MaterialID', $filteredIds);
+	        }
 
             // Perform request to get next portion of filtered material identifiers
             if (!$query->fieldsNew('MaterialID', $filteredIds)) {
@@ -223,7 +229,7 @@ class Filtered extends Generic
     public function fill()
     {
         // Clear current materials identifiers list
-        $this->materialIDs = array();
+        $this->materialIDs = null;
 
         // Perform material filtering
         if ($this->applyFilter($this->materialIDs)) {
@@ -245,6 +251,8 @@ class Filtered extends Generic
             return $query->cond('Active', 1)->exec();
         }
 
+	    // Clear current materials identifiers list
+	    $this->materialIDs = array();
         // Something failed
         return array();
     }
