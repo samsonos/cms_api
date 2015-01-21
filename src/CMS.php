@@ -691,6 +691,12 @@ class CMS extends CompressableService
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` ADD `priority` INT(11) NOT NULL DEFAULT 0 AFTER `parent_id`');
     }
 
+    /** Field `numeric_value` in `materialfield` table is now double */
+    public function migrate_21_to_22()
+    {
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield` MODIFY `numeric_value` DOUBLE NOT NULL DEFAULT 0 AFTER `Value`');
+    }
+
     public function materialColumnToField($column, $structure)
     {
         // Find first user
