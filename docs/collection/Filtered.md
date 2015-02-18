@@ -62,10 +62,13 @@ $this->field('price', 1000, dbRelation::GREATER)->field('photo', '', dbRelation:
 ```
 
 ## Ranged field filtering
-If you want to add field range filter(from min value to max value), you can use special method ```ranged()```. It behaves as [Field filtering method calls](#Method_calls) but parameters are changed: 
-```ranged($idsOrUrls, $minValue, $maxValue)```
+If you want to add field range filter(from min value to max value), you can use special method ```ranged($idsOrUrls, $minValue, $maxValue)``` 
+
 * $idsOrUrls - Single or Collection of field indentifiers
-* 
+* $minValue - Range begin value
+* $maxValue - Range end value
+
+Example usage:
 ```php
 $this->ranged('price', 500, 1500);
 ```
