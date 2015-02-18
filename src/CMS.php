@@ -941,10 +941,4 @@ class CMS extends CompressableService
         // Create cache collection
         dbRecord::$instances[ "samson\cms\CMSMaterial" ] = array();
     }
-
-    /** Constructor */
-    public function __construct($path = null)
-    {
-        parent::__construct($path);
-    }
 }
