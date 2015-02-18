@@ -74,7 +74,7 @@ class Filtered extends Generic
     public function navigation($navigation)
     {
         // Do not allow empty strings
-        if (isset($navigation{0}) || is_numeric($navigation)) {
+        if (!empty($navigation)) {
             // Create id or URL condition
             $idOrUrl = new Condition('OR');
             $idOrUrl->add('StructureID', $navigation)->add('Url', $navigation);
@@ -102,7 +102,7 @@ class Filtered extends Generic
     public function field($field, $value, $relation = dbRelation::EQUAL)
     {
         // Do not allow empty strings
-        if (isset($field{0}) || is_numeric($field)) {
+        if (!empty($field)) {
             // Create id or URL condition
             $idOrUrl = new Condition('OR');
             $idOrUrl->add('FieldID', $field)->add('Name', $field);
@@ -137,7 +137,7 @@ class Filtered extends Generic
      */
     public function ranged($field, $minValue, $maxValue)
     {
-        if (($minValue <= $maxValue) && (isset($field{0}) || is_numeric($field))) {
+        if (($minValue <= $maxValue) && !empty($field)) {
             // Create id or URL condition
             $idOrUrl = new Condition('OR');
             $idOrUrl->add('FieldID', $field)->add('Name', $field);
