@@ -35,6 +35,9 @@ class Filtered extends Generic
     /** @var string Collection entities class name */
     protected $entityName = 'samson\cms\CMSMaterial';
 
+    /** @var array Sorter parameters collection */
+    protected $sorter = array();
+
     /**
      * Add external identifier filter handler
      * @param callback $handler
@@ -182,11 +185,11 @@ class Filtered extends Generic
                 ->group_by('MaterialID')
             ;
 
-	        if (isset($filteredIds)) {
-		        $query->cond('MaterialID', $filteredIds);
-	        }
+            if (isset($filteredIds)) {
+                $query->cond('MaterialID', $filteredIds);
+            }
 
-	        // Perform request to get next portion of filtered material identifiers
+            // Perform request to get next portion of filtered material identifiers
             if (!$query->fieldsNew('MaterialID', $filteredIds)) {
                 // This filter applying failed
                 return false;
@@ -215,9 +218,9 @@ class Filtered extends Generic
                 ->group_by('MaterialID')
             ;
 
-	        if (isset($filteredIds)) {
-		        $query->cond('MaterialID', $filteredIds);
-	        }
+            if (isset($filteredIds)) {
+                $query->cond('MaterialID', $filteredIds);
+            }
 
             // Perform request to get next portion of filtered material identifiers
             if (!$query->fieldsNew('MaterialID', $filteredIds)) {
@@ -265,6 +268,24 @@ class Filtered extends Generic
     }
 
     /**
+     * Perform material identifiers collection sorting
+     * @param array $materialIDs Variable to return sorted collection
+     */
+    protected function applySorter(& $materialIDs = array())
+    {
+        // Check if sorter is configured
+        if (sizeof($this->sorter)) {
+            // Perform ordered db request
+            if (dbQuery('materialfield')
+                ->cond('FieldID', $this->sorter[0])
+                ->order_by($this->sorter[1], $this->sorter[2])
+                ->fieldsNew('MaterialID', $materialIDs)) {
+                // Perform some logic?
+            }
+        }
+    }
+
+    /**
      * Perform collection database retrieval using set filters
      * @return array $collection Return value
      */
@@ -280,6 +301,9 @@ class Filtered extends Generic
             // Store filtered collection size
             $this->count = sizeof($this->materialIDs);
 
+            // Perform sorting
+            $this->applySorter($this->materialIDs);
+
             // Call material identifier handlers
             $this->callHandlers($this->idHandlers, array(&$this->materialIDs));
 
@@ -293,8 +317,8 @@ class Filtered extends Generic
             return $query->cond('Active', 1)->exec();
         }
 
-	    // Clear current materials identifiers list
-	    $this->materialIDs = array();
+        // Clear current materials identifiers list
+        $this->materialIDs = array();
         // Something failed
         return array();
     }
