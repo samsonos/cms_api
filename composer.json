@@ -14,7 +14,8 @@
     "minimum-stability":"dev",
 	"require":
 	{
-		"samsonos/php_activerecord":"*"
+		"samsonos/php_activerecord":"*",
+		"samsonos/php_pager":"*"
 	},
     "require-dev": {
         "satooshi/php-coveralls": "dev-master",
