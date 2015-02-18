@@ -51,11 +51,21 @@ $this->field = array(
 
 ### Method calls
 We also created ```field()``` chainable method to add field filter group:
+```field($idsOrUrls, $value, $relation)```
+* $idsOrUrls - Single or Collection of field indentifiers of Urls
+* $value - Field value
+* $relation - Database request value relation
+
+Example usage:
 ```php 
 $this->field('price', 1000, dbRelation::GREATER)->field('photo', '', dbRelation::NOT_EQUAL);
 ```
 
-If you want to get some materials in range from min value to max value, you can use method ```ranged()```. Remember that it works only with numeric fields:
+## Ranged field filtering
+If you want to add field range filter(from min value to max value), you can use special method ```ranged()```. It behaves as [Field filtering method calls](#Method_calls) but parameters are changed: 
+```ranged($idsOrUrls, $minValue, $maxValue)```
+* $idsOrUrls - Single or Collection of field indentifiers
+* 
 ```php
 $this->ranged('price', 500, 1500);
 ```
