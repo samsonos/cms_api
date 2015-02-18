@@ -76,7 +76,7 @@ class Filtered extends Generic
         /**@var \samson\activerecord\field $field */
         if ($this->isFieldObject($field)) {
             $this->sorter = array(
-                $field->id,
+                $field,
                 in_array($field->Type, array(3, 7)) ? 'numeric_value' : 'value',
                 $destination
             );
@@ -272,6 +272,25 @@ class Filtered extends Generic
     }
 
     /**
+     * Perform material identifiers collection sorting
+     * @param array $materialIDs Variable to return sorted collection
+     */
+    protected function applySorter(& $materialIDs = array())
+    {
+        // Check if sorter is configured
+        if (sizeof($this->sorter)) {
+            // Perform ordered db request
+            if (dbQuery('materialfield')
+                ->cond('FieldID', $this->sorter[0]->id)
+                ->order_by($this->sorter[1], $this->sorter[2])
+                ->cond('MaterialID', $materialIDs)
+                ->fieldsNew('MaterialID', $materialIDs)) {
+                // Perform some logic?
+            }
+        }
+    }
+
+    /**
      * Call handlers stack
      * @param array $handlers Collection of callbacks with their parameters
      * @param array $params External parameters to pass to callback at first
@@ -282,34 +301,16 @@ class Filtered extends Generic
         // Call external handlers
         foreach ($handlers as $handler) {
             // Call external handlers chain
-            if (!call_user_func_array(
+            if (call_user_func_array(
                 $handler[0],
                 array_merge($params, $handler[1]) // Merge params and handler params
-            )) {
+            ) === false) {
                 // Stop - if one of external handlers has failed
                 return false;
             }
         }
 
         return true;
-    }
-
-    /**
-     * Perform material identifiers collection sorting
-     * @param array $materialIDs Variable to return sorted collection
-     */
-    protected function applySorter(& $materialIDs = array())
-    {
-        // Check if sorter is configured
-        if (sizeof($this->sorter)) {
-            // Perform ordered db request
-            if (dbQuery('materialfield')
-                ->cond('FieldID', $this->sorter[0])
-                ->order_by($this->sorter[1], $this->sorter[2])
-                ->fieldsNew('MaterialID', $materialIDs)) {
-                // Perform some logic?
-            }
-        }
     }
 
     /**

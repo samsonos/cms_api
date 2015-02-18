@@ -38,16 +38,28 @@ abstract class Paged extends Filtered
     }
 
     /**
-     * Pager db request handler
-     * @param array Collection of material identifiers
+     * Pager id handler
+     * @param array Array of material identifiers
      */
-    public function pagerInjection(& $materialIds)
+    public function pagerIDInjection(& $materialIds)
     {
         // Create count request to count pagination
         $this->pager->update(sizeof($materialIds));
 
         // Cut only needed materials identifiers from array
         $materialIds = array_slice($materialIds, $this->pager->start, $this->pager->end);
+    }
+
+    /**
+     * Pager db request handler
+     * @param array Array of material identifiers
+     */
+    public function pagerDBInjection(&$query)
+    {
+        // Add query sorter for showed page
+        if (sizeof($this->sorter)) {
+            $query->order_by($this->sorter[0]->Name, $this->sorter[2]);
+        }
     }
 
     /**
@@ -62,8 +74,11 @@ abstract class Paged extends Filtered
             $this->pager = new Pager($page, $this->pageSize);
         }
 
+        // Set pager id injection
+        $this->handler(array($this, 'pagerIDInjection'));
+
         // Set pager db query injection
-        $this->handler(array($this, 'pagerInjection'));
+        $this->entityHandler(array($this, 'pagerDBInjection'));
 
         // Call parents
         parent::__construct($renderer);
