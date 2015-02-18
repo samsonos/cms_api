@@ -55,6 +55,11 @@ We also created ```field()``` chainable method to add field filter group:
 $this->field('price', 1000, dbRelation::GREATER)->field('photo', '', dbRelation::NOT_EQUAL);
 ```
 
+If you want to get some materials in range from min value to max value, you can use method ```ranged()```. Remember that it works only with numeric fields:
+```php
+$this->ranged('price', 500, 1500);
+```
+
 # Filling filtered collection
 All filter logic is implemented in ```fill()``` method so you wont have to override it(we actually do not advice you to do so), but what if we need modify query, inject into it? For this purposes we have two special handler stacks:
 * [Identifier handler stack](#identifier-handler-stack)

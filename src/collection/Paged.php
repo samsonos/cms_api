@@ -57,8 +57,10 @@ abstract class Paged extends Filtered
      */
     public function __construct($renderer, $page = 1)
     {
-        // Create pagination
-        $this->pager = new Pager($page, $this->pageSize);
+        if (!isset($this->pager)) {
+            // Create pagination
+            $this->pager = new Pager($page, $this->pageSize);
+        }
 
         // Set pager db query injection
         $this->handler(array($this, 'pagerInjection'));
