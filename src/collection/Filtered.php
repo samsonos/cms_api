@@ -67,6 +67,23 @@ class Filtered extends Generic
     }
 
     /**
+     * Set collection sorter parameters
+     * @param string|integer $field Field identifier or name
+     * @param string $destination ASC|DESC
+     */
+    public function sorter($field, $destination = 'ASC')
+    {
+        /**@var \samson\activerecord\field $field */
+        if ($this->isFieldObject($field)) {
+            $this->sorter = array(
+                $field->id,
+                in_array($field->Type, array(3, 7)) ? 'numeric_value' : 'value',
+                $destination
+            );
+        }
+    }
+
+    /**
      * Filter collection using navigation entity or collection of them.
      * If collection of navigation Url or Ids is passed then this group will be
      * applied as single navigation filter to retrieve materials.
@@ -105,26 +122,18 @@ class Filtered extends Generic
     public function field($field, $value, $relation = dbRelation::EQUAL)
     {
         // Do not allow empty strings
-        if (!empty($field)) {
-            // Create id or URL condition
-            $idOrUrl = new Condition('OR');
-            $idOrUrl->add('FieldID', $field)->add('Name', $field);
+        if ($this->isFieldObject($field)) {
+            // Get field value column
+            $valueField = in_array($field->Type, array(3, 7)) ? 'numeric_value' : 'value';
 
-            /** @var \samson\activerecord\field $field */
-            $field = null;
-            if (dbQuery('field')->cond($idOrUrl)->first($field)) {
-                // Get field value column
-                $valueField = in_array($field->Type, array(3, 7)) ? 'numeric_value' : 'value';
+            /** @var Condition $condition Ranged condition */
+            $condition = new Condition('AND');
 
-                /** @var Condition $condition Ranged condition */
-                $condition = new Condition('AND');
+            // Add min value for ranged condition
+            $condition->add($valueField, $value, $relation);
 
-                // Add min value for ranged condition
-                $condition->add($valueField, $value, $relation);
-
-                // Store retrieved field element and its value as field collection filter
-                $this->field[] = array($field, $condition);
-            }
+            // Store retrieved field element and its value as field collection filter
+            $this->field[] = array($field, $condition);
         }
 
         // Chaining
@@ -140,14 +149,11 @@ class Filtered extends Generic
      */
     public function ranged($field, $minValue, $maxValue)
     {
-        if (($minValue <= $maxValue) && !empty($field)) {
-            // Create id or URL condition
-            $idOrUrl = new Condition('OR');
-            $idOrUrl->add('FieldID', $field)->add('Name', $field);
-
-            /** @var \samson\activerecord\field $field */
-            $field = null;
-            if (dbQuery('field')->cond($idOrUrl)->cond('Type', array(3, 7))->first($field)) {
+        // Check input parameters and try to find field
+        if (($minValue <= $maxValue) && $this->isFieldObject($field)) {
+            // TODO: Remove integers from code, handle else
+            // Only numeric fields are supported
+            if (in_array($field->Type, array(3,7))) {
                 /** @var Condition $condition Ranged condition */
                 $condition = new Condition('AND');
 
@@ -164,6 +170,27 @@ class Filtered extends Generic
 
         // Chaining
         return $this;
+    }
+
+    /**
+     * Try to find additional field record
+     * @param string|integer $field Additional field identifier or name
+     * @return bool True if field record has been found
+     */
+    protected function isFieldObject(&$field)
+    {
+        // Do not allow empty strings
+        if (!empty($field)) {
+            // Create id or URL condition
+            $idOrUrl = new Condition('OR');
+            $idOrUrl->add('FieldID', $field)->add('Name', $field);
+
+            // Perform query
+            return dbQuery('field')->cond($idOrUrl)->first($field);
+        }
+
+        // Field not found
+        return false;
     }
 
     /**
