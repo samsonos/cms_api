@@ -74,7 +74,7 @@ class Filtered extends Generic
     public function navigation($navigation)
     {
         // Do not allow empty strings
-        if (isset($navigation{0})) {
+        if (isset($navigation{0}) || is_numeric($navigation)) {
             // Create id or URL condition
             $idOrUrl = new Condition('OR');
             $idOrUrl->add('StructureID', $navigation)->add('Url', $navigation);
@@ -102,7 +102,7 @@ class Filtered extends Generic
     public function field($field, $value, $relation = dbRelation::EQUAL)
     {
         // Do not allow empty strings
-        if (isset($field{0})) {
+        if (isset($field{0}) || is_numeric($field)) {
             // Create id or URL condition
             $idOrUrl = new Condition('OR');
             $idOrUrl->add('FieldID', $field)->add('Name', $field);
@@ -110,8 +110,52 @@ class Filtered extends Generic
             /** @var \samson\activerecord\field $field */
             $field = null;
             if (dbQuery('field')->cond($idOrUrl)->first($field)) {
+                // Get field value column
+                $valueField = in_array($field->Type, array(3, 7)) ? 'numeric_value' : 'value';
+
+                /** @var Condition $condition Ranged condition */
+                $condition = new Condition('AND');
+
+                // Add min value for ranged condition
+                $condition->add($valueField, $value, $relation);
+
                 // Store retrieved field element and its value as field collection filter
-                $this->field[] = array($field, $value, $relation);
+                $this->field[] = array($field, $condition);
+            }
+        }
+
+        // Chaining
+        return $this;
+    }
+
+    /**
+     * Filter collection of numeric field in range from min to max values
+     * @param string|integer $field Additional field identifier or name
+     * @param integer $minValue Min value for range filter
+     * @param integer $maxValue Max value for range filter
+     * @return self Chaining
+     */
+    public function ranged($field, $minValue, $maxValue)
+    {
+        if (($minValue <= $maxValue) && (isset($field{0}) || is_numeric($field))) {
+            // Create id or URL condition
+            $idOrUrl = new Condition('OR');
+            $idOrUrl->add('FieldID', $field)->add('Name', $field);
+
+            /** @var \samson\activerecord\field $field */
+            $field = null;
+            if (dbQuery('field')->cond($idOrUrl)->cond('Type', array(3, 7))->first($field)) {
+                /** @var Condition $condition Ranged condition */
+                $condition = new Condition('AND');
+
+                // Add min value for ranged condition
+                $condition->add('numeric_value', $minValue, dbRelation::GREATER_EQ);
+
+                // Add max value for ranged condition
+                $condition->add('numeric_value', $maxValue, dbRelation::LOWER_EQ);
+
+                // Store created condition
+                $this->field[] = array($field, $condition);
             }
         }
 
@@ -164,15 +208,13 @@ class Filtered extends Generic
     {
         // Iterate all applied field filters
         foreach ($this->field as $field) {
-            // Get field value column
-            $valueField = in_array($field[0]->Type, array(3, 7)) ? 'numeric_value' : 'value';
-
             // Create material-field query
             $query = dbQuery('materialfield')
                 ->cond('FieldID', $field[0]->id)
-                ->cond($valueField, $field[1], $field[2])
+                ->cond($field[1])
                 ->group_by('MaterialID')
             ;
+
 	        if (isset($filteredIds)) {
 		        $query->cond('MaterialID', $filteredIds);
 	        }
