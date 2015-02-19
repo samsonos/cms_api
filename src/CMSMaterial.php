@@ -456,7 +456,7 @@ class CMSMaterial extends Material implements iModuleViewable
                 $tableColumnIds = array_flip($dbTableFieldsIds);
 
                 /** @var \samson\activerecord\material $dbTableRow Material object (table row) */
-                foreach ($materialFieldQuery->exec() as & $mf) {
+                foreach ($materialFieldQuery->exec() as $mf) {
                     $resultTable[$mf['MaterialID']][$tableColumnIds[$mf->FieldID]] =
                         !empty($mf->Value) ? $mf->Value : $mf->numeric_value;
                 }
