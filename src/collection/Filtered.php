@@ -340,6 +340,11 @@ class Filtered extends Generic
 
             // Call material query handlers
             $this->callHandlers($this->entityHandlers, array(&$query));
+            
+            // Add query sorter for showed page
+            if (sizeof($this->sorter)) {
+                $query->order_by($this->sorter[0]->Name, $this->sorter[2]);
+            }
 
             // Return final filtered entity query result
             return $query->cond('Active', 1)->exec();
