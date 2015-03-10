@@ -51,18 +51,6 @@ abstract class Paged extends Filtered
     }
 
     /**
-     * Pager db request handler
-     * @param array Array of material identifiers
-     */
-    public function pagerDBInjection(&$query)
-    {
-        // Add query sorter for showed page
-        if (sizeof($this->sorter)) {
-            $query->order_by($this->sorter[0]->Name, $this->sorter[2]);
-        }
-    }
-
-    /**
      * Constructor
      * @param \samson\core\IViewable $renderer View render object
      * @param int $page Current page number
@@ -73,9 +61,6 @@ abstract class Paged extends Filtered
             // Create pagination
             $this->pager = new Pager($page, $this->pageSize);
         }
-
-        // Set pager id injection
-        $this->handler(array($this, 'pagerIDInjection'));
 
         // Set pager db query injection
         $this->entityHandler(array($this, 'pagerDBInjection'));
