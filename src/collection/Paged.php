@@ -62,8 +62,8 @@ abstract class Paged extends Filtered
             $this->pager = new Pager($page, $this->pageSize);
         }
 
-        // Set pager db query injection
-        $this->entityHandler(array($this, 'pagerDBInjection'));
+        // Set pager id injection
+        $this->handler(array($this, 'pagerIDInjection'));
 
         // Call parents
         parent::__construct($renderer);
