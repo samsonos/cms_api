@@ -2,6 +2,11 @@
 namespace samson\cms;
 
 use samson\activerecord\dbRelation;
+use samson\activerecord\field;
+use samson\activerecord\materialfield;
+use samson\activerecord\structure;
+use samson\activerecord\structurefield;
+use samson\activerecord\structurematerial;
 use samson\activerecord\TableRelation;
 use samson\activerecord\material;
 use samson\core\CompressableService;
@@ -695,6 +700,70 @@ class CMS extends CompressableService
     public function migrate_21_to_22()
     {
         db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield` MODIFY `numeric_value` DOUBLE NOT NULL DEFAULT 0 AFTER `Value`');
+    }
+
+    /** Adding `materialFieldId` to `gallery` table */
+    public function migrate_22_to_23()
+    {
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'gallery` ADD `materialFieldId` INT(11) NOT NULL DEFAULT 0 AFTER `MaterialID`');
+    }
+
+    /** Create new gallery from old one */
+    public function migrate_23_to_24()
+    {
+        /** @var \samson\activerecord\user $user User object */
+        $user = null;
+        if(dbQuery('user')->first($user)) {
+
+        }
+
+        // Create field for old gallery
+        $field = new field(false);
+        $field->Name = '_gallery';
+        $field->Type = 9;
+        $field->local = 0;
+        $field->Description = 'Галерея Материала';
+        $field->UserID = $user->UserID;
+        $field->system = 1;
+        $field->Created = date('Y-m-d H:i:s');
+        $field->Modyfied = $field->Created;
+        $field->save();
+
+        /** @var \samson\activerecord\structure $structure Get system material structure */
+        $structure = null;
+        if (dbQuery('structure')->cond('Url', '__material')->exec($structure)) {
+            $structure = array_shift($structure);
+        }
+
+        // Create relation between system material structure and gallery field
+        $structureField = new structurefield(false);
+        $structureField->FieldID = $field->FieldID;
+        $structureField->StructureID = $structure->StructureID;
+        $structureField->Active = 1;
+        $structureField->Modified = date('Y-m-d H:i:s');
+        $structureField->save();
+
+        /** @var array $gallery Array of \samson\activerecord\gallery objects */
+        $gallery = null;
+        if (dbQuery('gallery')->exec($gallery)) {
+            /** @var \samson\activerecord\gallery $image Set gallery as additional field */
+            foreach ($gallery as $image) {
+                // Create new materialfield for image and save it id in gallery table
+                $materialField = new materialfield(false);
+                $materialField->MaterialID = $image->MaterialID;
+                $materialField->FieldID = $field->FieldID;
+                $materialField->Active = 1;
+                $materialField->save();
+                $structureMaterial = new structurematerial(false);
+                $structureMaterial->MaterialID = $image->MaterialID;
+                $structureMaterial->StructureID = $structure->StructureID;
+                $structureMaterial->Modified = date('Y-m-d H:i:s');
+                $structureMaterial->Active = 1;
+                $structureMaterial->save();
+                $image->materialFieldId = $materialField->MaterialFieldID;
+                $image->save();
+            }
+        }
     }
 
     public function materialColumnToField($column, $structure)
