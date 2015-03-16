@@ -369,40 +369,6 @@ class CMSMaterial extends Material implements iModuleViewable
             db()->simple_query($queryString);
         }
     }
-
-    /**
-     * Get collection of images for material by gallery additional field selector
-     * @param string $fieldSelector Additional field selector value
-     * @param string $selector Additional field field name to search for
-     * @return \samson\activerecord\gallery[] Collection of images in this gallery additional field for material
-     */
-    public function & gallery($fieldSelector, $selector = 'FieldID')
-    {
-        /** @var \samson\activerecord\gallery[] $images Get material images for this gallery */
-        $images = array();
-
-        /* @var \samson\activerecord\field Get field object if we need to search it by other fields */
-        $field = null;
-        if ($selector != 'FieldID') {
-            $field = dbQuery('field')->cond($selector, $fieldSelector)->first();
-            $fieldSelector = $field->id;
-        }
-
-        /** @var \samson\activerecord\materialfield $dbMaterialField Find material field gallery record */
-        $dbMaterialField = null;
-        if (dbQuery('materialfield')
-            ->cond("FieldID", $fieldSelector)
-            ->cond('MaterialID', $this->id)
-            ->first($dbMaterialField)
-        ) {
-            // Get material images for this materialfield
-            if (dbQuery('gallery')->cond('materialFieldId', $dbMaterialField->id)->exec($images)) {
-
-            }
-        }
-
-        return $images;
-    }
     
     /**
      * Function to retrieve this material table by specified field
