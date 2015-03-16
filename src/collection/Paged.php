@@ -38,10 +38,10 @@ abstract class Paged extends Filtered
     }
 
     /**
-     * Pager db request handler
-     * @param array Collection of material identifiers
+     * Pager id handler
+     * @param array Array of material identifiers
      */
-    public function pagerInjection(& $materialIds)
+    public function pagerIDInjection(& $materialIds)
     {
         // Create count request to count pagination
         $this->pager->update(sizeof($materialIds));
@@ -57,11 +57,13 @@ abstract class Paged extends Filtered
      */
     public function __construct($renderer, $page = 1)
     {
-        // Create pagination
-        $this->pager = new Pager($page, $this->pageSize);
+        if (!isset($this->pager)) {
+            // Create pagination
+            $this->pager = new Pager($page, $this->pageSize);
+        }
 
-        // Set pager db query injection
-        $this->handler(array($this, 'pagerInjection'));
+        // Set pager id injection
+        $this->handler(array($this, 'pagerIDInjection'));
 
         // Call parents
         parent::__construct($renderer);

@@ -51,8 +51,26 @@ $this->field = array(
 
 ### Method calls
 We also created ```field()``` chainable method to add field filter group:
+```field($idsOrUrls, $value, $relation)```
+* $idsOrUrls - Single or Collection of field indentifiers of Urls
+* $value - Field value
+* $relation - Database request value relation
+
+Example:
 ```php 
 $this->field('price', 1000, dbRelation::GREATER)->field('photo', '', dbRelation::NOT_EQUAL);
+```
+
+## Ranged field filtering
+If you want to add field range filter(from min value to max value), you can use special method ```ranged($idsOrUrls, $minValue, $maxValue)``` 
+
+* $idsOrUrls - Single or Collection of field indentifiers
+* $minValue - Range begin value
+* $maxValue - Range end value
+
+Example:
+```php
+$this->ranged('price', 500, 1500);
 ```
 
 # Filling filtered collection
@@ -108,8 +126,6 @@ class myItemCollection extends \samsonos\cms\collection\Filtered
   public function entityQueryCallback(&$query, $param1, ... )
   {
     $query->cond('Published', '1');
-    
-    return true;
   }
   
   public function identifierCallback(&$entityIds, $param1, ... )
@@ -138,4 +154,20 @@ class myItemCollection extends \samsonos\cms\collection\Filtered
 }
 ```
 
-Now you get should get acquainted with next [Paged collection](Paged.md) implementation.
+# Results sorting
+If you want to add result sorting to your collection then you should use ```sorter($idOrUrl, $destination)```.
+
+Example:
+```php
+// Override constructor to add field filters
+  public function __construct($renderer)
+  {
+    // Call this always before parent constructor call
+    $this->sorter('price', 'ASC'); // Add price ascending sorting
+    
+    // Call parents
+    parent::__construct($renderer);
+  }
+```
+
+Now you should get acquainted with next [Paged collection](Paged.md) implementation.

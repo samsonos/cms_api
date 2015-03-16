@@ -35,6 +35,9 @@ class Filtered extends Generic
     /** @var string Collection entities class name */
     protected $entityName = 'samson\cms\CMSMaterial';
 
+    /** @var array Sorter parameters collection */
+    protected $sorter = array();
+
     /**
      * Add external identifier filter handler
      * @param callback $handler
@@ -64,6 +67,23 @@ class Filtered extends Generic
     }
 
     /**
+     * Set collection sorter parameters
+     * @param string|integer $field Field identifier or name
+     * @param string $destination ASC|DESC
+     */
+    public function sorter($field, $destination = 'ASC')
+    {
+        /**@var \samson\activerecord\field $field */
+        if ($this->isFieldObject($field)) {
+            $this->sorter = array(
+                $field,
+                in_array($field->Type, array(3, 7)) ? 'numeric_value' : 'value',
+                $destination
+            );
+        }
+    }
+
+    /**
      * Filter collection using navigation entity or collection of them.
      * If collection of navigation Url or Ids is passed then this group will be
      * applied as single navigation filter to retrieve materials.
@@ -74,7 +94,7 @@ class Filtered extends Generic
     public function navigation($navigation)
     {
         // Do not allow empty strings
-        if (isset($navigation{0})) {
+        if (!empty($navigation)) {
             // Create id or URL condition
             $idOrUrl = new Condition('OR');
             $idOrUrl->add('StructureID', $navigation)->add('Url', $navigation);
@@ -102,21 +122,75 @@ class Filtered extends Generic
     public function field($field, $value, $relation = dbRelation::EQUAL)
     {
         // Do not allow empty strings
-        if (isset($field{0})) {
-            // Create id or URL condition
-            $idOrUrl = new Condition('OR');
-            $idOrUrl->add('FieldID', $field)->add('Name', $field);
+        if ($this->isFieldObject($field)) {
+            // Get field value column
+            $valueField = in_array($field->Type, array(3, 7)) ? 'numeric_value' : 'value';
 
-            /** @var \samson\activerecord\field $field */
-            $field = null;
-            if (dbQuery('field')->cond($idOrUrl)->first($field)) {
-                // Store retrieved field element and its value as field collection filter
-                $this->field[] = array($field, $value, $relation);
+            /** @var Condition $condition Ranged condition */
+            $condition = new Condition('AND');
+
+            // Add min value for ranged condition
+            $condition->add($valueField, $value, $relation);
+
+            // Store retrieved field element and its value as field collection filter
+            $this->field[] = array($field, $condition);
+        }
+
+        // Chaining
+        return $this;
+    }
+
+    /**
+     * Filter collection of numeric field in range from min to max values
+     * @param string|integer $field Additional field identifier or name
+     * @param integer $minValue Min value for range filter
+     * @param integer $maxValue Max value for range filter
+     * @return self Chaining
+     */
+    public function ranged($field, $minValue, $maxValue)
+    {
+        // Check input parameters and try to find field
+        if (($minValue <= $maxValue) && $this->isFieldObject($field)) {
+            // TODO: Remove integers from code, handle else
+            // Only numeric fields are supported
+            if (in_array($field->Type, array(3,7))) {
+                /** @var Condition $condition Ranged condition */
+                $condition = new Condition('AND');
+
+                // Add min value for ranged condition
+                $condition->add('numeric_value', $minValue, dbRelation::GREATER_EQ);
+
+                // Add max value for ranged condition
+                $condition->add('numeric_value', $maxValue, dbRelation::LOWER_EQ);
+
+                // Store created condition
+                $this->field[] = array($field, $condition);
             }
         }
 
         // Chaining
         return $this;
+    }
+
+    /**
+     * Try to find additional field record
+     * @param string|integer $field Additional field identifier or name
+     * @return bool True if field record has been found
+     */
+    protected function isFieldObject(&$field)
+    {
+        // Do not allow empty strings
+        if (!empty($field)) {
+            // Create id or URL condition
+            $idOrUrl = new Condition('OR');
+            $idOrUrl->add('FieldID', $field)->add('Name', $field);
+
+            // Perform query
+            return dbQuery('field')->cond($idOrUrl)->first($field);
+        }
+
+        // Field not found
+        return false;
     }
 
     /**
@@ -138,11 +212,11 @@ class Filtered extends Generic
                 ->group_by('MaterialID')
             ;
 
-	        if (isset($filteredIds)) {
-		        $query->cond('MaterialID', $filteredIds);
-	        }
+            if (isset($filteredIds)) {
+                $query->cond('MaterialID', $filteredIds);
+            }
 
-	        // Perform request to get next portion of filtered material identifiers
+            // Perform request to get next portion of filtered material identifiers
             if (!$query->fieldsNew('MaterialID', $filteredIds)) {
                 // This filter applying failed
                 return false;
@@ -164,18 +238,16 @@ class Filtered extends Generic
     {
         // Iterate all applied field filters
         foreach ($this->field as $field) {
-            // Get field value column
-            $valueField = in_array($field[0]->Type, array(3, 7)) ? 'numeric_value' : 'value';
-
             // Create material-field query
             $query = dbQuery('materialfield')
                 ->cond('FieldID', $field[0]->id)
-                ->cond($valueField, $field[1], $field[2])
+                ->cond($field[1])
                 ->group_by('MaterialID')
             ;
-	        if (isset($filteredIds)) {
-		        $query->cond('MaterialID', $filteredIds);
-	        }
+
+            if (isset($filteredIds)) {
+                $query->cond('MaterialID', $filteredIds);
+            }
 
             // Perform request to get next portion of filtered material identifiers
             if (!$query->fieldsNew('MaterialID', $filteredIds)) {
@@ -200,6 +272,25 @@ class Filtered extends Generic
     }
 
     /**
+     * Perform material identifiers collection sorting
+     * @param array $materialIDs Variable to return sorted collection
+     */
+    protected function applySorter(& $materialIDs = array())
+    {
+        // Check if sorter is configured
+        if (sizeof($this->sorter)) {
+            // Perform ordered db request
+            if (dbQuery('materialfield')
+                ->cond('FieldID', $this->sorter[0]->id)
+                ->order_by($this->sorter[1], $this->sorter[2])
+                ->cond('MaterialID', $materialIDs)
+                ->fieldsNew('MaterialID', $materialIDs)) {
+                // Perform some logic?
+            }
+        }
+    }
+
+    /**
      * Call handlers stack
      * @param array $handlers Collection of callbacks with their parameters
      * @param array $params External parameters to pass to callback at first
@@ -210,10 +301,10 @@ class Filtered extends Generic
         // Call external handlers
         foreach ($handlers as $handler) {
             // Call external handlers chain
-            if (!call_user_func_array(
+            if (call_user_func_array(
                 $handler[0],
                 array_merge($params, $handler[1]) // Merge params and handler params
-            )) {
+            ) === false) {
                 // Stop - if one of external handlers has failed
                 return false;
             }
@@ -238,6 +329,9 @@ class Filtered extends Generic
             // Store filtered collection size
             $this->count = sizeof($this->materialIDs);
 
+            // Perform sorting
+            $this->applySorter($this->materialIDs);
+
             // Call material identifier handlers
             $this->callHandlers($this->idHandlers, array(&$this->materialIDs));
 
@@ -246,13 +340,18 @@ class Filtered extends Generic
 
             // Call material query handlers
             $this->callHandlers($this->entityHandlers, array(&$query));
+            
+            // Add query sorter for showed page
+            if (sizeof($this->sorter)) {
+                $query->order_by($this->sorter[0]->Name, $this->sorter[2]);
+            }
 
             // Return final filtered entity query result
             return $query->cond('Active', 1)->exec();
         }
 
-	    // Clear current materials identifiers list
-	    $this->materialIDs = array();
+        // Clear current materials identifiers list
+        $this->materialIDs = array();
         // Something failed
         return array();
     }

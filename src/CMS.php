@@ -345,7 +345,7 @@ class CMS extends CompressableService
         db()->simple_query($sql_gallery);
         db()->simple_query( $sql_structure_relation);
         db()->simple_query("INSERT INTO `".dbMySQLConnector::$prefix."user` (`UserID`, `FName`, `SName`, `TName`, `Email`, `md5_Email`, `md5_Password`, `Created`, `Modyfied`, `GroupID`, `Active`, `Online`, `LastLogin`) VALUES
-	 (1, 'Виталий', 'Егоров', 'Игоревич', 'admin', '21232f297a57a5a743894a0e4a801fc3', 'fa9bb23b40db7ccff9ccfafdac0f647c', '2011-10-25 14:59:06', '2013-05-22 11:52:38', 1, 1, 1, '2013-05-22 14:52:38')
+	 (1, 'Виталий', 'Егоров', 'Игоревич', 'admin@admin.com', '64e1b8d34f425d19e1ee2ea7236d3028', 'fa9bb23b40db7ccff9ccfafdac0f647c', '2011-10-25 14:59:06', '2013-05-22 11:52:38', 1, 1, 1, '2013-05-22 14:52:38')
 			ON DUPLICATE KEY UPDATE Active=1");
 
         // Initiate migration mechanism
@@ -946,11 +946,5 @@ class CMS extends CompressableService
 
         // Create cache collection
         dbRecord::$instances[ "samson\cms\CMSMaterial" ] = array();
-    }
-
-    /** Constructor */
-    public function __construct($path = null)
-    {
-        parent::__construct($path);
     }
 }

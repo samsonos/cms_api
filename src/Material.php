@@ -21,27 +21,43 @@ class Material extends \samson\activerecord\material
     public static $_map = array();
 
     /**
-     * Get materials by identifier(s)
-     * @param array|string $identifier Material identifier or collection
-     * @param array|string $class Class for database query
-     * @return \samson\cms\Material[] Collection of found materials
+     * Get material entities by identifier(s).
+     * @param array|string $identifier Material identifier or their collection
+     * @param self[]|array|null $return Variable where request result would be returned
+     * @return bool|self[] True if material entities has been found
      */
-    public static function byId($identifier, $class = 'samson\cms\CMSMaterial')
+    public static function byId($identifier, & $return = array())
     {
-        // Convert id to array
-        $identifier = is_array($identifier) ? $identifier : array($identifier);
-
-        $result = array();
-
-        // If we have passed any identifier
-        if (sizeof($identifier)) {
-            // Perform db request and get materials
-            $result = dbQuery($class)
+        // Perform db request and get materials
+        if (dbQuery(get_called_class())
                 ->cond('MaterialID', $identifier)
-                ->exec();
+                ->exec($return)) {
+            // If only one argument is passed - return query result, otherwise bool
+            return func_num_args() > 1 ? true : $return;
         }
 
-        return $result;
+        // If only one argument is passed - return empty array, otherwise bool
+        return func_num_args() > 1 ? false : array();
+    }
+
+    /**
+     * Get material entities by url(s).
+     * @param array|string $url Material URL or their collection
+     * @param self[]|array|null $return Variable where request result would be returned
+     * @return bool|self[] True if material entities has been found
+     */
+    public static function byUrl($url, & $return = array())
+    {
+        // Perform db request and get materials
+        if (dbQuery(get_called_class())
+            ->cond('Url', $url)
+            ->exec($return)) {
+            // If only one argument is passed - return query result, otherwise bool
+            return func_num_args() > 1 ? true : $return;
+        }
+
+        // If only one argument is passed - return empty array, otherwise bool
+        return func_num_args() > 1 ? false : array();
     }
 
     /**
