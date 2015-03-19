@@ -53,19 +53,21 @@ abstract class Paged extends Filtered
     /**
      * Constructor
      * @param \samson\core\IViewable $renderer View render object
+     * @param \samson\activerecord\dbQuery $query Query object
+     * @param string $pagerPrefix Pager url prefix
      * @param int $page Current page number
      */
-    public function __construct($renderer, $page = 1)
+    public function __construct($renderer, $query = null, $pagerPrefix = '', $page = 1)
     {
         if (!isset($this->pager)) {
             // Create pagination
-            $this->pager = new Pager($page, $this->pageSize);
+            $this->pager = new Pager($page, $this->pageSize, $pagerPrefix);
         }
 
         // Set pager id injection
         $this->handler(array($this, 'pagerIDInjection'));
 
         // Call parents
-        parent::__construct($renderer);
+        parent::__construct($renderer, $query);
     }
 }
