@@ -7,6 +7,7 @@
  */
 namespace samsonos\cms\collection;
 
+use samson\activerecord\dbQuery;
 use samson\core\IViewSettable;
 
 /**
@@ -35,9 +36,11 @@ abstract class Generic implements \Iterator, IViewSettable
     /** @var  integer Collection size */
     protected $count = 0;
 
+    /** @var  \samson\activerecord\dbQuery Query  */
+    protected $query;
+
     /**
      * Fill collection with items
-     * @return array Collection of items
      */
     abstract public function fill();
 
@@ -127,10 +130,13 @@ abstract class Generic implements \Iterator, IViewSettable
 
     /**
      * Generic collection constructor
-     * @var \samson\core\IViewable View render object
+     * @param \samson\core\IViewable $renderer View render object
+     * @param \samson\activerecord\dbQuery $query Query object
      */
-    public function __construct($renderer)
+    public function __construct($renderer, $query = null)
     {
+        // TODO: Query creation will be removed in future
+        $this->query = empty($query) ? new dbQuery() : $query;
         $this->renderer = clone $renderer;
     }
 
