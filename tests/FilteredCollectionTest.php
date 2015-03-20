@@ -35,7 +35,7 @@ class FilteredCollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testNavigation()
     {
-        assertEquals($this->collection, $this->collection->navigation(array()));
+        assertEquals($this->collection, $this->collection->navigation('navigation'));
     }
 
     public function testField()
@@ -44,6 +44,7 @@ class FilteredCollectionTest extends \PHPUnit_Framework_TestCase
             ->method('first')
             ->will($this->returnValue(true));
         assertEquals($this->collection, $this->collection->field(1, 'value'));
+        assertEquals($this->collection, $this->collection->field('', 'value'));
     }
 
     public function testSearch()
@@ -53,11 +54,15 @@ class FilteredCollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testRanged()
     {
-        assertEquals($this->collection, $this->collection->ranged(1, 1, 2));
+        $field = $this->getMockBuilder('\samson\cms\Field')->getMock();
+        $field->Type = 3;
+        assertEquals($this->collection, $this->collection->ranged($field, 1, 2));
+
     }
 
     public function testFill()
     {
+        $this->collection->sorter(1);
         assertEquals($this->collection, $this->collection->fill());
     }
 }
