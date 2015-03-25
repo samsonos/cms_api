@@ -766,6 +766,34 @@ class CMS extends CompressableService
         }
     }
 
+    /**
+     * Add new key_value field to materialfield table, and also create index
+     */
+    public function migrate_24_to_25()
+    {
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield` ADD `key_value` BIGINT NOT NULL DEFAULT 0 AFTER `MaterialID`');
+        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield` ADD INDEX `key_value` (`key_value`)');
+    }
+
+    /**
+     * Save old material identifiers
+     */
+    public function migrate_25_to_26()
+    {
+        /** @var array $fieldIds Array of material type fields */
+        $fieldIds = array();
+        // Fill the array
+        dbQuery('field')->cond('Type', 6)->fieldsNew('FieldID', $fieldIds);
+        /** @var array $materialFields Array of materialfields, which have type of filed material */
+        $materialFields = dbQuery('materialfield')->cond('FieldID', $fieldIds)->exec();
+        /** @var \samson\activerecord\materialfield $materialField */
+        foreach ($materialFields as $materialField) {
+            $materialField->key_value = $materialField->Value;
+            $materialField->Value = '';
+            $materialField->save();
+        }
+    }
+
     public function materialColumnToField($column, $structure)
     {
         // Find first user
