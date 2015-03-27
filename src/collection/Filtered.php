@@ -322,8 +322,8 @@ class Filtered extends Generic
                 ->group_by('MaterialID')
                 ->fieldsNew('MaterialID', $fieldFilter);
             // Condition to search in material table by Name and URL
-            $materialCondition = (new Condition('OR'))
-                ->add('Name', '%' . $searchString . '%', dbRelation::LIKE)
+            $materialCondition = new Condition('OR');
+            $materialCondition->add('Name', '%' . $searchString . '%', dbRelation::LIKE)
                 ->add('Url', '%' . $searchString . '%', dbRelation::LIKE);
             // Try to find search value in material table
             $this->query->className('material')
