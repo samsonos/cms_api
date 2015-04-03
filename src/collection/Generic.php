@@ -9,6 +9,8 @@ namespace samsonos\cms\collection;
 
 use samson\activerecord\dbQuery;
 use samson\core\IViewSettable;
+use samsonframework\core\RenderInterface;
+use samsonframework\orm\QueryInterface;
 
 /**
  * This class is a generic approach for rendering catalogs and lists,
@@ -36,7 +38,7 @@ abstract class Generic implements \Iterator, IViewSettable
     /** @var  integer Collection size */
     protected $count = 0;
 
-    /** @var  \samson\activerecord\dbQuery Query  */
+    /** @var QueryInterface Query  */
     protected $query;
 
     /**
@@ -130,13 +132,12 @@ abstract class Generic implements \Iterator, IViewSettable
 
     /**
      * Generic collection constructor
-     * @param \samson\core\IViewable $renderer View render object
-     * @param \samson\activerecord\dbQuery $query Query object
+     * @param RenderInterface $renderer View render object
+     * @param QueryInterface $query Query object
      */
-    public function __construct($renderer, $query = null)
+    public function __construct(RenderInterface $renderer, QueryInterface $query)
     {
-        // TODO: Query creation will be removed in future
-        $this->query = empty($query) ? new dbQuery() : $query;
+        $this->query = $query;
         $this->renderer = clone $renderer;
     }
 
