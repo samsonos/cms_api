@@ -7,7 +7,9 @@
  */
 namespace samsonos\cms\collection;
 
-use samson\pager\Pager;
+use samsonframework\core\RenderInterface;
+use samsonframework\pager\PagerInterface;
+use samsonframework\orm\QueryInterface;
 
 /**
  * Generic SamsonCMS entities collection with pages
@@ -52,17 +54,14 @@ abstract class Paged extends Filtered
 
     /**
      * Constructor
-     * @param \samson\core\IViewable $renderer View render object
-     * @param \samson\activerecord\dbQuery $query Query object
-     * @param string $pagerPrefix Pager url prefix
-     * @param int $page Current page number
+     * @param RenderInterface $renderer View render object
+     * @param QueryInterface $query Query object
+     * @param PagerInterface $pager Pager instance
      */
-    public function __construct($renderer, $query = null, $pagerPrefix = '', $page = 1)
+    public function __construct(RenderInterface $renderer, QueryInterface $query, PagerInterface $pager)
     {
-        if (!isset($this->pager)) {
-            // Create pagination
-            $this->pager = new Pager($page, $this->pageSize, $pagerPrefix);
-        }
+        // Set pager
+        $this->pager = $pager;
 
         // Set pager id injection
         $this->handler(array($this, 'pagerIDInjection'));
