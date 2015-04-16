@@ -47,7 +47,10 @@ abstract class Paged extends Filtered
     {
         // Create count request to count pagination
         $this->pager->update(sizeof($materialIds));
-
+        
+        // Apply Sorter before cutting the pages
+        $this->applySorter($materialIds);
+        
         // Cut only needed materials identifiers from array
         $materialIds = array_slice($materialIds, $this->pager->start, $this->pager->end);
     }
