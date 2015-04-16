@@ -1017,6 +1017,9 @@ class CMS extends CompressableService
             else if( $db_field->Type == 3 ) {
                 $v_col = 'numeric_value';
             }
+			else if( $db_field->Type == 6 ) {
+                $v_col = 'key_value';
+            }
 
             // Save additional field
             self::$fields[$db_field->Name] = "\n".' MAX(IF('.$equal.','.$t_name.'.`'.$v_col.'`, NULL)) as `'.$db_field->Name.'`';
