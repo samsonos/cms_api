@@ -1011,13 +1011,10 @@ class CMS extends CompressableService
             // Define field value DB column for storing data
             $v_col = 'Value';
             // We must get data from other column for this type of field
-            if ( $db_field->Type == 7 ) {
+            if ($db_field->Type == 7 || $db_field->Type == 3 ||  $db_field->Type == 10) {
                 $v_col = 'numeric_value';
             }
-            else if( $db_field->Type == 3 ) {
-                $v_col = 'numeric_value';
-            }
-			else if( $db_field->Type == 6 ) {
+            else if( $db_field->Type == 6 ) {
                 $v_col = 'key_value';
             }
 
