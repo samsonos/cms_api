@@ -349,15 +349,15 @@ class CMS extends CompressableService
         db()->simple_query($sql_relation_material);
         db()->simple_query($sql_gallery);
         db()->simple_query( $sql_structure_relation);
-        db()->simple_query("INSERT INTO `".dbMySQLConnector::$prefix."user` (`UserID`, `FName`, `SName`, `TName`, `Email`, `md5_Email`, `md5_Password`, `Created`, `Modyfied`, `GroupID`, `Active`, `Online`, `LastLogin`) VALUES
-	 (1, 'Виталий', 'Егоров', 'Игоревич', 'admin@admin.com', '64e1b8d34f425d19e1ee2ea7236d3028', 'fa9bb23b40db7ccff9ccfafdac0f647c', '2011-10-25 14:59:06', '2013-05-22 11:52:38', 1, 1, 1, '2013-05-22 14:52:38')
-			ON DUPLICATE KEY UPDATE Active=1");
+        db()->simple_query("INSERT INTO `".dbMySQLConnector::$prefix."user` (`user_id`, `f_name`, `s_name`, `t_name`, `email`, `md5_email`, `md5_password`, `created`, `modified`, `group_id`, `active`) VALUES
+	 (1, 'Виталий', 'Егоров', 'Игоревич', 'admin@admin.com', '64e1b8d34f425d19e1ee2ea7236d3028', 'fa9bb23b40db7ccff9ccfafdac0f647c', '2011-10-25 14:59:06', '2013-05-22 11:52:38', 1, 1)
+			ON DUPLICATE KEY UPDATE active=1");
 
         // Initiate migration mechanism
         db()->migration( get_class($this), array( $this, 'migrator' ));
 
         // Define permanent table relations
-        new TableRelation( 'material', 'user', 'UserID' );
+        new TableRelation( 'material', 'user', 'UserID', 0, 'user_id' );
         new TableRelation( 'material', 'gallery', 'MaterialID', TableRelation::T_ONE_TO_MANY );
         new TableRelation( 'material', 'materialfield', 'MaterialID', TableRelation::T_ONE_TO_MANY );
         new TableRelation( 'material', 'field', 'materialfield.FieldID', TableRelation::T_ONE_TO_MANY );
@@ -371,7 +371,7 @@ class CMS extends CompressableService
         new TableRelation( 'structure', 'material', 'structurematerial.MaterialID', TableRelation::T_ONE_TO_MANY, null, 'manymaterials');
         new TableRelation( 'structure', 'gallery', 'structurematerial.MaterialID', TableRelation::T_ONE_TO_MANY, null, 'manymaterials');
         /*new TableRelation( 'structure', 'material', 'MaterialID' );*/
-        new TableRelation( 'structure', 'user', 'UserID' );
+        new TableRelation( 'structure', 'user', 'UserID', 0, 'user_id' );
         new TableRelation( 'structure', 'materialfield', 'material.MaterialID', TableRelation::T_ONE_TO_MANY, 'MaterialID', '_mf');
         new TableRelation( 'structure', 'structurematerial', 'StructureID', TableRelation::T_ONE_TO_MANY );
         new TableRelation( 'related_materials', 'material', 'first_material', TableRelation::T_ONE_TO_MANY, 'MaterialID' );
@@ -792,6 +792,23 @@ class CMS extends CompressableService
             $materialField->Value = '';
             $materialField->save();
         }
+    }
+
+    public function migrate_26_to_27()
+    {
+        db()->simple_query('ALTER TABLE `user` CHANGE  `UserID`  `user_id` INT( 11 ) NOT NULL AUTO_INCREMENT');
+        db()->simple_query('ALTER TABLE `user` CHANGE  `FName`  `f_name` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL');
+        db()->simple_query('ALTER TABLE `user` CHANGE  `SName`  `s_name` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL');
+        db()->simple_query('ALTER TABLE `user` CHANGE  `TName`  `t_name` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL');
+        db()->simple_query('ALTER TABLE `user` CHANGE  `Email`  `email` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL');
+        db()->simple_query('ALTER TABLE `user` CHANGE  `Created`  `created` DATETIME NOT NULL');
+        db()->simple_query('ALTER TABLE `user` CHANGE  `Modyfied`  `modified` TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP');
+        db()->simple_query('ALTER TABLE `user` CHANGE  `GroupID`  `group_id` INT( 11 ) NOT NULL');
+        db()->simple_query('ALTER TABLE `user` CHANGE  `Active`  `active` INT( 11 ) NOT NULL');
+        db()->simple_query('ALTER TABLE `user` DROP `LastLogin`');
+        db()->simple_query('ALTER TABLE `user` DROP `Password`');
+        db()->simple_query('ALTER TABLE `user` DROP `accessToken`');
+        db()->simple_query('ALTER TABLE `user` DROP `Online`');
     }
 
     public function materialColumnToField($column, $structure)
