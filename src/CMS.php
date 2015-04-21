@@ -371,7 +371,7 @@ class CMS extends CompressableService
         new TableRelation( 'structure', 'material', 'structurematerial.MaterialID', TableRelation::T_ONE_TO_MANY, null, 'manymaterials');
         new TableRelation( 'structure', 'gallery', 'structurematerial.MaterialID', TableRelation::T_ONE_TO_MANY, null, 'manymaterials');
         /*new TableRelation( 'structure', 'material', 'MaterialID' );*/
-        new TableRelation( 'structure', 'user', 'UserID' );
+        new TableRelation( 'structure', 'user', 'UserID', 0, 'user_id' );
         new TableRelation( 'structure', 'materialfield', 'material.MaterialID', TableRelation::T_ONE_TO_MANY, 'MaterialID', '_mf');
         new TableRelation( 'structure', 'structurematerial', 'StructureID', TableRelation::T_ONE_TO_MANY );
         new TableRelation( 'related_materials', 'material', 'first_material', TableRelation::T_ONE_TO_MANY, 'MaterialID' );
