@@ -80,7 +80,7 @@ class Filtered extends Generic
         if ($this->isFieldObject($field)) {
             $this->sorter = array(
                 $field,
-                in_array($field->Type, array(3, 7)) ? 'numeric_value' : 'value',
+                in_array($field->Type, array(3, 7, 10)) ? 'numeric_value' : 'value',
                 $destination
             );
         }
@@ -127,7 +127,7 @@ class Filtered extends Generic
         // Do not allow empty strings
         if ($this->isFieldObject($field)) {
             // Get field value column
-            $valueField = in_array($field->Type, array(3, 7)) ? 'numeric_value' : 'value';
+            $valueField = in_array($field->Type, array(3, 7, 10)) ? 'numeric_value' : 'value';
 
             /** @var Condition $condition Ranged condition */
             $condition = new Condition('AND');
@@ -174,7 +174,7 @@ class Filtered extends Generic
         if (($minValue <= $maxValue) && $this->isFieldObject($field)) {
             // TODO: Remove integers from code, handle else
             // Only numeric fields are supported
-            if (in_array($field->Type, array(3,7))) {
+            if (in_array($field->Type, array(3, 7, 10))) {
                 /** @var Condition $condition Ranged condition */
                 $condition = new Condition('AND');
 
