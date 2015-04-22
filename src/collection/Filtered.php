@@ -9,14 +9,17 @@ namespace samsonos\cms\collection;
 
 use samson\activerecord\Condition;
 use samson\activerecord\dbRelation;
-use samsonframework\collection\Generic;
+use samsonframework\collection\Paged;
+use samsonframework\pager\PagerInterface;
+use samsonframework\core\RenderInterface;
+use samsonframework\orm\QueryInterface;
 
 /**
  * Collection query builder for filtering
  * @package samsonos\cms\collection
  * @author Egorov Vitaly <egorov@samsonos.com>
  */
-class Filtered extends Generic
+class Filtered extends Paged
 {
     /** @var array Collection for current filtered material identifiers */
     protected $materialIDs = array();
@@ -41,6 +44,37 @@ class Filtered extends Generic
 
     /** @var array Sorter parameters collection */
     protected $sorter = array();
+
+    /** @var int Amount of tours at one page */
+    protected $pageSize = 15;
+
+    /**
+     * Generic collection constructor
+     * @param RenderInterface $renderer View render object
+     * @param QueryInterface $query Query object
+     */
+    public function __construct(RenderInterface $renderer, QueryInterface $query, PagerInterface $pager)
+    {
+        // Call parent initialization
+        parent::__construct($renderer, $query->className('material'), $pager);
+
+        //$pager->pageSize = $this->pageSize;
+    }
+
+    /**
+     * Render products collection block
+     * @param string $prefix Prefix for view variables
+     * @param array $restricted Collection of ignored keys
+     * @return array Collection key => value
+     */
+    public function toView($prefix = null, array $restricted = array())
+    {
+        // Render pager and collection
+        return array(
+            $prefix.'html' => $this->render(),
+            $prefix.'pager' => $this->pager->toHTML()
+        );
+    }
 
     /**
      * Add external identifier filter handler
@@ -419,6 +453,12 @@ class Filtered extends Generic
 
             // Perform sorting
             $this->applySorter($this->materialIDs);
+
+            // Create count request to count pagination
+            $this->pager->update(sizeof($this->materialIDs));
+
+            // Cut only needed materials identifiers from array
+            $this->materialIDs = array_slice($this->materialIDs, $this->pager->start, $this->pager->end);
 
             // Call material identifier handlers
             $this->callHandlers($this->idHandlers, array(&$this->materialIDs));
