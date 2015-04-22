@@ -451,6 +451,9 @@ class Filtered extends Paged
             // Store filtered collection size
             $this->count = sizeof($this->materialIDs);
 
+            // Call material identifier handlers
+            $this->callHandlers($this->idHandlers, array(&$this->materialIDs));
+
             // Perform sorting
             $this->applySorter($this->materialIDs);
 
@@ -459,9 +462,6 @@ class Filtered extends Paged
 
             // Cut only needed materials identifiers from array
             $this->materialIDs = array_slice($this->materialIDs, $this->pager->start, $this->pager->end);
-
-            // Call material identifier handlers
-            $this->callHandlers($this->idHandlers, array(&$this->materialIDs));
 
             // Create final material query
             $this->query->className($this->entityName)->cond('MaterialID', $this->materialIDs);
