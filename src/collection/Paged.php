@@ -11,6 +11,7 @@ namespace samsonos\cms\collection;
  * Generic SamsonCMS entities collection with pages
  * @package samsonos\cms\collection
  * @author Egorov Vitaly <egorov@samsonos.com>
+ * @deprecated Use samsonos\cms\collection\Filtered
  */
 class Paged extends Filtered
 {
