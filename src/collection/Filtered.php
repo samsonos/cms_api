@@ -9,6 +9,7 @@ namespace samsonos\cms\collection;
 
 use samson\activerecord\Condition;
 use samson\activerecord\dbRelation;
+use samsonframework\collection\Generic;
 
 /**
  * Collection query builder for filtering
