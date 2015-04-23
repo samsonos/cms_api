@@ -18,7 +18,6 @@
     "samsonos/php_pager": "*"
   },
   "require-dev": {
-    "satooshi/php-coveralls": "dev-master",
     "phpunit/phpunit": "4.*"
   },
   "license": "Open Software License (OSL) v 3.0",
