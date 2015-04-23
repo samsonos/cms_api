@@ -45,9 +45,6 @@ class Filtered extends Paged
     /** @var array Sorter parameters collection */
     protected $sorter = array();
 
-    /** @var int Amount of tours at one page */
-    protected $pageSize = 15;
-
     /**
      * Generic collection constructor
      * @param RenderInterface $renderer View render object
@@ -57,8 +54,6 @@ class Filtered extends Paged
     {
         // Call parent initialization
         parent::__construct($renderer, $query->className('material'), $pager);
-
-        //$pager->pageSize = $this->pageSize;
     }
 
     /**
