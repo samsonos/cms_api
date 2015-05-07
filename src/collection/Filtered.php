@@ -107,11 +107,19 @@ class Filtered extends Paged
     public function sorter($field, $destination = 'ASC')
     {
         /**@var \samson\activerecord\field $field */
-        if ($this->isFieldObject($field)) {
+        // TODO: Add ability to sort with entity fields
+        if (in_array($field, array('Modyfied', 'Created', 'Url', 'Name'))) {
             $this->sorter = array(
-                $field,
-                in_array($field->Type, array(3, 7, 10)) ? 'numeric_value' : 'value',
-                $destination
+                'field' => $field,
+                'name' => $field,
+                'destination' => $destination
+            );
+        } else if ($this->isFieldObject($field)) {
+            $this->sorter = array(
+                'entity' => $field,
+                'name' => $field->Name,
+                'field' => in_array($field->Type, array(3, 7, 10)) ? 'numeric_value' : 'value',
+                'destination' => $destination
             );
         }
     }
@@ -395,10 +403,20 @@ class Filtered extends Paged
     {
         // Check if sorter is configured
         if (sizeof($this->sorter)) {
-            // Perform ordered db request
-            if ($this->query->className('materialfield')
-                ->cond('FieldID', $this->sorter[0]->id)
-                ->order_by($this->sorter[1], $this->sorter[2])
+            // If we need to sort by entity own field(column)
+            // TODO: Get this list of entity field dynamically
+            if (in_array($this->sorter['field'], array('Modyfied', 'Created', 'Url', 'Name'))) {
+                // Sort material identifiers by its own table fields
+                $this->query->className('material')
+                    ->cond('Active', 1)
+                    ->cond('MaterialID', $materialIDs)
+                    ->order_by($this->sorter['name'], $this->sorter['destination'])
+                    ->fieldsNew('MaterialID', $materialIDs);
+
+            // Perform additional field ordered db request
+            } else if ($this->query->className('materialfield')
+                ->cond('FieldID', $this->sorter['entity']->id)
+                ->order_by($this->sorter['name'], $this->sorter['destination'])
                 ->cond('MaterialID', $materialIDs)
                 ->fieldsNew('MaterialID', $materialIDs)) {
                 // Perform some logic?
@@ -466,7 +484,7 @@ class Filtered extends Paged
 
             // Add query sorter for showed page
             if (sizeof($this->sorter)) {
-                $this->query->order_by($this->sorter[0]->Name, $this->sorter[2]);
+                $this->query->order_by($this->sorter['name'], $this->sorter['destination']);
             }
 
             // Return final filtered entity query result
