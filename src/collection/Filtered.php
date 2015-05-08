@@ -415,13 +415,13 @@ class Filtered extends Paged
                 $this->query->className('material')
                     ->cond('Active', 1)
                     ->cond('MaterialID', $materialIDs)
-                    ->order_by($this->sorter['name'], $this->sorter['destination'])
+                    ->order_by($this->sorter['field'], $this->sorter['destination'])
                     ->fieldsNew('MaterialID', $materialIDs);
 
             // Perform additional field ordered db request
             } else if ($this->query->className('materialfield')
                 ->cond('FieldID', $this->sorter['entity']->id)
-                ->order_by($this->sorter['name'], $this->sorter['destination'])
+                ->order_by($this->sorter['field'], $this->sorter['destination'])
                 ->cond('MaterialID', $materialIDs)
                 ->fieldsNew('MaterialID', $materialIDs)) {
                 // Perform some logic?
