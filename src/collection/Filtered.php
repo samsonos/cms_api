@@ -9,13 +9,17 @@ namespace samsonos\cms\collection;
 
 use samson\activerecord\Condition;
 use samson\activerecord\dbRelation;
+use samsonframework\collection\Paged;
+use samsonframework\pager\PagerInterface;
+use samsonframework\core\RenderInterface;
+use samsonframework\orm\QueryInterface;
 
 /**
  * Collection query builder for filtering
  * @package samsonos\cms\collection
  * @author Egorov Vitaly <egorov@samsonos.com>
  */
-class Filtered extends Generic
+class Filtered extends Paged
 {
     /** @var array Collection for current filtered material identifiers */
     protected $materialIDs = array();
@@ -40,6 +44,32 @@ class Filtered extends Generic
 
     /** @var array Sorter parameters collection */
     protected $sorter = array();
+
+    /**
+     * Generic collection constructor
+     * @param RenderInterface $renderer View render object
+     * @param QueryInterface $query Query object
+     */
+    public function __construct(RenderInterface $renderer, QueryInterface $query, PagerInterface $pager)
+    {
+        // Call parent initialization
+        parent::__construct($renderer, $query->className('material'), $pager);
+    }
+
+    /**
+     * Render products collection block
+     * @param string $prefix Prefix for view variables
+     * @param array $restricted Collection of ignored keys
+     * @return array Collection key => value
+     */
+    public function toView($prefix = null, array $restricted = array())
+    {
+        // Render pager and collection
+        return array(
+            $prefix.'html' => $this->render(),
+            $prefix.'pager' => $this->pager->toHTML()
+        );
+    }
 
     /**
      * Add external identifier filter handler
@@ -73,15 +103,24 @@ class Filtered extends Generic
      * Set collection sorter parameters
      * @param string|integer $field Field identifier or name
      * @param string $destination ASC|DESC
+     * @return void
      */
     public function sorter($field, $destination = 'ASC')
     {
         /**@var \samson\activerecord\field $field */
-        if ($this->isFieldObject($field)) {
+        // TODO: Add ability to sort with entity fields
+        if (in_array($field, array('Modyfied', 'Created', 'Url', 'Name'))) {
             $this->sorter = array(
-                $field,
-                in_array($field->Type, array(3, 7, 10)) ? 'numeric_value' : 'value',
-                $destination
+                'field' => $field,
+                'name' => $field,
+                'destination' => $destination
+            );
+        } else if ($this->isFieldObject($field)) {
+            $this->sorter = array(
+                'entity' => $field,
+                'name' => $field->Name,
+                'field' => in_array($field->Type, array(3, 7, 10)) ? 'numeric_value' : 'value',
+                'destination' => $destination
             );
         }
     }
@@ -304,40 +343,44 @@ class Filtered extends Generic
             foreach ($this->navigation as $navigation) {
                 $navigationArray = array_merge($navigationArray, $navigation);
             }
+
             // Get all related fields
             $this->query->className('structurefield')
                 ->cond('StructureID', $navigationArray)
                 ->group_by('FieldID')
                 ->fieldsNew('FieldID', $fields);
-        }
 
-        // Iterate over search strings
-        foreach ($this->search as $searchString) {
-            // Try to find search value in materialfield table
-            $this->query->className('materialfield')
-                ->cond('FieldID', $fields)
-                ->cond('MaterialID', $filteredIds)
-                ->cond('Value', '%' . $searchString . '%', dbRelation::LIKE)
-                ->cond('Active', 1)
-                ->group_by('MaterialID')
-                ->fieldsNew('MaterialID', $fieldFilter);
-            // Condition to search in material table by Name and URL
-            $materialCondition = new Condition('OR');
-            $materialCondition->add('Name', '%' . $searchString . '%', dbRelation::LIKE)
-                ->add('Url', '%' . $searchString . '%', dbRelation::LIKE);
-            // Try to find search value in material table
-            $this->query->className('material')
-                ->cond('MaterialID', $filteredIds)
-                ->cond($materialCondition)
-                ->cond('Active', 1)
-                ->fieldsNew('MaterialID', $materialFilter);
-            // If there are no materials with specified conditions
-            if (empty($materialFilter) && empty($fieldFilter)) {
-                // Filter applying failed
-                return false;
-            } else {
-                // Otherwise set filtered material identifiers
-                $filteredIds = array_unique(array_merge($materialFilter, $fieldFilter));
+            // Iterate over search strings
+            foreach ($this->search as $searchString) {
+                // Try to find search value in materialfield table
+                $this->query->className('materialfield')
+                    ->cond('FieldID', $fields)
+                    ->cond('MaterialID', $filteredIds)
+                    ->cond('Value', '%' . $searchString . '%', dbRelation::LIKE)
+                    ->cond('Active', 1)
+                    ->group_by('MaterialID')
+                    ->fieldsNew('MaterialID', $fieldFilter);
+
+                // TODO: Add generic support for all native fields or their configuration
+                // Condition to search in material table by Name and URL
+                $materialCondition = new Condition('OR');
+                $materialCondition->add('Name', '%' . $searchString . '%', dbRelation::LIKE)
+                    ->add('Url', '%' . $searchString . '%', dbRelation::LIKE);
+
+                // Try to find search value in material table
+                $this->query->className('material')
+                    ->cond('MaterialID', $filteredIds)
+                    ->cond($materialCondition)
+                    ->cond('Active', 1)
+                    ->fieldsNew('MaterialID', $materialFilter);
+
+                // If there are no materials with specified conditions
+                if (empty($materialFilter) && empty($fieldFilter)) {
+                    // Filter applying failed
+                    return false;
+                } else {// Otherwise set filtered material identifiers
+                    $filteredIds = array_unique(array_merge($materialFilter, $fieldFilter));
+                }
             }
         }
 
@@ -365,10 +408,20 @@ class Filtered extends Generic
     {
         // Check if sorter is configured
         if (sizeof($this->sorter)) {
-            // Perform ordered db request
-            if ($this->query->className('materialfield')
-                ->cond('FieldID', $this->sorter[0]->id)
-                ->order_by($this->sorter[1], $this->sorter[2])
+            // If we need to sort by entity own field(column)
+            // TODO: Get this list of entity field dynamically
+            if (in_array($this->sorter['field'], array('Modyfied', 'Created', 'Url', 'Name'))) {
+                // Sort material identifiers by its own table fields
+                $this->query->className('material')
+                    ->cond('Active', 1)
+                    ->cond('MaterialID', $materialIDs)
+                    ->order_by($this->sorter['name'], $this->sorter['destination'])
+                    ->fieldsNew('MaterialID', $materialIDs);
+
+            // Perform additional field ordered db request
+            } else if ($this->query->className('materialfield')
+                ->cond('FieldID', $this->sorter['entity']->id)
+                ->order_by($this->sorter['name'], $this->sorter['destination'])
                 ->cond('MaterialID', $materialIDs)
                 ->fieldsNew('MaterialID', $materialIDs)) {
                 // Perform some logic?
@@ -416,11 +469,17 @@ class Filtered extends Generic
             // Store filtered collection size
             $this->count = sizeof($this->materialIDs);
 
+            // Call material identifier handlers
+            $this->callHandlers($this->idHandlers, array(&$this->materialIDs));
+
             // Perform sorting
             $this->applySorter($this->materialIDs);
 
-            // Call material identifier handlers
-            $this->callHandlers($this->idHandlers, array(&$this->materialIDs));
+            // Create count request to count pagination
+            $this->pager->update(sizeof($this->materialIDs));
+
+            // Cut only needed materials identifiers from array
+            $this->materialIDs = array_slice($this->materialIDs, $this->pager->start, $this->pager->end);
 
             // Create final material query
             $this->query->className($this->entityName)->cond('MaterialID', $this->materialIDs);
@@ -430,16 +489,22 @@ class Filtered extends Generic
 
             // Add query sorter for showed page
             if (sizeof($this->sorter)) {
-                $this->query->order_by($this->sorter[0]->Name, $this->sorter[2]);
+                $this->query->order_by($this->sorter['name'], $this->sorter['destination']);
             }
 
             // Return final filtered entity query result
             $this->collection = $this->query->cond('Active', 1)->exec();
+
+        } else { // Collection is empty
+
+            // Clear current materials identifiers list
+            $this->materialIDs = array();
+
+            // Updated pagination
+            $this->pager->update(sizeof($this->materialIDs));
         }
 
-        // Clear current materials identifiers list
-        $this->materialIDs = array();
-
+        // Chaining
         return $this;
     }
 }
