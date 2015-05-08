@@ -342,40 +342,44 @@ class Filtered extends Paged
             foreach ($this->navigation as $navigation) {
                 $navigationArray = array_merge($navigationArray, $navigation);
             }
+
             // Get all related fields
             $this->query->className('structurefield')
                 ->cond('StructureID', $navigationArray)
                 ->group_by('FieldID')
                 ->fieldsNew('FieldID', $fields);
-        }
 
-        // Iterate over search strings
-        foreach ($this->search as $searchString) {
-            // Try to find search value in materialfield table
-            $this->query->className('materialfield')
-                ->cond('FieldID', $fields)
-                ->cond('MaterialID', $filteredIds)
-                ->cond('Value', '%' . $searchString . '%', dbRelation::LIKE)
-                ->cond('Active', 1)
-                ->group_by('MaterialID')
-                ->fieldsNew('MaterialID', $fieldFilter);
-            // Condition to search in material table by Name and URL
-            $materialCondition = new Condition('OR');
-            $materialCondition->add('Name', '%' . $searchString . '%', dbRelation::LIKE)
-                ->add('Url', '%' . $searchString . '%', dbRelation::LIKE);
-            // Try to find search value in material table
-            $this->query->className('material')
-                ->cond('MaterialID', $filteredIds)
-                ->cond($materialCondition)
-                ->cond('Active', 1)
-                ->fieldsNew('MaterialID', $materialFilter);
-            // If there are no materials with specified conditions
-            if (empty($materialFilter) && empty($fieldFilter)) {
-                // Filter applying failed
-                return false;
-            } else {
-                // Otherwise set filtered material identifiers
-                $filteredIds = array_unique(array_merge($materialFilter, $fieldFilter));
+            // Iterate over search strings
+            foreach ($this->search as $searchString) {
+                // Try to find search value in materialfield table
+                $this->query->className('materialfield')
+                    ->cond('FieldID', $fields)
+                    ->cond('MaterialID', $filteredIds)
+                    ->cond('Value', '%' . $searchString . '%', dbRelation::LIKE)
+                    ->cond('Active', 1)
+                    ->group_by('MaterialID')
+                    ->fieldsNew('MaterialID', $fieldFilter);
+
+                // TODO: Add generic support for all native fields or their configuration
+                // Condition to search in material table by Name and URL
+                $materialCondition = new Condition('OR');
+                $materialCondition->add('Name', '%' . $searchString . '%', dbRelation::LIKE)
+                    ->add('Url', '%' . $searchString . '%', dbRelation::LIKE);
+
+                // Try to find search value in material table
+                $this->query->className('material')
+                    ->cond('MaterialID', $filteredIds)
+                    ->cond($materialCondition)
+                    ->cond('Active', 1)
+                    ->fieldsNew('MaterialID', $materialFilter);
+
+                // If there are no materials with specified conditions
+                if (empty($materialFilter) && empty($fieldFilter)) {
+                    // Filter applying failed
+                    return false;
+                } else {// Otherwise set filtered material identifiers
+                    $filteredIds = array_unique(array_merge($materialFilter, $fieldFilter));
+                }
             }
         }
 
