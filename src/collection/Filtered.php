@@ -119,7 +119,7 @@ class Filtered extends Paged
             $this->sorter = array(
                 'entity' => $field,
                 'name' => $field->Name,
-                'field' => in_array($field->Type, array(3, 7, 10)) ? 'numeric_value' : 'value',
+                'field' => in_array($field->Type, array(3, 7, 10, 11)) ? 'numeric_value' : 'value',
                 'destination' => $destination
             );
         }
@@ -166,7 +166,7 @@ class Filtered extends Paged
         // Do not allow empty strings
         if ($this->isFieldObject($field)) {
             // Get field value column
-            $valueField = in_array($field->Type, array(3, 7, 10)) ? 'numeric_value' : 'value';
+            $valueField = in_array($field->Type, array(3, 7, 10, 11)) ? 'numeric_value' : 'value';
 
             /** @var Condition $condition Ranged condition */
             $condition = new Condition('AND');
@@ -415,13 +415,13 @@ class Filtered extends Paged
                 $this->query->className('material')
                     ->cond('Active', 1)
                     ->cond('MaterialID', $materialIDs)
-                    ->order_by($this->sorter['name'], $this->sorter['destination'])
+                    ->order_by($this->sorter['field'], $this->sorter['destination'])
                     ->fieldsNew('MaterialID', $materialIDs);
 
             // Perform additional field ordered db request
             } else if ($this->query->className('materialfield')
                 ->cond('FieldID', $this->sorter['entity']->id)
-                ->order_by($this->sorter['name'], $this->sorter['destination'])
+                ->order_by($this->sorter['field'], $this->sorter['destination'])
                 ->cond('MaterialID', $materialIDs)
                 ->fieldsNew('MaterialID', $materialIDs)) {
                 // Perform some logic?
