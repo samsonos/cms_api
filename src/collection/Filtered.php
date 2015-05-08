@@ -103,6 +103,7 @@ class Filtered extends Paged
      * Set collection sorter parameters
      * @param string|integer $field Field identifier or name
      * @param string $destination ASC|DESC
+     * @return void
      */
     public function sorter($field, $destination = 'ASC')
     {
@@ -493,11 +494,17 @@ class Filtered extends Paged
 
             // Return final filtered entity query result
             $this->collection = $this->query->cond('Active', 1)->exec();
+
+        } else { // Collection is empty
+
+            // Clear current materials identifiers list
+            $this->materialIDs = array();
+
+            // Updated pagination
+            $this->pager->update(sizeof($this->materialIDs));
         }
 
-        // Clear current materials identifiers list
-        $this->materialIDs = array();
-
+        // Chaining
         return $this;
     }
 }
