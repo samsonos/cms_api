@@ -462,6 +462,15 @@ class Filtered extends Paged
         // Clear current materials identifiers list
         $this->materialIDs = null;
 
+        // TODO: Change this to new OOP approach
+        $class = $this->entityName;
+
+        // If no filters is set
+        if (!sizeof($this->search) && !sizeof($this->navigation) && !sizeof($this->field)) {
+            // Get all entity records identifiers
+            $this->materialIDs = $this->query->fields($class::$_primary);
+        }
+
         // Perform material filtering
         if ($this->applyFilter($this->materialIDs)) {
             // Now we have all possible material filters applied and final material identifiers collection
@@ -471,6 +480,25 @@ class Filtered extends Paged
 
             // Call material identifier handlers
             $this->callHandlers($this->idHandlers, array(&$this->materialIDs));
+
+            // Filter all materials by active column
+            $this->materialIDs = $this->query
+                ->className($this->entityName)
+                ->cond('Active', 1)
+                ->cond('system', 0)
+                ->cond($class::$_primary, $this->materialIDs)
+                ->fields($class::$_primary);
+
+            /*
+            // Get system navigation items
+            $navIds = $this->query->className('structure')->cond('system', '1')->fields('StructureID');
+
+            // Remove all system materials from material identifiers collection
+            $this->materialIDs = array_diff(
+                $this->materialIDs,
+                $this->query->className('structurematerial')->cond('StructureID', $navIds)->fields('MaterialID')
+            );
+            */
 
             // Perform sorting
             $this->applySorter($this->materialIDs);
@@ -482,7 +510,7 @@ class Filtered extends Paged
             $this->materialIDs = array_slice($this->materialIDs, $this->pager->start, $this->pager->end);
 
             // Create final material query
-            $this->query->className($this->entityName)->cond('MaterialID', $this->materialIDs);
+            $this->query->className($this->entityName)->cond($class::$_primary, $this->materialIDs);
 
             // Call material query handlers
             $this->callHandlers($this->entityHandlers, array(&$this->query));
@@ -493,7 +521,7 @@ class Filtered extends Paged
             }
 
             // Return final filtered entity query result
-            $this->collection = $this->query->cond('Active', 1)->exec();
+            $this->collection = $this->query->exec();
 
         } else { // Collection is empty
 
