@@ -167,7 +167,8 @@ class Filtered extends Paged
         if ($this->isFieldObject($field)) {
             // Get field value column
             $valueField = in_array($field->Type, array(3, 7, 10)) ? 'numeric_value' : 'value';
-
+			$valueField = $field->Type == 6 ? 'key_value' : $valueField;
+			
             /** @var Condition $condition Ranged condition */
             $condition = new Condition('AND');
 
