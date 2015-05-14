@@ -121,7 +121,7 @@ class CMS extends CompressableService
 
         // Perform request to find all matched material ids
         $ids = array();
-        if ($query->fieldsNew('MaterialID', $ids)) {
+        if ($query->fields('MaterialID', $ids)) {
             // Create inner query
             $innerQuery = dbQuery($className)->cond('MaterialID', $ids);
 
@@ -783,7 +783,7 @@ class CMS extends CompressableService
         /** @var array $fieldIds Array of material type fields */
         $fieldIds = array();
         // Fill the array
-        dbQuery('field')->cond('Type', 6)->fieldsNew('FieldID', $fieldIds);
+        dbQuery('field')->cond('Type', 6)->fields('FieldID', $fieldIds);
         /** @var array $materialFields Array of materialfields, which have type of filed material */
         $materialFields = dbQuery('materialfield')->cond('FieldID', $fieldIds)->exec();
         /** @var \samson\activerecord\materialfield $materialField */

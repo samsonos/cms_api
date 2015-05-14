@@ -395,7 +395,7 @@ class CMSMaterial extends Material implements iModuleViewable
         /** If this table has columns */
         if (dbQuery('structurefield')
             ->cond("StructureID", $tableSelector)
-            ->fieldsNew('FieldID', $dbTableFieldsIds)
+            ->fields('FieldID', $dbTableFieldsIds)
         ) {
             // Get localized and not localized fields
             $localizedFields = array();
@@ -428,7 +428,7 @@ class CMSMaterial extends Material implements iModuleViewable
 
             // Get table row materials
             $tableMaterialIds = array();
-            if ($tableQuery->fieldsNew('MaterialID', $tableMaterialIds)) {
+            if ($tableQuery->fields('MaterialID', $tableMaterialIds)) {
                 // Create field condition
                 $localizationFieldCond = new Condition('or');
 
