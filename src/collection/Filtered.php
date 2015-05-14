@@ -143,7 +143,7 @@ class Filtered extends Paged
 
             /** @var array $navigationIds  */
             $navigationIds = null;
-            if ($this->query->className('structure')->cond($idOrUrl)->fieldsNew('StructureID', $navigationIds)) {
+            if ($this->query->className('structure')->cond($idOrUrl)->fields('StructureID', $navigationIds)) {
                 // Store all retrieved navigation elements as navigation collection filter
                 $this->navigation[] = $navigationIds;
             }
@@ -278,7 +278,7 @@ class Filtered extends Paged
             }
 
             // Perform request to get next portion of filtered material identifiers
-            if (!$this->query->fieldsNew('MaterialID', $filteredIds)) {
+            if (!$this->query->fields('MaterialID', $filteredIds)) {
                 // This filter applying failed
                 return false;
             }
@@ -311,7 +311,7 @@ class Filtered extends Paged
             }
 
             // Perform request to get next portion of filtered material identifiers
-            if (!$this->query->fieldsNew('MaterialID', $filteredIds)) {
+            if (!$this->query->fields('MaterialID', $filteredIds)) {
                 // This filter applying failed
                 return false;
             }
@@ -349,7 +349,7 @@ class Filtered extends Paged
             $this->query->className('structurefield')
                 ->cond('StructureID', $navigationArray)
                 ->group_by('FieldID')
-                ->fieldsNew('FieldID', $fields);
+                ->fields('FieldID', $fields);
 
             // Iterate over search strings
             foreach ($this->search as $searchString) {
@@ -360,7 +360,7 @@ class Filtered extends Paged
                     ->cond('Value', '%' . $searchString . '%', dbRelation::LIKE)
                     ->cond('Active', 1)
                     ->group_by('MaterialID')
-                    ->fieldsNew('MaterialID', $fieldFilter);
+                    ->fields('MaterialID', $fieldFilter);
 
                 // TODO: Add generic support for all native fields or their configuration
                 // Condition to search in material table by Name and URL
@@ -373,7 +373,7 @@ class Filtered extends Paged
                     ->cond('MaterialID', $filteredIds)
                     ->cond($materialCondition)
                     ->cond('Active', 1)
-                    ->fieldsNew('MaterialID', $materialFilter);
+                    ->fields('MaterialID', $materialFilter);
 
                 // If there are no materials with specified conditions
                 if (empty($materialFilter) && empty($fieldFilter)) {
@@ -417,14 +417,14 @@ class Filtered extends Paged
                     ->cond('Active', 1)
                     ->cond('MaterialID', $materialIDs)
                     ->order_by($this->sorter['field'], $this->sorter['destination'])
-                    ->fieldsNew('MaterialID', $materialIDs);
+                    ->fields('MaterialID', $materialIDs);
 
             // Perform additional field ordered db request
             } else if ($this->query->className('materialfield')
                 ->cond('FieldID', $this->sorter['entity']->id)
                 ->order_by($this->sorter['field'], $this->sorter['destination'])
                 ->cond('MaterialID', $materialIDs)
-                ->fieldsNew('MaterialID', $materialIDs)) {
+                ->fields('MaterialID', $materialIDs)) {
                 // Perform some logic?
             }
         }
