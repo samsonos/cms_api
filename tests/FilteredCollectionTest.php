@@ -5,7 +5,7 @@
  */
 namespace samsonos\cms\collection;
 
-require_once 'dbEntities.php';
+//require_once 'dbEntities.php';
 
 class FilteredCollectionTest extends \PHPUnit_Framework_TestCase
 {
