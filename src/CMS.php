@@ -335,23 +335,27 @@ class CMS extends CompressableService
 				ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // Выполним SQL комманды
-        db()->simple_query($sql_version);
-        db()->simple_query($sql_field);
-        db()->simple_query($sql_navfield);
-        db()->simple_query($sql_materialfield);
-        db()->simple_query($sql_material);
-        db()->simple_query($sql_structure);
-        db()->simple_query($sql_structurematerial);
-        db()->simple_query($sql_user);
-        db()->simple_query($sql_group);
-        db()->simple_query($sql_right);
-        db()->simple_query($sql_groupright);
-        db()->simple_query($sql_relation_material);
-        db()->simple_query($sql_gallery);
-        db()->simple_query($sql_structure_relation);
-        db()->simple_query("INSERT INTO `" . dbMySQLConnector::$prefix . "user` (`UserID`, `FName`, `SName`, `TName`, `email`, `md5_email`, `md5_password`, `created`, `modyfied`, `active`) VALUES
+        db()->query($sql_version);
+        db()->query($sql_field);
+        db()->query($sql_navfield);
+        db()->query($sql_materialfield);
+        db()->query($sql_material);
+        db()->query($sql_structure);
+        db()->query($sql_structurematerial);
+        db()->query($sql_user);
+        db()->query($sql_group);
+        db()->query($sql_right);
+        db()->query($sql_groupright);
+        db()->query($sql_relation_material);
+        db()->query($sql_gallery);
+        db()->query($sql_structure_relation);
+
+        // Check if we did not already create user
+        if (!sizeof(db()->fetch('SELECT * from user where email ="admin@admin.com"'))) {
+            db()->query("INSERT INTO `" . dbMySQLConnector::$prefix . "user` (`UserID`, `FName`, `SName`, `TName`, `email`, `md5_email`, `md5_password`, `created`, `modyfied`, `active`) VALUES
 	 (1, 'Виталий', 'Егоров', 'Игоревич', 'admin@admin.com', '64e1b8d34f425d19e1ee2ea7236d3028', '64e1b8d34f425d19e1ee2ea7236d3028', '2011-10-25 14:59:06', '2013-05-22 11:52:38',  1)
 			ON DUPLICATE KEY UPDATE active=1");
+        }
 
         // Initiate migration mechanism
         db()->migration(get_class($this), array($this, 'migrator'));
@@ -414,60 +418,60 @@ class CMS extends CompressableService
     public function migrate_1_to_2()
     {
         elapsed('Removing `Relations` table');
-        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'relations');
+        db()->query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'relations');
 
         elapsed('Removing old localized tables if they exists table');
-        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'enstructure');
-        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'enstructurematerial');
-        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'enstructurefield');
-        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'enfield');
-        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'enmaterial');
-        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'enmaterialfield');
-        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'uastructure');
-        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'uastructurematerial');
-        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'uastructurefield');
-        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'uafield');
-        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'uamaterial');
-        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'uamaterialfield');
+        db()->query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'enstructure');
+        db()->query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'enstructurematerial');
+        db()->query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'enstructurefield');
+        db()->query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'enfield');
+        db()->query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'enmaterial');
+        db()->query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'enmaterialfield');
+        db()->query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'uastructure');
+        db()->query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'uastructurematerial');
+        db()->query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'uastructurefield');
+        db()->query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'uafield');
+        db()->query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'uamaterial');
+        db()->query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'uamaterialfield');
 
         elapsed('Removing old group/right tables if they exists table');
-        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . '`group`');
-        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . '`right`');
-        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'groupright');
-        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'mem_cache');
+        db()->query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . '`group`');
+        db()->query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . '`right`');
+        db()->query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'groupright');
+        db()->query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'mem_cache');
 
         elapsed('Adding `numeric_value` field into `materialfield` table');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'materialfield` ADD  `numeric_value` INT( 255 ) NOT NULL AFTER  `Value`');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'materialfield` ADD  `numeric_value` INT( 255 ) NOT NULL AFTER  `Value`');
 
         elapsed('Adding `locale` field into `material` table');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` ADD  `locale` varchar( 2 ) NOT NULL AFTER `Name`');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` ADD  `locale` varchar( 2 ) NOT NULL AFTER `Name`');
 
         elapsed('Removing `Draftmaterial` field from `material` table');
-        db()->simple_query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` DROP `Draftmaterial`');
+        db()->query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` DROP `Draftmaterial`');
 
         elapsed('Changing `' . dbMySQLConnector::$prefix . 'material` table columns order');
-        db()->simple_query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` MODIFY `Teaser` TEXT AFTER `Content`');
-        db()->simple_query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` MODIFY `Published` INT(1) UNSIGNED AFTER `Draft`');
-        db()->simple_query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` MODIFY `Active` INT(1) UNSIGNED AFTER `Published`');
-        db()->simple_query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` MODIFY `UserID` INT(11) AFTER `Title`');
-        db()->simple_query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` MODIFY `Modyfied` TIMESTAMP AFTER `Title`');
-        db()->simple_query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` MODIFY `Created` DATETIME AFTER `Title`');
+        db()->query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` MODIFY `Teaser` TEXT AFTER `Content`');
+        db()->query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` MODIFY `Published` INT(1) UNSIGNED AFTER `Draft`');
+        db()->query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` MODIFY `Active` INT(1) UNSIGNED AFTER `Published`');
+        db()->query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` MODIFY `UserID` INT(11) AFTER `Title`');
+        db()->query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` MODIFY `Modyfied` TIMESTAMP AFTER `Title`');
+        db()->query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` MODIFY `Created` DATETIME AFTER `Title`');
     }
 
     /** Automatic migration to new CMS table structure */
     public function migrate_2_to_3()
     {
         elapsed('Adding `locale` field into `structure` table');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure` ADD  `locale` VARCHAR( 10 ) NOT NULL AFTER  `Name` ;');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure` ADD  `locale` VARCHAR( 10 ) NOT NULL AFTER  `Name` ;');
     }
 
     /** Automatic migration to new CMS table structure */
     public function migrate_3_to_4()
     {
         elapsed('Adding `locale` field into `materialfield` table');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'materialfield` ADD  `locale` VARCHAR( 10 ) NOT NULL AFTER  `numeric_value` ;');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'materialfield` ADD  `locale` VARCHAR( 10 ) NOT NULL AFTER  `numeric_value` ;');
         elapsed('Adding `local` field into `field` table');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'field` ADD  `local` int( 10 ) NOT NULL AFTER  `Type` ;');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'field` ADD  `local` int( 10 ) NOT NULL AFTER  `Type` ;');
     }
 
     /**
@@ -510,7 +514,7 @@ class CMS extends CompressableService
     public function migrate_7_to_8()
     {
         elapsed('Adding `StructureID` field into `material` table');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` ADD  `structure_id` INT( 255 ) NOT NULL AFTER  `Active`');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` ADD  `structure_id` INT( 255 ) NOT NULL AFTER  `Active`');
     }
 
     public function migrate_8_to_9()
@@ -525,40 +529,40 @@ class CMS extends CompressableService
 		  `locale` VARCHAR( 10 ) NOT NULL,
 		  PRIMARY KEY (`filter_id`)
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
-        db()->simple_query($sql_filter);
+        db()->query($sql_filter);
 
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'field` ADD  `filtered` INT( 10 ) NOT NULL AFTER  `local`');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'field` ADD  `filtered` INT( 10 ) NOT NULL AFTER  `local`');
     }
 
     /* added index key**/
     public function migrate_9_to_10()
     {
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'user`                ADD INDEX (`GroupID`)');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'gallery`             ADD INDEX (`MaterialID`)');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'groupright`          ADD INDEX (`GroupID`)');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'groupright`          ADD INDEX (`RightID`)');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material`            ADD INDEX (`structure_id`)');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material`            ADD INDEX (`UserID`)');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure`           ADD INDEX (`ParentID`)');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure`           ADD INDEX (`UserID`)');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure`           ADD INDEX (`MaterialID`)');
-        //db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field`               ADD INDEX (`UserID`)');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'field`               ADD INDEX (`ParentID`)');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structurefield`      ADD INDEX (`FieldID`)');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'materialfield`       ADD INDEX (`FieldID`)');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure_relation`  ADD INDEX (`parent_id`)');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure_relation`  ADD INDEX (`child_id`)');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'user`                ADD INDEX (`GroupID`)');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'gallery`             ADD INDEX (`MaterialID`)');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'groupright`          ADD INDEX (`GroupID`)');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'groupright`          ADD INDEX (`RightID`)');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material`            ADD INDEX (`structure_id`)');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material`            ADD INDEX (`UserID`)');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure`           ADD INDEX (`ParentID`)');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure`           ADD INDEX (`UserID`)');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure`           ADD INDEX (`MaterialID`)');
+        //db()->query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field`               ADD INDEX (`UserID`)');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'field`               ADD INDEX (`ParentID`)');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structurefield`      ADD INDEX (`FieldID`)');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'materialfield`       ADD INDEX (`FieldID`)');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure_relation`  ADD INDEX (`parent_id`)');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure_relation`  ADD INDEX (`child_id`)');
     }
 
     // Add system fields
     public function migrate_10_to_11()
     {
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` ADD `system` INT(1) NOT NULL DEFAULT 0');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure` ADD `system` INT(1) NOT NULL DEFAULT 0');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'field` ADD `system` INT(1) NOT NULL DEFAULT 0');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'user` ADD `system` INT(1) NOT NULL DEFAULT 0');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` ADD `system` INT(1) NOT NULL DEFAULT 0');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure` ADD `system` INT(1) NOT NULL DEFAULT 0');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'field` ADD `system` INT(1) NOT NULL DEFAULT 0');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'user` ADD `system` INT(1) NOT NULL DEFAULT 0');
 
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` DROP `locale`');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` DROP `locale`');
     }
 
     /**
@@ -620,10 +624,10 @@ class CMS extends CompressableService
      */
     public function migrate_14_to_15()
     {
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` ADD `parent_id` INT(11) NOT NULL DEFAULT 0 AFTER `MaterialID`');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` ADD `type` INT(1) NOT NULL DEFAULT 0 AFTER `Draft`');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure` ADD `type` INT(1) NOT NULL DEFAULT 0 AFTER `PriorityNumber`');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'field` ADD `UserID` INT(11) NOT NULL DEFAULT 0 AFTER `PriorityNumber`');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` ADD `parent_id` INT(11) NOT NULL DEFAULT 0 AFTER `MaterialID`');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` ADD `type` INT(1) NOT NULL DEFAULT 0 AFTER `Draft`');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure` ADD `type` INT(1) NOT NULL DEFAULT 0 AFTER `PriorityNumber`');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'field` ADD `UserID` INT(11) NOT NULL DEFAULT 0 AFTER `PriorityNumber`');
     }
 
     /**
@@ -636,10 +640,10 @@ class CMS extends CompressableService
      */
     public function migrate_15_to_16()
     {
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'gallery` ADD `priority` INT(11) NOT NULL DEFAULT 0 AFTER `MaterialID`');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'gallery` ADD `size` INT(11) NOT NULL DEFAULT 0 AFTER `Src`');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'gallery` DROP `Thumbpath`');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'gallery` DROP `Thumbsrc`');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'gallery` ADD `priority` INT(11) NOT NULL DEFAULT 0 AFTER `MaterialID`');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'gallery` ADD `size` INT(11) NOT NULL DEFAULT 0 AFTER `Src`');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'gallery` DROP `Thumbpath`');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'gallery` DROP `Thumbsrc`');
 
         foreach (dbQuery('gallery')->exec() as $gallery) {
             $gallery->Path = dirname($gallery->Path);
@@ -653,7 +657,7 @@ class CMS extends CompressableService
      */
     public function migrate_16_to_17()
     {
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'user` DROP `Password`');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'user` DROP `Password`');
     }
 
     /**
@@ -678,43 +682,39 @@ class CMS extends CompressableService
     /** Added "remains" field to material table */
     public function migrate_18_to_19()
     {
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` ADD `remains` FLOAT NOT NULL DEFAULT 0 AFTER `system`');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` ADD `remains` FLOAT NOT NULL DEFAULT 0 AFTER `system`');
     }
 
     /** Added "access_token" field to user table */
     public function migrate_19_to_20()
     {
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'user` ADD `access_token` VARCHAR(256) NOT NULL DEFAULT 0');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'user` ADD `access_token` VARCHAR(256) NOT NULL DEFAULT 0');
     }
 
     /** Added `priority` field to `field` and `material` tables */
     /** Required for materialtables */
     public function migrate_20_to_21()
     {
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'field` ADD `priority` INT(11) NOT NULL DEFAULT 0 AFTER `ParentID`');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` ADD `priority` INT(11) NOT NULL DEFAULT 0 AFTER `parent_id`');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'field` ADD `priority` INT(11) NOT NULL DEFAULT 0 AFTER `ParentID`');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` ADD `priority` INT(11) NOT NULL DEFAULT 0 AFTER `parent_id`');
     }
 
     /** Field `numeric_value` in `materialfield` table is now double */
     public function migrate_21_to_22()
     {
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'materialfield` MODIFY `numeric_value` DOUBLE NOT NULL DEFAULT 0 AFTER `Value`');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'materialfield` MODIFY `numeric_value` DOUBLE NOT NULL DEFAULT 0 AFTER `Value`');
     }
 
     /** Adding `materialFieldId` to `gallery` table */
     public function migrate_22_to_23()
     {
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'gallery` ADD `materialFieldId` INT(11) NOT NULL DEFAULT 0 AFTER `MaterialID`');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'gallery` ADD `materialFieldId` INT(11) NOT NULL DEFAULT 0 AFTER `MaterialID`');
     }
 
     /** Create new gallery from old one */
     public function migrate_23_to_24()
     {
-        /** @var \samson\activerecord\user $user User object */
-        $user = null;
-        if (dbQuery('user')->first($user)) {
-
-        }
+        $user = array_shift(db()->fetch('SELECT * from User Limit 1'));
 
         // Create field for old gallery
         $field = new field(false);
@@ -722,7 +722,7 @@ class CMS extends CompressableService
         $field->Type = 9;
         $field->local = 0;
         $field->Description = 'Галерея Материала';
-        $field->UserID = $user->UserID;
+        $field->UserID = $user['UserID'];
         $field->system = 1;
         $field->Created = date('Y-m-d H:i:s');
         $field->Modyfied = $field->Created;
@@ -770,8 +770,8 @@ class CMS extends CompressableService
      */
     public function migrate_24_to_25()
     {
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'materialfield` ADD `key_value` BIGINT NOT NULL DEFAULT 0 AFTER `MaterialID`');
-        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'materialfield` ADD INDEX `key_value` (`key_value`)');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'materialfield` ADD `key_value` BIGINT NOT NULL DEFAULT 0 AFTER `MaterialID`');
+        db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'materialfield` ADD INDEX `key_value` (`key_value`)');
     }
 
     /**
@@ -795,19 +795,19 @@ class CMS extends CompressableService
 
     public function migrate_26_to_27()
     {
-        db()->simple_query('ALTER TABLE `user` CHANGE  `UserID`  `user_id` INT( 11 ) NOT NULL AUTO_INCREMENT');
-        db()->simple_query('ALTER TABLE `user` CHANGE  `FName`  `f_name` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL');
-        db()->simple_query('ALTER TABLE `user` CHANGE  `SName`  `s_name` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL');
-        db()->simple_query('ALTER TABLE `user` CHANGE  `TName`  `t_name` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL');
-        db()->simple_query('ALTER TABLE `user` CHANGE  `Email`  `email` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL');
-        db()->simple_query('ALTER TABLE `user` CHANGE  `Created`  `created` DATETIME NOT NULL');
-        db()->simple_query('ALTER TABLE `user` CHANGE  `Modyfied`  `modified` TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP');
-        db()->simple_query('ALTER TABLE `user` CHANGE  `GroupID`  `group_id` INT( 11 ) NOT NULL');
-        db()->simple_query('ALTER TABLE `user` CHANGE  `Active`  `active` INT( 11 ) NOT NULL');
-        db()->simple_query('ALTER TABLE `user` DROP `LastLogin`');
-        db()->simple_query('ALTER TABLE `user` DROP `Password`');
-        db()->simple_query('ALTER TABLE `user` DROP `accessToken`');
-        db()->simple_query('ALTER TABLE `user` DROP `Online`');
+        db()->query('ALTER TABLE `user` CHANGE  `UserID`  `user_id` INT( 11 ) NOT NULL AUTO_INCREMENT');
+        db()->query('ALTER TABLE `user` CHANGE  `FName`  `f_name` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL');
+        db()->query('ALTER TABLE `user` CHANGE  `SName`  `s_name` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL');
+        db()->query('ALTER TABLE `user` CHANGE  `TName`  `t_name` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL');
+        db()->query('ALTER TABLE `user` CHANGE  `Email`  `email` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL');
+        db()->query('ALTER TABLE `user` CHANGE  `Created`  `created` DATETIME NOT NULL');
+        db()->query('ALTER TABLE `user` CHANGE  `Modyfied`  `modified` TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP');
+        db()->query('ALTER TABLE `user` CHANGE  `GroupID`  `group_id` INT( 11 ) NOT NULL');
+        db()->query('ALTER TABLE `user` CHANGE  `Active`  `active` INT( 11 ) NOT NULL');
+        db()->query('ALTER TABLE `user` DROP `LastLogin`');
+        db()->query('ALTER TABLE `user` DROP `Password`');
+        db()->query('ALTER TABLE `user` DROP `accessToken`');
+        db()->query('ALTER TABLE `user` DROP `Online`');
     }
 
     public function materialColumnToField($column, $structure)
@@ -885,7 +885,7 @@ class CMS extends CompressableService
             }
         }
 
-        db()->simple_query('ALTER TABLE  `material` DROP  `' . $column . '`');
+        db()->query('ALTER TABLE  `material` DROP  `' . $column . '`');
     }
 
     /**
