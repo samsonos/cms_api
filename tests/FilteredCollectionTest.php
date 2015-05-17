@@ -20,7 +20,7 @@ class FilteredCollectionTest extends \PHPUnit_Framework_TestCase
         $module = $this->getMockBuilder('\samson\core\ExternalModule')->getMock();
         $this->database = $this->getMockBuilder('\samson\activerecord\dbQuery')->getMock();
         $this->database->expects($this->any())->method($this->anything())->will($this->returnSelf());
-        $this->collection = new Filtered($module, $this->database);
+        $this->collection = new Filtered($module, $this->database, new \samson\pager\Pager());
     }
 
     public function testHandler()
