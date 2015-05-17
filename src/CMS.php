@@ -17,16 +17,16 @@ class CMS extends CompressableService
 {
     /**
      * Get materials count grouped by structure selectors
-     * @param mixed  $selectors Collection of structures selectors to group materials
-     * @param string $selector  Selector to find structures, [Url] is used by default
-     * @param callable $handler  External handler
+     * @param mixed $selectors Collection of structures selectors to group materials
+     * @param string $selector Selector to find structures, [Url] is used by default
+     * @param callable $handler External handler
      *
      * @return \integer[] Collection where key is structure selector and value is materials count
      */
     public static function getMaterialsCountByStructures($selectors, $selector = 'Url', $handler = null)
     {
         // If not array is passed
-        if(!is_array($selectors)) {
+        if (!is_array($selectors)) {
             // convert it to array
             $selectors = array($selectors);
         }
@@ -56,7 +56,7 @@ class CMS extends CompressableService
                 // Check if we have this structure in results array
                 if (isset($results[$result->Url])) {
                     // Store materials count
-                    $results[$result->Url.'Count'] = $result->__Count;
+                    $results[$result->Url . 'Count'] = $result->__Count;
                 }
             }
         }
@@ -73,11 +73,11 @@ class CMS extends CompressableService
      *
      * Method makes two requests and performs them as quick as possible
      *
-     * @param mixed     $structures     Identifier of structure, or collection of them
-     * @param array     $materials      Collection  where results will be returned
-     * @param string    $className      Class name of final result objects, must be Material ancestor
-     * @param callable  $handler        External function to change generic query(add conditions and etc.)
-     * @param array     $handlerParams  External handler additional parameters collection to pass to handler
+     * @param mixed $structures Identifier of structure, or collection of them
+     * @param array $materials Collection  where results will be returned
+     * @param string $className Class name of final result objects, must be Material ancestor
+     * @param callable $handler External function to change generic query(add conditions and etc.)
+     * @param array $handlerParams External handler additional parameters collection to pass to handler
      *
      * @return bool True if materials ancestors has been found
      */
@@ -96,8 +96,8 @@ class CMS extends CompressableService
         // Convert external handler to array of handlers for backward compatibility
         $handlers = is_callable($handlers) ? array($handlers) : $handlers;
 
-         // Iterate all handlers
-        for ($i=0, $size=sizeof($handlers); $i < $size; $i++) {
+        // Iterate all handlers
+        for ($i = 0, $size = sizeof($handlers); $i < $size; $i++) {
 
             // Generic handler parameters array definition if we have parameters for i handle
             $hParams = isset($handlerParams[$i]) ? $handlerParams[$i] : array();
@@ -165,7 +165,7 @@ class CMS extends CompressableService
     public function prepare()
     {
         // SQL команда на добавление таблицы пользователей
-        $sql_user = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."user` (
+        $sql_user = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "user` (
               `UserID` int(11) NOT NULL AUTO_INCREMENT,
 		  `FName` varchar(255) NOT NULL,
 		  `SName` varchar(255) NOT NULL,
@@ -184,7 +184,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы пользователей
-        $sql_gallery = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."gallery` (
+        $sql_gallery = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "gallery` (
 		  `PhotoID` int(11) NOT NULL AUTO_INCREMENT,
 		  `MaterialID` int(11) NOT NULL,
 		  `Path` varchar(255) NOT NULL,
@@ -197,7 +197,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы групп пользователей
-        $sql_group = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."group` (
+        $sql_group = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "group` (
 		  `GroupID` int(20) NOT NULL AUTO_INCREMENT,
 		  `Name` varchar(255) NOT NULL,
 		  `Active` int(11) NOT NULL,
@@ -205,7 +205,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы связей пользователей и групп
-        $sql_groupright ="CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."groupright` (
+        $sql_groupright = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "groupright` (
 		  `GroupRightID` int(11) NOT NULL AUTO_INCREMENT,
 		  `GroupID` int(10) NOT NULL,
 		  `RightID` int(20) NOT NULL,
@@ -218,7 +218,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;";
 
         // SQL команда на добавление таблицы прав пользователей
-        $sql_right = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."right` (
+        $sql_right = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "right` (
 		  `RightID` int(20) NOT NULL AUTO_INCREMENT,
 		  `Name` varchar(255) NOT NULL,
 		  `Active` int(11) NOT NULL,
@@ -226,7 +226,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // Related materials
-        $sql_relation_material = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."related_materials` (
+        $sql_relation_material = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "related_materials` (
 		  `related_materials_id` int(11) NOT NULL AUTO_INCREMENT,
 		  `first_material` int(11) NOT NULL,
 		  `first_locale` varchar(10) NOT NULL,
@@ -236,7 +236,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы материалов
-        $sql_material = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."material` (
+        $sql_material = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "material` (
 		  `MaterialID` int(11) NOT NULL AUTO_INCREMENT,
 		  `Name` varchar(555) NOT NULL,
 		  `Content` text NOT NULL,
@@ -258,7 +258,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы навигации
-        $sql_structure = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."structure` (
+        $sql_structure = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "structure` (
 		  `StructureID` int(11) NOT NULL AUTO_INCREMENT,
 		  `ParentID` int(11) NOT NULL,
 		  `Name` varchar(255) NOT NULL,
@@ -274,7 +274,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL комманда на создание таблицы связей навигации и материалов
-        $sql_structurematerial = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."structurematerial` (
+        $sql_structurematerial = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "structurematerial` (
 		  `StructureMaterialID` int(11) NOT NULL AUTO_INCREMENT,
 		  `StructureID` int(11) NOT NULL,
 		  `MaterialID` int(11) NOT NULL,
@@ -286,7 +286,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы полей
-        $sql_field = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."field` (
+        $sql_field = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "field` (
 		  `FieldID` int(11) NOT NULL AUTO_INCREMENT,
 		  `ParentID` int(11) NOT NULL,
 		  `Name` varchar(255) NOT NULL,
@@ -301,7 +301,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы связей ЄНС с полями
-        $sql_navfield = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."structurefield` (
+        $sql_navfield = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "structurefield` (
 		  `StructureFieldID` int(11) NOT NULL AUTO_INCREMENT,
 		  `StructureID` int(11) NOT NULL,
 		  `FieldID` int(11) NOT NULL,
@@ -312,7 +312,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL комманда на создание таблицы связей материалов и полей
-        $sql_materialfield = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."materialfield` (
+        $sql_materialfield = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "materialfield` (
 		  `MaterialFieldID` int(11) NOT NULL AUTO_INCREMENT,
 		  `FieldID` int(11) NOT NULL,
 		  `MaterialID` int(11) NOT NULL,
@@ -323,7 +323,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL комманда на создание таблицы связей между структурами
-        $sql_structure_relation = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."structure_relation` (
+        $sql_structure_relation = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "structure_relation` (
 		  `structure_relation_id` int(11) NOT NULL AUTO_INCREMENT,
 		  `parent_id` int(11) NOT NULL,
 		  `child_id` int(11) NOT NULL,
@@ -331,7 +331,7 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL table for storing database version
-        $sql_version = " CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."cms_version` ( `version` varchar(15) not null default '1')
+        $sql_version = " CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "cms_version` ( `version` varchar(15) not null default '1')
 				ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // Выполним SQL комманды
@@ -348,44 +348,44 @@ class CMS extends CompressableService
         db()->simple_query($sql_groupright);
         db()->simple_query($sql_relation_material);
         db()->simple_query($sql_gallery);
-        db()->simple_query( $sql_structure_relation);
-        db()->simple_query("INSERT INTO `".dbMySQLConnector::$prefix."user` (`UserID`, `FName`, `SName`, `TName`, `email`, `md5_email`, `md5_password`, `created`, `modyfied`, `active`) VALUES
+        db()->simple_query($sql_structure_relation);
+        db()->simple_query("INSERT INTO `" . dbMySQLConnector::$prefix . "user` (`UserID`, `FName`, `SName`, `TName`, `email`, `md5_email`, `md5_password`, `created`, `modyfied`, `active`) VALUES
 	 (1, 'Виталий', 'Егоров', 'Игоревич', 'admin@admin.com', '64e1b8d34f425d19e1ee2ea7236d3028', '64e1b8d34f425d19e1ee2ea7236d3028', '2011-10-25 14:59:06', '2013-05-22 11:52:38',  1)
 			ON DUPLICATE KEY UPDATE active=1");
 
         // Initiate migration mechanism
-        db()->migration( get_class($this), array( $this, 'migrator' ));
+        db()->migration(get_class($this), array($this, 'migrator'));
 
         // Define permanent table relations
-        new TableRelation( 'material', 'user', 'UserID', 0, 'user_id' );
-        new TableRelation( 'material', 'gallery', 'MaterialID', TableRelation::T_ONE_TO_MANY );
-        new TableRelation( 'material', 'materialfield', 'MaterialID', TableRelation::T_ONE_TO_MANY );
-        new TableRelation( 'material', 'field', 'materialfield.FieldID', TableRelation::T_ONE_TO_MANY );
-        new TableRelation( 'material', 'structurematerial', 'MaterialID', TableRelation::T_ONE_TO_MANY );
-        new TableRelation( 'material', 'structure', 'structurematerial.StructureID', TableRelation::T_ONE_TO_MANY );
-        new TableRelation( 'materialfield', 'field', 'FieldID' );
-        new TableRelation( 'materialfield', 'material', 'MaterialID' );
-        new TableRelation( 'structurematerial', 'structure', 'StructureID' );
-        new TableRelation( 'structurematerial', 'materialfield', 'MaterialID', TableRelation::T_ONE_TO_MANY  );
-        new TableRelation( 'structurematerial', 'material', 'MaterialID', TableRelation::T_ONE_TO_MANY  );
-        new TableRelation( 'structure', 'material', 'structurematerial.MaterialID', TableRelation::T_ONE_TO_MANY, null, 'manymaterials');
-        new TableRelation( 'structure', 'gallery', 'structurematerial.MaterialID', TableRelation::T_ONE_TO_MANY, null, 'manymaterials');
+        new TableRelation('material', 'user', 'UserID', 0, 'user_id');
+        new TableRelation('material', 'gallery', 'MaterialID', TableRelation::T_ONE_TO_MANY);
+        new TableRelation('material', 'materialfield', 'MaterialID', TableRelation::T_ONE_TO_MANY);
+        new TableRelation('material', 'field', 'materialfield.FieldID', TableRelation::T_ONE_TO_MANY);
+        new TableRelation('material', 'structurematerial', 'MaterialID', TableRelation::T_ONE_TO_MANY);
+        new TableRelation('material', 'structure', 'structurematerial.StructureID', TableRelation::T_ONE_TO_MANY);
+        new TableRelation('materialfield', 'field', 'FieldID');
+        new TableRelation('materialfield', 'material', 'MaterialID');
+        new TableRelation('structurematerial', 'structure', 'StructureID');
+        new TableRelation('structurematerial', 'materialfield', 'MaterialID', TableRelation::T_ONE_TO_MANY);
+        new TableRelation('structurematerial', 'material', 'MaterialID', TableRelation::T_ONE_TO_MANY);
+        new TableRelation('structure', 'material', 'structurematerial.MaterialID', TableRelation::T_ONE_TO_MANY, null, 'manymaterials');
+        new TableRelation('structure', 'gallery', 'structurematerial.MaterialID', TableRelation::T_ONE_TO_MANY, null, 'manymaterials');
         /*new TableRelation( 'structure', 'material', 'MaterialID' );*/
-        new TableRelation( 'structure', 'user', 'UserID', 0, 'user_id' );
-        new TableRelation( 'structure', 'materialfield', 'material.MaterialID', TableRelation::T_ONE_TO_MANY, 'MaterialID', '_mf');
-        new TableRelation( 'structure', 'structurematerial', 'StructureID', TableRelation::T_ONE_TO_MANY );
-        new TableRelation( 'related_materials', 'material', 'first_material', TableRelation::T_ONE_TO_MANY, 'MaterialID' );
-        new TableRelation( 'related_materials', 'materialfield', 'first_material', TableRelation::T_ONE_TO_MANY, 'MaterialID' );
-        new TableRelation( 'field', 'structurefield', 'FieldID' );
-        new TableRelation( 'field', 'structure', 'structurefield.StructureID' );
-        new TableRelation( 'structurefield', 'field', 'FieldID'  );
-        new TableRelation( 'structurefield', 'materialfield', 'FieldID'  );
-        new TableRelation( 'structurefield', 'material', 'materialfield.MaterialID'  );
-        new TableRelation( 'structure', 'structure_relation', 'StructureID', TableRelation::T_ONE_TO_MANY, 'parent_id', 'children_relations' );
-        new TableRelation( 'structure', 'structure', 'children_relations.child_id', TableRelation::T_ONE_TO_MANY, 'StructureID', 'children' );
-        new TableRelation( 'structure', 'structure_relation', 'StructureID', TableRelation::T_ONE_TO_MANY, 'child_id', 'parents_relations' );
-        new TableRelation( 'structure', 'structure', 'parents_relations.parent_id', TableRelation::T_ONE_TO_MANY, 'StructureID', 'parents' );
-        new TableRelation( 'structurematerial', 'structure_relation', 'StructureID', TableRelation::T_ONE_TO_MANY, 'parent_id' );
+        new TableRelation('structure', 'user', 'UserID', 0, 'user_id');
+        new TableRelation('structure', 'materialfield', 'material.MaterialID', TableRelation::T_ONE_TO_MANY, 'MaterialID', '_mf');
+        new TableRelation('structure', 'structurematerial', 'StructureID', TableRelation::T_ONE_TO_MANY);
+        new TableRelation('related_materials', 'material', 'first_material', TableRelation::T_ONE_TO_MANY, 'MaterialID');
+        new TableRelation('related_materials', 'materialfield', 'first_material', TableRelation::T_ONE_TO_MANY, 'MaterialID');
+        new TableRelation('field', 'structurefield', 'FieldID');
+        new TableRelation('field', 'structure', 'structurefield.StructureID');
+        new TableRelation('structurefield', 'field', 'FieldID');
+        new TableRelation('structurefield', 'materialfield', 'FieldID');
+        new TableRelation('structurefield', 'material', 'materialfield.MaterialID');
+        new TableRelation('structure', 'structure_relation', 'StructureID', TableRelation::T_ONE_TO_MANY, 'parent_id', 'children_relations');
+        new TableRelation('structure', 'structure', 'children_relations.child_id', TableRelation::T_ONE_TO_MANY, 'StructureID', 'children');
+        new TableRelation('structure', 'structure_relation', 'StructureID', TableRelation::T_ONE_TO_MANY, 'child_id', 'parents_relations');
+        new TableRelation('structure', 'structure', 'parents_relations.parent_id', TableRelation::T_ONE_TO_MANY, 'StructureID', 'parents');
+        new TableRelation('structurematerial', 'structure_relation', 'StructureID', TableRelation::T_ONE_TO_MANY, 'parent_id');
         //elapsed('CMS:prepare');
 
         // Все прошло успешно
@@ -400,14 +400,12 @@ class CMS extends CompressableService
     public function migrator($to_version = null)
     {
         // If something passed - change database version to it
-        if( func_num_args() ) {
+        if (func_num_args()) {
             // Save current version to special db table
-            db()->simple_query("ALTER TABLE  `".dbMySQLConnector::$prefix."cms_version` CHANGE  `version`  `version` VARCHAR( 15 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT  '".$to_version."';");
-            die('Database successfully migrated to ['.$to_version.']');
-        }
-        // Return current database version
-        else {
-            $version_row = db()->query('SHOW COLUMNS FROM `'.dbMySQLConnector::$prefix.'cms_version`');
+            db()->query("ALTER TABLE  `" . dbMySQLConnector::$prefix . "cms_version` CHANGE  `version`  `version` VARCHAR( 15 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT  '" . $to_version . "';");
+            die('Database successfully migrated to [' . $to_version . ']');
+        } else { // Return current database version
+            $version_row = db()->fetch('SHOW COLUMNS FROM `' . dbMySQLConnector::$prefix . 'cms_version`');
             return $version_row[0]['Default'];
         }
     }
@@ -416,60 +414,60 @@ class CMS extends CompressableService
     public function migrate_1_to_2()
     {
         elapsed('Removing `Relations` table');
-        db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'relations');
+        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'relations');
 
         elapsed('Removing old localized tables if they exists table');
-        db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'enstructure');
-        db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'enstructurematerial');
-        db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'enstructurefield');
-        db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'enfield');
-        db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'enmaterial');
-        db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'enmaterialfield');
-        db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'uastructure');
-        db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'uastructurematerial');
-        db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'uastructurefield');
-        db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'uafield');
-        db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'uamaterial');
-        db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'uamaterialfield');
+        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'enstructure');
+        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'enstructurematerial');
+        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'enstructurefield');
+        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'enfield');
+        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'enmaterial');
+        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'enmaterialfield');
+        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'uastructure');
+        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'uastructurematerial');
+        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'uastructurefield');
+        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'uafield');
+        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'uamaterial');
+        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'uamaterialfield');
 
         elapsed('Removing old group/right tables if they exists table');
-        db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'`group`');
-        db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'`right`');
-        db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'groupright');
-        db()->simple_query('DROP TABLE IF EXISTS '.dbMySQLConnector::$prefix.'mem_cache');
+        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . '`group`');
+        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . '`right`');
+        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'groupright');
+        db()->simple_query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'mem_cache');
 
         elapsed('Adding `numeric_value` field into `materialfield` table');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield` ADD  `numeric_value` INT( 255 ) NOT NULL AFTER  `Value`');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'materialfield` ADD  `numeric_value` INT( 255 ) NOT NULL AFTER  `Value`');
 
         elapsed('Adding `locale` field into `material` table');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` ADD  `locale` varchar( 2 ) NOT NULL AFTER `Name`');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` ADD  `locale` varchar( 2 ) NOT NULL AFTER `Name`');
 
         elapsed('Removing `Draftmaterial` field from `material` table');
-        db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` DROP `Draftmaterial`');
+        db()->simple_query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` DROP `Draftmaterial`');
 
-        elapsed('Changing `'.dbMySQLConnector::$prefix.'material` table columns order');
-        db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `Teaser` TEXT AFTER `Content`');
-        db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `Published` INT(1) UNSIGNED AFTER `Draft`');
-        db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `Active` INT(1) UNSIGNED AFTER `Published`');
-        db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `UserID` INT(11) AFTER `Title`');
-        db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `Modyfied` TIMESTAMP AFTER `Title`');
-        db()->simple_query('ALTER TABLE `'.dbMySQLConnector::$prefix.'material` MODIFY `Created` DATETIME AFTER `Title`');
+        elapsed('Changing `' . dbMySQLConnector::$prefix . 'material` table columns order');
+        db()->simple_query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` MODIFY `Teaser` TEXT AFTER `Content`');
+        db()->simple_query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` MODIFY `Published` INT(1) UNSIGNED AFTER `Draft`');
+        db()->simple_query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` MODIFY `Active` INT(1) UNSIGNED AFTER `Published`');
+        db()->simple_query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` MODIFY `UserID` INT(11) AFTER `Title`');
+        db()->simple_query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` MODIFY `Modyfied` TIMESTAMP AFTER `Title`');
+        db()->simple_query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` MODIFY `Created` DATETIME AFTER `Title`');
     }
 
     /** Automatic migration to new CMS table structure */
     public function migrate_2_to_3()
     {
         elapsed('Adding `locale` field into `structure` table');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure` ADD  `locale` VARCHAR( 10 ) NOT NULL AFTER  `Name` ;');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure` ADD  `locale` VARCHAR( 10 ) NOT NULL AFTER  `Name` ;');
     }
 
     /** Automatic migration to new CMS table structure */
     public function migrate_3_to_4()
     {
         elapsed('Adding `locale` field into `materialfield` table');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield` ADD  `locale` VARCHAR( 10 ) NOT NULL AFTER  `numeric_value` ;');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'materialfield` ADD  `locale` VARCHAR( 10 ) NOT NULL AFTER  `numeric_value` ;');
         elapsed('Adding `local` field into `field` table');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field` ADD  `local` int( 10 ) NOT NULL AFTER  `Type` ;');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'field` ADD  `local` int( 10 ) NOT NULL AFTER  `Type` ;');
     }
 
     /**
@@ -487,7 +485,7 @@ class CMS extends CompressableService
         $this->materialColumnToField('Teaser', 'material');
 
         // Convert all old "date" fields to numeric for fixing db requests
-        if (dbQuery('field')->Type(3)->fields('id',$fields)) {
+        if (dbQuery('field')->Type(3)->fields('id', $fields)) {
             foreach (dbQuery('materialfield')->FieldID($fields)->exec() as $mf) {
                 $mf->numeric_value = strtotime($mf->Value);
                 $mf->save();
@@ -512,7 +510,7 @@ class CMS extends CompressableService
     public function migrate_7_to_8()
     {
         elapsed('Adding `StructureID` field into `material` table');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` ADD  `structure_id` INT( 255 ) NOT NULL AFTER  `Active`');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` ADD  `structure_id` INT( 255 ) NOT NULL AFTER  `Active`');
     }
 
     public function migrate_8_to_9()
@@ -520,7 +518,7 @@ class CMS extends CompressableService
         elapsed('Adding `filter` table');
         elapsed('Adding `filtered` field into `field` table');
         // SQL комманда на создание таблицы фильтров
-        $sql_filter = "CREATE TABLE IF NOT EXISTS `".dbMySQLConnector::$prefix."filter` (
+        $sql_filter = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "filter` (
 		  `filter_id` int(11) NOT NULL AUTO_INCREMENT,
 		  `field_id` int(11) NOT NULL,
 		  `value` varchar(255) NOT NULL,
@@ -529,37 +527,38 @@ class CMS extends CompressableService
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
         db()->simple_query($sql_filter);
 
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field` ADD  `filtered` INT( 10 ) NOT NULL AFTER  `local`');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'field` ADD  `filtered` INT( 10 ) NOT NULL AFTER  `local`');
     }
+
     /* added index key**/
     public function migrate_9_to_10()
     {
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'user`                ADD INDEX (`GroupID`)');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'gallery`             ADD INDEX (`MaterialID`)');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'groupright`          ADD INDEX (`GroupID`)');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'groupright`          ADD INDEX (`RightID`)');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material`            ADD INDEX (`structure_id`)');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material`            ADD INDEX (`UserID`)');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure`           ADD INDEX (`ParentID`)');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure`           ADD INDEX (`UserID`)');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure`           ADD INDEX (`MaterialID`)');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'user`                ADD INDEX (`GroupID`)');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'gallery`             ADD INDEX (`MaterialID`)');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'groupright`          ADD INDEX (`GroupID`)');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'groupright`          ADD INDEX (`RightID`)');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material`            ADD INDEX (`structure_id`)');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material`            ADD INDEX (`UserID`)');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure`           ADD INDEX (`ParentID`)');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure`           ADD INDEX (`UserID`)');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure`           ADD INDEX (`MaterialID`)');
         //db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field`               ADD INDEX (`UserID`)');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field`               ADD INDEX (`ParentID`)');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structurefield`      ADD INDEX (`FieldID`)');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield`       ADD INDEX (`FieldID`)');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure_relation`  ADD INDEX (`parent_id`)');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure_relation`  ADD INDEX (`child_id`)');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'field`               ADD INDEX (`ParentID`)');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structurefield`      ADD INDEX (`FieldID`)');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'materialfield`       ADD INDEX (`FieldID`)');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure_relation`  ADD INDEX (`parent_id`)');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure_relation`  ADD INDEX (`child_id`)');
     }
 
     // Add system fields
     public function migrate_10_to_11()
     {
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` ADD `system` INT(1) NOT NULL DEFAULT 0');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure` ADD `system` INT(1) NOT NULL DEFAULT 0');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field` ADD `system` INT(1) NOT NULL DEFAULT 0');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'user` ADD `system` INT(1) NOT NULL DEFAULT 0');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` ADD `system` INT(1) NOT NULL DEFAULT 0');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure` ADD `system` INT(1) NOT NULL DEFAULT 0');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'field` ADD `system` INT(1) NOT NULL DEFAULT 0');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'user` ADD `system` INT(1) NOT NULL DEFAULT 0');
 
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` DROP `locale`');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` DROP `locale`');
     }
 
     /**
@@ -572,25 +571,25 @@ class CMS extends CompressableService
         $this->materialColumnToField('Description', 'seo');
 
         $structure = null;
-        if(dbQuery('structure')->Name('material')->first($structure)) {
+        if (dbQuery('structure')->Name('material')->first($structure)) {
             $structure->system = 1;
             $structure->save();
         }
 
         $structure = null;
-        if(dbQuery('structure')->Name('seo')->first($structure)) {
+        if (dbQuery('structure')->Name('seo')->first($structure)) {
             $structure->system = 1;
             $structure->save();
         }
 
         $field = null;
-        if(dbQuery('field')->Name('Content')->first($field)) {
+        if (dbQuery('field')->Name('Content')->first($field)) {
             $field->system = 1;
             $field->save();
         }
 
         $field = null;
-        if(dbQuery('field')->Name('Teaser')->first($field)) {
+        if (dbQuery('field')->Name('Teaser')->first($field)) {
             $field->system = 1;
             $field->save();
         }
@@ -621,10 +620,10 @@ class CMS extends CompressableService
      */
     public function migrate_14_to_15()
     {
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` ADD `parent_id` INT(11) NOT NULL DEFAULT 0 AFTER `MaterialID`');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` ADD `type` INT(1) NOT NULL DEFAULT 0 AFTER `Draft`');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'structure` ADD `type` INT(1) NOT NULL DEFAULT 0 AFTER `PriorityNumber`');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field` ADD `UserID` INT(11) NOT NULL DEFAULT 0 AFTER `PriorityNumber`');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` ADD `parent_id` INT(11) NOT NULL DEFAULT 0 AFTER `MaterialID`');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` ADD `type` INT(1) NOT NULL DEFAULT 0 AFTER `Draft`');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'structure` ADD `type` INT(1) NOT NULL DEFAULT 0 AFTER `PriorityNumber`');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'field` ADD `UserID` INT(11) NOT NULL DEFAULT 0 AFTER `PriorityNumber`');
     }
 
     /**
@@ -637,11 +636,11 @@ class CMS extends CompressableService
      */
     public function migrate_15_to_16()
     {
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'gallery` ADD `priority` INT(11) NOT NULL DEFAULT 0 AFTER `MaterialID`');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'gallery` ADD `size` INT(11) NOT NULL DEFAULT 0 AFTER `Src`');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'gallery` DROP `Thumbpath`');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'gallery` DROP `Thumbsrc`');
-        
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'gallery` ADD `priority` INT(11) NOT NULL DEFAULT 0 AFTER `MaterialID`');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'gallery` ADD `size` INT(11) NOT NULL DEFAULT 0 AFTER `Src`');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'gallery` DROP `Thumbpath`');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'gallery` DROP `Thumbsrc`');
+
         foreach (dbQuery('gallery')->exec() as $gallery) {
             $gallery->Path = dirname($gallery->Path);
             $gallery->Src = basename($gallery->Src);
@@ -654,7 +653,7 @@ class CMS extends CompressableService
      */
     public function migrate_16_to_17()
     {
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'user` DROP `Password`');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'user` DROP `Password`');
     }
 
     /**
@@ -665,7 +664,7 @@ class CMS extends CompressableService
         /** @var \samson\activerecord\gallery $images */
         $images = null;
         dbQuery('gallery')->cond('Path', '')->exec($images);
-        foreach($images as $image) {
+        foreach ($images as $image) {
             $oldPath = $image->Src;
             $image->Path = dirname($oldPath) . '/';
             $image->Src = basename($oldPath);
@@ -679,33 +678,33 @@ class CMS extends CompressableService
     /** Added "remains" field to material table */
     public function migrate_18_to_19()
     {
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` ADD `remains` FLOAT NOT NULL DEFAULT 0 AFTER `system`');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` ADD `remains` FLOAT NOT NULL DEFAULT 0 AFTER `system`');
     }
-    
+
     /** Added "access_token" field to user table */
     public function migrate_19_to_20()
     {
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'user` ADD `access_token` VARCHAR(256) NOT NULL DEFAULT 0');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'user` ADD `access_token` VARCHAR(256) NOT NULL DEFAULT 0');
     }
 
     /** Added `priority` field to `field` and `material` tables */
     /** Required for materialtables */
     public function migrate_20_to_21()
     {
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'field` ADD `priority` INT(11) NOT NULL DEFAULT 0 AFTER `ParentID`');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'material` ADD `priority` INT(11) NOT NULL DEFAULT 0 AFTER `parent_id`');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'field` ADD `priority` INT(11) NOT NULL DEFAULT 0 AFTER `ParentID`');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'material` ADD `priority` INT(11) NOT NULL DEFAULT 0 AFTER `parent_id`');
     }
 
     /** Field `numeric_value` in `materialfield` table is now double */
     public function migrate_21_to_22()
     {
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield` MODIFY `numeric_value` DOUBLE NOT NULL DEFAULT 0 AFTER `Value`');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'materialfield` MODIFY `numeric_value` DOUBLE NOT NULL DEFAULT 0 AFTER `Value`');
     }
 
     /** Adding `materialFieldId` to `gallery` table */
     public function migrate_22_to_23()
     {
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'gallery` ADD `materialFieldId` INT(11) NOT NULL DEFAULT 0 AFTER `MaterialID`');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'gallery` ADD `materialFieldId` INT(11) NOT NULL DEFAULT 0 AFTER `MaterialID`');
     }
 
     /** Create new gallery from old one */
@@ -713,7 +712,7 @@ class CMS extends CompressableService
     {
         /** @var \samson\activerecord\user $user User object */
         $user = null;
-        if(dbQuery('user')->first($user)) {
+        if (dbQuery('user')->first($user)) {
 
         }
 
@@ -771,8 +770,8 @@ class CMS extends CompressableService
      */
     public function migrate_24_to_25()
     {
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield` ADD `key_value` BIGINT NOT NULL DEFAULT 0 AFTER `MaterialID`');
-        db()->simple_query('ALTER TABLE  `'.dbMySQLConnector::$prefix.'materialfield` ADD INDEX `key_value` (`key_value`)');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'materialfield` ADD `key_value` BIGINT NOT NULL DEFAULT 0 AFTER `MaterialID`');
+        db()->simple_query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'materialfield` ADD INDEX `key_value` (`key_value`)');
     }
 
     /**
@@ -815,16 +814,16 @@ class CMS extends CompressableService
     {
         // Find first user
         $user = null;
-        if(dbQuery('user')->first($user)) {
+        if (dbQuery('user')->first($user)) {
 
         }
 
         // Create structure for all materials
         $db_structure = null;
-        if (!dbQuery('structure')->Url('__'.$structure)->Active(1)->first($db_structure)) {
+        if (!dbQuery('structure')->Url('__' . $structure)->Active(1)->first($db_structure)) {
             $db_structure = new \samson\activerecord\structure(false);
             $db_structure->Name = $structure;
-            $db_structure->Url = '__'.$structure;
+            $db_structure->Url = '__' . $structure;
             $db_structure->Active = 1;
             $db_structure->UserID = $user->id;
             $db_structure->system = 1;
@@ -854,7 +853,7 @@ class CMS extends CompressableService
         // Iterate all existing materials
         $db_materials = array();
         if (dbQuery('material')->Active('1')->Draft('0')->exec($db_materials)) {
-            trace('Found materials:'.sizeof($db_materials));
+            trace('Found materials:' . sizeof($db_materials));
             foreach ($db_materials as $db_material) {
                 //trace('Updating material:'.$db_material->id);
                 // If current material has no connection with new structure
@@ -886,7 +885,7 @@ class CMS extends CompressableService
             }
         }
 
-        db()->simple_query('ALTER TABLE  `material` DROP  `'.$column.'`');
+        db()->simple_query('ALTER TABLE  `material` DROP  `' . $column . '`');
     }
 
     /**
@@ -894,8 +893,8 @@ class CMS extends CompressableService
      * Field to search for can be specified, by default search if performed by URL field
      * Function supports finding material by own fields and by any additional fields
      *
-     * @param string $selector  Value of CMSMaterial to search
-     * @param string $field		Field name for searching
+     * @param string $selector Value of CMSMaterial to search
+     * @param string $field Field name for searching
      * @return CMSMaterial Instance of CMSMaterial on successfull search
      */
     public function & material($selector, $field = 'Url')
@@ -903,25 +902,24 @@ class CMS extends CompressableService
         $db_cmsmat = null;
 
         // If id passed switch to real table column name
-        if( $field == 'id' ) $field = 'MaterialID';
+        if ($field == 'id') $field = 'MaterialID';
 
         // Build classname with PHP < 5.3 compatibility
         $classname = ns_classname('cmsmaterial', 'samson\cms');
 
         // If instance of CMSMaterial passed - just return it
-        if( $selector instanceof $classname ) return $selector;
+        if ($selector instanceof $classname) return $selector;
         // Try to search activerecord instances cache by selector
-        else if( isset( dbRecord::$instances[$classname][$selector] )) $db_cmsmat = & dbRecord::$instances[$classname][$selector];
+        else if (isset(dbRecord::$instances[$classname][$selector])) $db_cmsmat = &dbRecord::$instances[$classname][$selector];
         // Try to load from memory cache
         //else if( CacheTable::ifget( $selector, $db_cmsmat ) );
         // Perform request to database
-        else
-        {
+        else {
             // Get material	by field
-            $db_cmsmat = CMSMaterial::get( array( $field, $selector ), NULL, 0, 1 );
+            $db_cmsmat = CMSMaterial::get(array($field, $selector), NULL, 0, 1);
 
             // If we have found material - get the first one
-            if( is_array( $db_cmsmat ) && sizeof( $db_cmsmat ) ) $db_cmsmat = array_shift($db_cmsmat);
+            if (is_array($db_cmsmat) && sizeof($db_cmsmat)) $db_cmsmat = array_shift($db_cmsmat);
             else $db_cmsmat = null;
         }
 
@@ -941,27 +939,29 @@ class CMS extends CompressableService
         $cmsnav = null;
 
         // If no selector passed
-        if( !isset($selector) ) return $cmsnav;
+        if (!isset($selector)) return $cmsnav;
 
         // If id passed switch to real table column name
-        if( $field == 'id' ) $field = 'StructureID';
+        if ($field == 'id') $field = 'StructureID';
 
         // Build classname with PHP < 5.3 compatibility
         $classname = \samson\core\AutoLoader::className('CMSNav', 'samson\cms');
 
         // If instance of CMSNav passed - just return it
-        if( is_a( $selector, $classname)) return $selector;
+        if (is_a($selector, $classname)) return $selector;
         // Try to search activerecord instances cache by selector
-        else if( isset(dbRecord::$instances[$classname][$selector]) ) {$cmsnav = & dbRecord::$instances[$classname][$selector];}
-        // Perform request to database
-        else if( dbQuery($classname)
-            ->cond('Active',1)
-            ->cond( $field, $selector )
+        else if (isset(dbRecord::$instances[$classname][$selector])) {
+            $cmsnav = &dbRecord::$instances[$classname][$selector];
+        } // Perform request to database
+        else if (dbQuery($classname)
+            ->cond('Active', 1)
+            ->cond($field, $selector)
             ->join('children_relations')
             ->join('children', '\samson\cms\CMSNav')
             ->join('parents_relations')
             ->join('parents', '\samson\cms\CMSNav')
-            ->first( $cmsnav )) {
+            ->first($cmsnav)
+        ) {
             $cmsnav->prepare();
         }
 
@@ -970,9 +970,9 @@ class CMS extends CompressableService
 
     /**
      * Perform request to get CNSMaterials by CMSNav
-     * @param mixed $selector 	CMSNav selector
-     * @param string $field		CMSNav field name for searching
-     * @param string $handler	External handler
+     * @param mixed $selector CMSNav selector
+     * @param string $field CMSNav field name for searching
+     * @param string $handler External handler
      * @return array
      */
     public function & navmaterials($selector, $field = 'Url', $handler = null)
@@ -980,17 +980,15 @@ class CMS extends CompressableService
         $result = array();
 
         // Find CMSNav
-        if(null !== ($db_nav = $this->navigation($selector, $field)))
-        {
+        if (null !== ($db_nav = $this->navigation($selector, $field))) {
             // Get material ids from structure materials records
             $ids = array();
-            if(dbQuery('samson\cms\CMSNavMaterial')->cond( 'StructureID', $db_nav->id )->fields( 'MaterialID', $ids ))
-            {
+            if (dbQuery('samson\cms\CMSNavMaterial')->cond('StructureID', $db_nav->id)->fields('MaterialID', $ids)) {
                 // Create material db query
                 $q = cmsquery()->id($ids);
 
                 // Set ecternal query handler
-                if( isset( $handler ) ) $q->handler( $handler );
+                if (isset($handler)) $q->handler($handler);
 
                 // Perform DB request and get materials
                 $result = $q->exec();
@@ -1001,7 +999,7 @@ class CMS extends CompressableService
     }
 
     /** @see \samson\core\CompressableExternalModule::afterCompress() */
-    public function afterCompress( & $obj = null, array & $code = null )
+    public function afterCompress(& $obj = null, array & $code = null)
     {
         // Fill additional fields data to material db request data for automatic altering material request
         self::$fields = array();
@@ -1009,7 +1007,7 @@ class CMS extends CompressableService
         $t_name = '_mf';
 
         // Save original material attributes
-        self::$materialAttributes = & CMSMaterial::$_attributes;
+        self::$materialAttributes = &CMSMaterial::$_attributes;
 
         // Copy original material table attributes
         CMSMaterial::$_attributes = \samson\activerecord\material::$_attributes;
@@ -1019,46 +1017,44 @@ class CMS extends CompressableService
         CMSMaterial::$_map = \samson\activerecord\material::$_map;
 
         // Perform db query to get all possible material fields
-        if( dbQuery('field')->Active(1)->Name('', dbRelation::NOT_EQUAL)->exec($this->material_fields)) foreach ($this->material_fields as $db_field)
-        {
+        if (dbQuery('field')->Active(1)->Name('', dbRelation::NOT_EQUAL)->exec($this->material_fields)) foreach ($this->material_fields as $db_field) {
             // Add additional field localization condition
-            if ($db_field->local==1) $equal = '(('.$t_name.'.FieldID = '.$db_field->id.')&&('.$t_name.".locale = '".locale()."'))";
-            else $equal = '(('.$t_name.'.FieldID = '.$db_field->id.')&&('.$t_name.".locale = ''))";
+            if ($db_field->local == 1) $equal = '((' . $t_name . '.FieldID = ' . $db_field->id . ')&&(' . $t_name . ".locale = '" . locale() . "'))";
+            else $equal = '((' . $t_name . '.FieldID = ' . $db_field->id . ')&&(' . $t_name . ".locale = ''))";
 
             // Define field value DB column for storing data
             $v_col = 'Value';
             // We must get data from other column for this type of field
-            if ($db_field->Type == 7 || $db_field->Type == 3 ||  $db_field->Type == 10) {
+            if ($db_field->Type == 7 || $db_field->Type == 3 || $db_field->Type == 10) {
                 $v_col = 'numeric_value';
-            }
-            else if( $db_field->Type == 6 ) {
+            } else if ($db_field->Type == 6) {
                 $v_col = 'key_value';
             }
 
             // Save additional field
-            self::$fields[$db_field->Name] = "\n".' MAX(IF('.$equal.','.$t_name.'.`'.$v_col.'`, NULL)) as `'.$db_field->Name.'`';
+            self::$fields[$db_field->Name] = "\n" . ' MAX(IF(' . $equal . ',' . $t_name . '.`' . $v_col . '`, NULL)) as `' . $db_field->Name . '`';
 
             // Set additional object metadata
-            CMSMaterial::$_attributes[ $db_field->Name ] = $db_field->Name;
-            CMSMaterial::$_map[ $db_field->Name ] = dbMySQLConnector::$prefix.'material.'.$db_field->Name;
+            CMSMaterial::$_attributes[$db_field->Name] = $db_field->Name;
+            CMSMaterial::$_map[$db_field->Name] = dbMySQLConnector::$prefix . 'material.' . $db_field->Name;
         }
 
         // Set additional object metadata
-        CMSMaterial::$_sql_select['this'] = ' STRAIGHT_JOIN '.CMSMaterial::$_sql_select['this'];
+        CMSMaterial::$_sql_select['this'] = ' STRAIGHT_JOIN ' . CMSMaterial::$_sql_select['this'];
         if (sizeof(self::$fields)) {
-            CMSMaterial::$_sql_select['this'] .= ','.implode(',', self::$fields);
+            CMSMaterial::$_sql_select['this'] .= ',' . implode(',', self::$fields);
         }
-        CMSMaterial::$_sql_from['this'] .= "\n".'LEFT JOIN '.dbMySQLConnector::$prefix.'materialfield as '.$t_name.' on '.dbMySQLConnector::$prefix.'material.MaterialID = '.$t_name.'.MaterialID';
-        CMSMaterial::$_own_group[] = dbMySQLConnector::$prefix.'material.MaterialID';
+        CMSMaterial::$_sql_from['this'] .= "\n" . 'LEFT JOIN ' . dbMySQLConnector::$prefix . 'materialfield as ' . $t_name . ' on ' . dbMySQLConnector::$prefix . 'material.MaterialID = ' . $t_name . '.MaterialID';
+        CMSMaterial::$_own_group[] = dbMySQLConnector::$prefix . 'material.MaterialID';
     }
 
     /** @see \samson\core\ExternalModule::init() */
-    public function init( array $params = array() )
+    public function init(array $params = array())
     {
         // Change static class data
         $this->afterCompress();
 
         // Create cache collection
-        dbRecord::$instances[ "samson\cms\CMSMaterial" ] = array();
+        dbRecord::$instances["samson\cms\CMSMaterial"] = array();
     }
 }
