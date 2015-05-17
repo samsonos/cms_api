@@ -407,7 +407,7 @@ class CMS extends CompressableService
         if (func_num_args()) {
             // Save current version to special db table
             db()->query("ALTER TABLE  `" . dbMySQLConnector::$prefix . "cms_version` CHANGE  `version`  `version` VARCHAR( 15 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT  '" . $to_version . "';");
-            die('Database successfully migrated to [' . $to_version . ']');
+//            die('Database successfully migrated to [' . $to_version . ']');
         } else { // Return current database version
             $version_row = db()->fetch('SHOW COLUMNS FROM `' . dbMySQLConnector::$prefix . 'cms_version`');
             return $version_row[0]['Default'];
