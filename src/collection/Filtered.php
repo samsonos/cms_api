@@ -109,7 +109,7 @@ class Filtered extends Paged
     {
         /**@var \samson\activerecord\field $field */
         // TODO: Add ability to sort with entity fields
-        if (in_array($field, array('Modyfied', 'Created', 'Url', 'Name'))) {
+        if (in_array($field, \samson\activerecord\material::$_attributes)) {
             $this->sorter = array(
                 'field' => $field,
                 'name' => $field,
@@ -411,7 +411,7 @@ class Filtered extends Paged
         if (sizeof($this->sorter)) {
             // If we need to sort by entity own field(column)
             // TODO: Get this list of entity field dynamically
-            if (in_array($this->sorter['field'], array('Modyfied', 'Created', 'Url', 'Name'))) {
+            if (in_array($this->sorter['field'], \samson\activerecord\material::$_attributes)) {
                 // Sort material identifiers by its own table fields
                 $this->query->className('material')
                     ->cond('Active', 1)
