@@ -28,5 +28,8 @@
       "samsonos\\cms\\": "src/"
     },
     "files": ["src/global.php"]
+  },
+  "config":{
+    "github-protocols":["https"]
   }
 }
