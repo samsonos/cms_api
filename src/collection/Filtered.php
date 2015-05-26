@@ -410,11 +410,9 @@ class Filtered extends Paged
         // Check if sorter is configured
         if (sizeof($this->sorter)) {
             // If we need to sort by entity own field(column)
-            // TODO: Get this list of entity field dynamically
             if (in_array($this->sorter['field'], \samson\activerecord\material::$_attributes)) {
                 // Sort material identifiers by its own table fields
-                $this->query->className('material')
-                    ->cond('Active', 1)
+                $this->query->className('\samson\activerecord\material')
                     ->cond('MaterialID', $materialIDs)
                     ->order_by($this->sorter['field'], $this->sorter['destination'])
                     ->fields('MaterialID', $materialIDs);
@@ -469,7 +467,7 @@ class Filtered extends Paged
         // If no filters is set
         if (!sizeof($this->search) && !sizeof($this->navigation) && !sizeof($this->field)) {
             // Get all entity records identifiers
-            $this->materialIDs = $this->query->fields($class::$_primary);
+            $this->materialIDs = $this->query->cond('Active', 1)->cond('system', 0)->fields($class::$_primary);
         }
 
         // Perform material filtering
@@ -479,29 +477,18 @@ class Filtered extends Paged
             // Store filtered collection size
             $this->count = sizeof($this->materialIDs);
 
-            // Call material identifier handlers
-            $this->callHandlers($this->idHandlers, array(&$this->materialIDs));
-
-
-            // Filter all materials by active column
-            $this->materialIDs = $this->query
-                ->className('samson\activerecord\material')
-                ->cond('Active', 1)
-                ->cond('system', 0)
-                ->cond($class::$_primary, $this->materialIDs)
-                ->fields($class::$_primary)
-            ;
-
-            /*
-            // Get system navigation items
-            $navIds = $this->query->className('structure')->cond('system', '1')->fields('StructureID');
-
-            // Remove all system materials from material identifiers collection
-            $this->materialIDs = array_diff(
-                $this->materialIDs,
-                $this->query->className('structurematerial')->cond('StructureID', $navIds)->fields('MaterialID')
-            );
-            */
+            // If we have external material identifier handlers
+            if (sizeof($this->idHandlers)) {
+                // Call material identifier handlers
+                $this->callHandlers($this->idHandlers, array(&$this->materialIDs));
+            } else { // Generic filtering of all materials by active and system column
+                $this->materialIDs = $this->query
+                    ->className('samson\activerecord\material')
+                    ->cond('Active', 1)
+                    ->cond('system', 0)
+                    ->cond($class::$_primary, $this->materialIDs)
+                    ->fields($class::$_primary);
+            }
 
             // Perform sorting
             $this->applySorter($this->materialIDs);
