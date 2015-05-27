@@ -39,6 +39,9 @@ class Filtered extends Paged
     /** @var array External material handler and params array */
     protected $entityHandlers = array();
 
+    /** @var array Base material entity handler callbacks array */
+    protected $baseEntityHandlers = array();
+
     /** @var string Collection entities class name */
     protected $entityName = 'samson\cms\CMSMaterial';
 
@@ -81,6 +84,20 @@ class Filtered extends Paged
     {
         // Add callback with parameters to array
         $this->idHandlers[] = array($handler, $params);
+
+        return $this;
+    }
+
+    /**
+     * Set external entity handler
+     * @param callback $handler
+     * @param array $params
+     * @return self Chaining
+     */
+    public function baseEntityHandler($handler, array $params = array())
+    {
+        // Add callback with parameters to array
+        $this->baseEntityHandlers[] = array($handler, $params);
 
         return $this;
     }
@@ -405,25 +422,18 @@ class Filtered extends Paged
      * Perform material identifiers collection sorting
      * @param array $materialIDs Variable to return sorted collection
      */
-    protected function applySorter(& $materialIDs = array())
+    protected function applyFieldSorter(& $materialIDs = array())
     {
         // Check if sorter is configured
         if (sizeof($this->sorter)) {
-            // If we need to sort by entity own field(column)
-            if (in_array($this->sorter['field'], \samson\activerecord\material::$_attributes)) {
-                // Sort material identifiers by its own table fields
-                $this->query->className('\samson\activerecord\material')
-                    ->cond('MaterialID', $materialIDs)
+            // If we need to sort by entity additional field(column)
+            if (!in_array($this->sorter['field'], \samson\activerecord\material::$_attributes)) {
+                // Sort material identifiers by its additional fields
+                $this->query->className('materialfield')
+                    ->cond('FieldID', $this->sorter['entity']->id)
                     ->order_by($this->sorter['field'], $this->sorter['destination'])
+                    ->cond('MaterialID', $materialIDs)
                     ->fields('MaterialID', $materialIDs);
-
-            // Perform additional field ordered db request
-            } else if ($this->query->className('materialfield')
-                ->cond('FieldID', $this->sorter['entity']->id)
-                ->order_by($this->sorter['field'], $this->sorter['destination'])
-                ->cond('MaterialID', $materialIDs)
-                ->fields('MaterialID', $materialIDs)) {
-                // Perform some logic?
             }
         }
     }
@@ -452,6 +462,39 @@ class Filtered extends Paged
     }
 
     /**
+     * Perform filtering on base material entity
+     * @param array $materialIDs Variable to return sorted collection
+     */
+    protected function applyBaseEntityFilter(& $materialIDs = array())
+    {
+        // TODO: Change this to new OOP approach
+        $class = $this->entityName;
+
+        // Configure query to base entity
+        $this->query->className('samson\activerecord\material');
+
+        // Call base material entity handlers to prepare query
+        $this->callHandlers($this->baseEntityHandlers, array(&$this->query));
+
+        // Check if sorter is configured
+        if (sizeof($this->sorter)) {
+            // If we need to sort by entity own field(column)
+            if (in_array($this->sorter['field'], $class::$_attributes)) {
+                // Add material entity sorter
+                $this->query->order_by($this->sorter['field'], $this->sorter['destination']);
+            }
+        }
+
+        // Perform main entity query
+        $this->materialIDs = $this->query
+            ->cond('Active', 1) // Remove deleted entities
+            ->cond('system', 0) // Remove system entities
+            ->cond($class::$_primary, $materialIDs) // Filter to current set
+            ->fields($class::$_primary)
+        ;
+    }
+
+    /**
      * Perform collection database retrieval using set filters
      *
      * @return self Chaining
@@ -477,21 +520,14 @@ class Filtered extends Paged
             // Store filtered collection size
             $this->count = sizeof($this->materialIDs);
 
-            // If we have external material identifier handlers
-            if (sizeof($this->idHandlers)) {
-                // Call material identifier handlers
-                $this->callHandlers($this->idHandlers, array(&$this->materialIDs));
-            } else { // Generic filtering of all materials by active and system column
-                $this->materialIDs = $this->query
-                    ->className('samson\activerecord\material')
-                    ->cond('Active', 1)
-                    ->cond('system', 0)
-                    ->cond($class::$_primary, $this->materialIDs)
-                    ->fields($class::$_primary);
-            }
+            // Call material identifier handlers
+            $this->callHandlers($this->idHandlers, array(&$this->materialIDs));
+
+            // Perform base entity query for final filtering
+            $this->applyBaseEntityFilter($this->materialIDs);
 
             // Perform sorting
-            $this->applySorter($this->materialIDs);
+            $this->applyFieldSorter($this->materialIDs);
 
             // Create count request to count pagination
             $this->pager->update(sizeof($this->materialIDs));
