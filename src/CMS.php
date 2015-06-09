@@ -748,17 +748,23 @@ class CMS extends CompressableService
             /** @var \samson\activerecord\gallery $image Set gallery as additional field */
             foreach ($gallery as $image) {
                 // Create new materialfield for image and save it id in gallery table
-                $materialField = new materialfield(false);
-                $materialField->MaterialID = $image->MaterialID;
-                $materialField->FieldID = $field->FieldID;
+                if (!dbQuery('materialfield')->cond('MaterialID', $image->MaterialID)->cond('FieldID', $field->FieldID)->first($materialField)) {
+                    $materialField = new materialfield(false);
+                    $materialField->MaterialID = $image->MaterialID;
+                    $materialField->FieldID = $field->FieldID;
+                }
                 $materialField->Active = 1;
                 $materialField->save();
-                $structureMaterial = new structurematerial(false);
-                $structureMaterial->MaterialID = $image->MaterialID;
-                $structureMaterial->StructureID = $structure->StructureID;
-                $structureMaterial->Modified = date('Y-m-d H:i:s');
+
+                if (!dbQuery('structurematerial')->cond('MaterialID', $image->MaterialID)->cond('StructureID', $structure->StructureID)->first($structureMaterial)) {
+                    $structureMaterial = new structurematerial(false);
+                    $structureMaterial->MaterialID = $image->MaterialID;
+                    $structureMaterial->StructureID = $structure->StructureID;
+                    $structureMaterial->Modified = date('Y-m-d H:i:s');
+                }
                 $structureMaterial->Active = 1;
                 $structureMaterial->save();
+
                 $image->materialFieldId = $materialField->MaterialFieldID;
                 $image->save();
             }
