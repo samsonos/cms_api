@@ -350,13 +350,6 @@ class CMS extends CompressableService
         db()->query($sql_gallery);
         db()->query($sql_structure_relation);
 
-        // Check if we did not already create user
-        if (!sizeof(db()->fetch('SELECT * from user where email ="admin@admin.com"'))) {
-            db()->query("INSERT INTO `" . dbMySQLConnector::$prefix . "user` (`user_id`, `f_name`, `s_name`, `t_name`, `email`, `md5_email`, `md5_password`, `created`, `modified`, `active`) VALUES
-	 (1, 'Виталий', 'Егоров', 'Игоревич', 'admin@admin.com', '64e1b8d34f425d19e1ee2ea7236d3028', '64e1b8d34f425d19e1ee2ea7236d3028', '2011-10-25 14:59:06', '2013-05-22 11:52:38',  1)
-			ON DUPLICATE KEY UPDATE active=1");
-        }
-
         // Initiate migration mechanism
         db()->migration(get_class($this), array($this, 'migrator'));
 
@@ -456,6 +449,13 @@ class CMS extends CompressableService
         db()->query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` MODIFY `UserID` INT(11) AFTER `Title`');
         db()->query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` MODIFY `Modyfied` TIMESTAMP AFTER `Title`');
         db()->query('ALTER TABLE `' . dbMySQLConnector::$prefix . 'material` MODIFY `Created` DATETIME AFTER `Title`');
+
+        // Check if we did not already create user
+        if (!sizeof(db()->fetch('SELECT * from user where email ="admin@admin.com"'))) {
+            db()->query("INSERT INTO `" . dbMySQLConnector::$prefix . "user` (`UserID`, `FName`, `SName`, `TName`, `email`, `md5_email`, `md5_password`, `created`, `modyfied`, `active`) VALUES
+	 (1, 'Виталий', 'Егоров', 'Игоревич', 'admin@admin.com', '64e1b8d34f425d19e1ee2ea7236d3028', '64e1b8d34f425d19e1ee2ea7236d3028', '2011-10-25 14:59:06', '2013-05-22 11:52:38',  1)
+			ON DUPLICATE KEY UPDATE active=1");
+        }
     }
 
     /** Automatic migration to new CMS table structure */
