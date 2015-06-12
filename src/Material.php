@@ -21,26 +21,6 @@ class Material extends \samson\activerecord\material
     public static $_map = array();
 
     /**
-     * Get material entities by identifier(s).
-     * @param array|string $identifier Material identifier or their collection
-     * @param self[]|array|null $return Variable where request result would be returned
-     * @return bool|self[] True if material entities has been found
-     */
-    public static function byId($identifier, & $return = array())
-    {
-        // Perform db request and get materials
-        if (dbQuery(get_called_class())
-                ->cond('MaterialID', $identifier)
-                ->exec($return)) {
-            // If only one argument is passed - return query result, otherwise bool
-            return func_num_args() > 1 ? true : $return;
-        }
-
-        // If only one argument is passed - return empty array, otherwise bool
-        return func_num_args() > 1 ? false : array();
-    }
-
-    /**
      * Get material entities by url(s).
      * @param array|string $url Material URL or their collection
      * @param self[]|array|null $return Variable where request result would be returned
