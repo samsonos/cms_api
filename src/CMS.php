@@ -383,6 +383,7 @@ class CMS extends CompressableService
         new TableRelation('structure', 'structure_relation', 'StructureID', TableRelation::T_ONE_TO_MANY, 'child_id', 'parents_relations');
         new TableRelation('structure', 'structure', 'parents_relations.parent_id', TableRelation::T_ONE_TO_MANY, 'StructureID', 'parents');
         new TableRelation('structurematerial', 'structure_relation', 'StructureID', TableRelation::T_ONE_TO_MANY, 'parent_id');
+        new TableRelation('groupright', 'right', 'RightID', TableRelation::T_ONE_TO_MANY);
         //elapsed('CMS:prepare');
 
         // Все прошло успешно
