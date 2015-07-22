@@ -221,6 +221,7 @@ class CMS extends CompressableService
         $sql_right = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "right` (
 		  `RightID` int(20) NOT NULL AUTO_INCREMENT,
 		  `Name` varchar(255) NOT NULL,
+		  `Description` varchar(255) NOT NULL,
 		  `Active` int(11) NOT NULL,
 		  PRIMARY KEY (`RightID`)
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
