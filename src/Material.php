@@ -21,27 +21,23 @@ class Material extends \samson\activerecord\material
     public static $_map = array();
 
     /**
-     * Get materials by identifier(s)
-     * @param array|string $identifier Material identifier or collection
-     * @param array|string $class Class for database query
-     * @return \samson\cms\Material[] Collection of found materials
+     * Get material entities by url(s).
+     * @param array|string $url Material URL or their collection
+     * @param self[]|array|null $return Variable where request result would be returned
+     * @return bool|self[] True if material entities has been found
      */
-    public static function byId($identifier, $class = 'samson\cms\CMSMaterial')
+    public static function byUrl($url, & $return = array())
     {
-        // Convert id to array
-        $identifier = is_array($identifier) ? $identifier : array($identifier);
-
-        $result = array();
-
-        // If we have passed any identifier
-        if (sizeof($identifier)) {
-            // Perform db request and get materials
-            $result = dbQuery($class)
-                ->cond('MaterialID', $identifier)
-                ->exec();
+        // Perform db request and get materials
+        if (dbQuery(get_called_class())
+            ->cond('Url', $url)
+            ->exec($return)) {
+            // If only one argument is passed - return query result, otherwise bool
+            return func_num_args() > 1 ? true : $return;
         }
 
-        return $result;
+        // If only one argument is passed - return empty array, otherwise bool
+        return func_num_args() > 1 ? false : array();
     }
 
     /**
@@ -66,6 +62,46 @@ class Material extends \samson\activerecord\material
 
         // Value not set
         return '';
+    }
+
+    /**
+     * Get collection of images for material by gallery additional field selector. If none is passed
+     * all images from gallery table would be returned for this material entity.
+     *
+     * @param string|null $fieldSelector Additional field selector value
+     * @param string $selector Additional field field name to search for
+     * @return \samson\activerecord\gallery[] Collection of images in this gallery additional field for material
+     */
+    public function & gallery($fieldSelector = null, $selector = 'FieldID')
+    {
+        /** @var \samson\activerecord\gallery[] $images Get material images for this gallery */
+        $images = array();
+
+        /* @var \samson\activerecord\field Get field object if we need to search it by other fields */
+        $field = null;
+        if ($selector != 'FieldID') {
+            $field = dbQuery('field')->cond($selector, $fieldSelector)->first();
+            $fieldSelector = $field->id;
+        }
+
+        // Create query
+        $query = dbQuery('materialfield');
+
+        // Add field filter if present
+        if (isset($fieldSelector)) {
+            $query->cond("FieldID", $fieldSelector);
+        }
+
+        /** @var \samson\activerecord\materialfield $dbMaterialField Find material field gallery record */
+        $dbMaterialField = null;
+        if ($query->cond('MaterialID', $this->id)->first($dbMaterialField)) {
+            // Get material images for this materialfield
+            if (dbQuery('gallery')->cond('materialFieldId', $dbMaterialField->id)->exec($images)) {
+
+            }
+        }
+
+        return $images;
     }
 
     /**
