@@ -868,7 +868,7 @@ class CMS extends CompressableService
         db()->query('DELETE FROM structurefield WHERE structurefieldid in (select * from (SELECT sm.structurefieldid FROM `structurefield` as sm left join structure as s on sm.structureid = s.structureID WHERE s.structureid is null) as p)');
         // Remove empty structurefield relation to field
         db()->query('DELETE FROM structurefield WHERE structurefieldid in (select * from (SELECT sm.structurefieldid FROM `structurefield` as sm left join field as s on sm.fieldid = s.fieldid WHERE s.fieldid is null) as p)');
-        db()->query("ALTER TABLE  `yourtour`.`structurefield` ADD INDEX  `structureid` (  `StructureID` ) COMMENT;");
+        db()->query("ALTER TABLE  `yourtour`.`structurefield` ADD INDEX  `structureid` (  `StructureID` ) COMMENT '';");
         // Add cascade relation by structure
         db()->query('ALTER TABLE  `structurefield` ADD FOREIGN KEY (  `StructureID` ) REFERENCES  `yourtour`.`structure` (`StructureID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
         // Add cascade relation by field
@@ -883,7 +883,10 @@ class CMS extends CompressableService
         // Do the same with gallery table
         db()->query('DELETE FROM gallery WHERE photoid in (select * from (SELECT sm.photoid FROM `gallery` as sm left join `material` as s on sm.materialid = s.materialid WHERE s.materialid is null) as p)');
         db()->query('ALTER TABLE  `gallery` ADD FOREIGN KEY (  `MaterialID` ) REFERENCES  `yourtour`.`material` (`MaterialID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
-
+        db()->query('DELETE FROM gallery WHERE photoid in (select * from (SELECT sm.photoid FROM `gallery` as sm left join `materialfield` as s on sm.materialfieldid = s.materialfieldid WHERE s.materialfieldid is null) as p)');
+        db()->query("ALTER TABLE  `yourtour`.`gallery` ADD INDEX  `materialfield` (  `materialFieldId` ) COMMENT  '';");
+        db()->query("ALTER TABLE  `gallery` ADD FOREIGN KEY (  `materialFieldId` ) REFERENCES  `yourtour`.`materialfield` (`MaterialFieldID`) ON DELETE CASCADE ON UPDATE CASCADE ;");
+        
         db()->query('DROP TABLE `related_materials`;');
     }
 
