@@ -181,7 +181,7 @@ class CMS extends CompressableService
 		  `Online` int(11) NOT NULL,
 		  `LastLogin` datetime NOT NULL,
 		  PRIMARY KEY (`UserID`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы пользователей
         $sql_gallery = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "gallery` (
@@ -194,7 +194,7 @@ class CMS extends CompressableService
 		  `Name` varchar(255) NOT NULL,
 		  `Active` int(11) NOT NULL,
 		  PRIMARY KEY (`PhotoID`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы групп пользователей
         $sql_group = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "group` (
@@ -202,7 +202,7 @@ class CMS extends CompressableService
 		  `Name` varchar(255) NOT NULL,
 		  `Active` int(11) NOT NULL,
 		  PRIMARY KEY (`GroupID`)
-		) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы связей пользователей и групп
         $sql_groupright = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "groupright` (
@@ -215,7 +215,7 @@ class CMS extends CompressableService
 		  `TS` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 		  `Active` int(11) NOT NULL,
 		  PRIMARY KEY (`GroupRightID`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;";
 
         // SQL команда на добавление таблицы прав пользователей
         $sql_right = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "right` (
@@ -224,7 +224,7 @@ class CMS extends CompressableService
 		  `Description` varchar(255) NOT NULL,
 		  `Active` int(11) NOT NULL,
 		  PRIMARY KEY (`RightID`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // Related materials
         $sql_relation_material = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "related_materials` (
@@ -234,7 +234,7 @@ class CMS extends CompressableService
 		  `second_material` int(11) NOT NULL,
 		  `second_locale` varchar(10) NOT NULL,
 		  PRIMARY KEY (`related_materials_id`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы материалов
         $sql_material = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "material` (
@@ -256,7 +256,7 @@ class CMS extends CompressableService
 		  `structure_id` int(11) NOT NULL,
 		PRIMARY KEY (`MaterialID`),
 		KEY `Url` (`Url`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы навигации
         $sql_structure = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "structure` (
@@ -272,7 +272,7 @@ class CMS extends CompressableService
 		  `Active` int(11) NOT NULL DEFAULT '1',
 		PRIMARY KEY (`StructureID`),
 		KEY `Url` (`Url`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL комманда на создание таблицы связей навигации и материалов
         $sql_structurematerial = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "structurematerial` (
@@ -284,7 +284,7 @@ class CMS extends CompressableService
 		  PRIMARY KEY (`StructureMaterialID`),
 		  KEY `StructureID` (`StructureID`),
 		  KEY `MaterialID` (`MaterialID`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы полей
         $sql_field = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "field` (
@@ -299,7 +299,7 @@ class CMS extends CompressableService
 		  `Modyfied` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 		  `Active` int(11) NOT NULL,
 		  PRIMARY KEY (`FieldID`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы связей ЄНС с полями
         $sql_navfield = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "structurefield` (
@@ -310,7 +310,7 @@ class CMS extends CompressableService
 		  `Active` int(11) NOT NULL,
 		  PRIMARY KEY (`StructureFieldID`),
 		  KEY `StructureID` (`StructureID`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL комманда на создание таблицы связей материалов и полей
         $sql_materialfield = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "materialfield` (
@@ -321,7 +321,7 @@ class CMS extends CompressableService
 		  `Active` int(11) NOT NULL,
 		  PRIMARY KEY (`MaterialFieldID`),
 		  KEY `MaterialID` (`MaterialID`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL комманда на создание таблицы связей между структурами
         $sql_structure_relation = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "structure_relation` (
@@ -329,11 +329,11 @@ class CMS extends CompressableService
 		  `parent_id` int(11) NOT NULL,
 		  `child_id` int(11) NOT NULL,
 		  PRIMARY KEY (`structure_relation_id`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL table for storing database version
         $sql_version = " CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "cms_version` ( `version` varchar(15) not null default '1')
-				ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+				ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // Выполним SQL комманды
         db()->query($sql_version);
@@ -530,7 +530,7 @@ class CMS extends CompressableService
 		  `value` varchar(255) NOT NULL,
 		  `locale` VARCHAR( 10 ) NOT NULL,
 		  PRIMARY KEY (`filter_id`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
         db()->query($sql_filter);
 
         db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'field` ADD  `filtered` INT( 10 ) NOT NULL AFTER  `local`');
@@ -816,6 +816,25 @@ class CMS extends CompressableService
         db()->query('ALTER TABLE `user` DROP `Password`');
         db()->query('ALTER TABLE `user` DROP `accessToken`');
         db()->query('ALTER TABLE `user` DROP `Online`');
+    }
+
+    public function migrate_27_to_28()
+    {
+        db()->query('ALTER TABLE  `material` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `user` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `structure` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `structurematerial` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `structurefield` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `materialfield` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `field` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `group` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `right` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `groupright` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `gallery` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `material` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `structure_relation` ENGINE = INNODB;');
+
+
     }
 
     public function materialColumnToField($column, $structure)
