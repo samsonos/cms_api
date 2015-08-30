@@ -880,6 +880,10 @@ class CMS extends CompressableService
         db()->query('ALTER TABLE  `groupright` ADD FOREIGN KEY (  `GroupID` ) REFERENCES  `yourtour`.`group` (`GroupID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
         db()->query('ALTER TABLE  `groupright` ADD FOREIGN KEY (  `RightID` ) REFERENCES  `yourtour`.`right` (`RightID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
 
+        // Do the same with gallery table
+        db()->query('DELETE FROM gallery WHERE photoid in (select * from (SELECT sm.photoid FROM `gallery` as sm left join `material` as s on sm.materialid = s.materialid WHERE s.materialid is null) as p)');
+        db()->query('ALTER TABLE  `gallery` ADD FOREIGN KEY (  `MaterialID` ) REFERENCES  `yourtour`.`material` (`MaterialID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
+
         db()->query('DROP TABLE `related_materials`;');
     }
 
