@@ -461,7 +461,7 @@ class CMSMaterial extends Material implements iModuleViewable
                     }
 
                     $resultTable[$mf['MaterialID']][$tableColumnIds[$mf->FieldID]] =
-                        !empty($mf->Value) ? $mf->Value : $mf->numeric_value;
+                        !empty($mf->Value) ? $mf->Value : (!empty($mf->numeric_value) ? $mf->numeric_value : $mf->key_value);
                 }
             }
         }
