@@ -454,8 +454,8 @@ class CMS extends CompressableService
 
         // Check if we did not already create user
         if (!sizeof(db()->fetch('SELECT * from user where email ="admin@admin.com"'))) {
-            db()->query("INSERT INTO `" . dbMySQLConnector::$prefix . "user` (`UserID`, `FName`, `SName`, `TName`, `email`, `md5_email`, `md5_password`, `created`, `modyfied`, `active`) VALUES
-	 (1, 'Виталий', 'Егоров', 'Игоревич', 'admin@admin.com', '64e1b8d34f425d19e1ee2ea7236d3028', '64e1b8d34f425d19e1ee2ea7236d3028', '2011-10-25 14:59:06', '2013-05-22 11:52:38',  1)
+            db()->query("INSERT INTO `" . dbMySQLConnector::$prefix . "user` (`UserID`, `FName`, `SName`, `TName`, `email`, `md5_email`, `md5_password`, `created`, `modyfied`, `active`, `group_id`) VALUES
+	 (1, 'Виталий', 'Егоров', 'Игоревич', 'admin@admin.com', '64e1b8d34f425d19e1ee2ea7236d3028', '64e1b8d34f425d19e1ee2ea7236d3028', '2011-10-25 14:59:06', '2013-05-22 11:52:38',  1, 1)
 			ON DUPLICATE KEY UPDATE active=1");
         }
     }
