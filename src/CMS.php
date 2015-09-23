@@ -458,6 +458,11 @@ class CMS extends CompressableService
 	 (1, 'Виталий', 'Егоров', 'Игоревич', 'admin@admin.com', '64e1b8d34f425d19e1ee2ea7236d3028', '64e1b8d34f425d19e1ee2ea7236d3028', '2011-10-25 14:59:06', '2013-05-22 11:52:38',  1, 1)
 			ON DUPLICATE KEY UPDATE active=1");
         }
+
+        // Check if we did not already create user admin group
+        if (!sizeof(db()->fetch('SELECT * from `group` where GroupID ="Administrator"'))) {
+            db()->query("INSERT INTO `" . dbMySQLConnector::$prefix . "group` (`Name`, `Active`) VALUES ('Administrator', 1) ON DUPLICATE KEY UPDATE active=1");
+        }
     }
 
     /** Automatic migration to new CMS table structure */
@@ -843,52 +848,52 @@ class CMS extends CompressableService
         // Remove empty structurematerial to structure relations
         db()->query("DELETE FROM structurematerial WHERE structurematerialid in (select * from (SELECT sm.structurematerialid FROM `structurematerial` as sm left join structure as s on sm.structureid = s.structureID WHERE s.structureid is null) as p)");
         // Add cascade relation by structure
-        db()->query("ALTER TABLE  `structurematerial` ADD FOREIGN KEY (  `StructureID` ) REFERENCES  `".dbName."`.`structure` (`StructureID`) ON DELETE CASCADE ON UPDATE CASCADE ;");
+        db()->query("ALTER TABLE  `structurematerial` ADD FOREIGN KEY (  `StructureID` ) REFERENCES  `" . dbName . "`.`structure` (`StructureID`) ON DELETE CASCADE ON UPDATE CASCADE ;");
 
         // Remove empty structurematerial to material relations
         db()->query("DELETE FROM structurematerial WHERE structurematerialid in (select * from (SELECT sm.structurematerialid FROM `structurematerial` as sm left join material as m on sm.materialid = m.materialid WHERE m.materialid is null) as p)");
         // Add cascade relation by material
-        db()->query('ALTER TABLE  `structurematerial` ADD FOREIGN KEY (  `MaterialID` ) REFERENCES  `'.dbName.'`.`material` (`MaterialID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
+        db()->query('ALTER TABLE  `structurematerial` ADD FOREIGN KEY (  `MaterialID` ) REFERENCES  `' . dbName . '`.`material` (`MaterialID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
 
         // Remove empty structure_relation to structure
         db()->query('DELETE FROM structure_relation WHERE structure_relation_id in (select * from (SELECT sm.structure_relation_id FROM `structure_relation` as sm left join structure as s on sm.child_id = s.structureid WHERE s.structureid is null) as p)');
         db()->query('DELETE FROM structure_relation WHERE structure_relation_id in (select * from (SELECT sm.structure_relation_id FROM `structure_relation` as sm left join structure as s on sm.parent_id = s.structureid WHERE s.structureid is null) as p)');
         // Add cascade relation by structure
-        db()->query('ALTER TABLE  `structure_relation` ADD FOREIGN KEY (  `parent_id` ) REFERENCES  `'.dbName.'`.`structure` (`StructureID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
-        db()->query('ALTER TABLE  `structure_relation` ADD FOREIGN KEY (  `child_id` ) REFERENCES  `'.dbName.'`.`structure` (`StructureID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
+        db()->query('ALTER TABLE  `structure_relation` ADD FOREIGN KEY (  `parent_id` ) REFERENCES  `' . dbName . '`.`structure` (`StructureID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
+        db()->query('ALTER TABLE  `structure_relation` ADD FOREIGN KEY (  `child_id` ) REFERENCES  `' . dbName . '`.`structure` (`StructureID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
 
         // Remove empty materialfield relation to material
         db()->query('DELETE FROM materialfield WHERE materialfieldid in (select * from (SELECT mf.materialfieldid FROM `materialfield` as mf left join material as m on mf.materialid = m.materialid WHERE m.materialid is null) as p)');
         // Remove empty materialfield relation to field
         db()->query('DELETE FROM materialfield WHERE materialfieldid in (select * from (SELECT mf.materialfieldid FROM `materialfield` as mf left join field as s on mf.fieldid = s.fieldid WHERE s.fieldid is null) as p)');
         // Add cascade relation by material
-        db()->query('ALTER TABLE  `materialfield` ADD FOREIGN KEY (  `MaterialID` ) REFERENCES  `'.dbName.'`.`material` (`MaterialID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
+        db()->query('ALTER TABLE  `materialfield` ADD FOREIGN KEY (  `MaterialID` ) REFERENCES  `' . dbName . '`.`material` (`MaterialID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
         // Add cascade relation by field
-        db()->query('ALTER TABLE  `materialfield` ADD FOREIGN KEY (  `FieldID` ) REFERENCES  `'.dbName.'`.`field` (`FieldID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
+        db()->query('ALTER TABLE  `materialfield` ADD FOREIGN KEY (  `FieldID` ) REFERENCES  `' . dbName . '`.`field` (`FieldID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
 
         // Remove empty structurefield relation to structure
         db()->query('DELETE FROM structurefield WHERE structurefieldid in (select * from (SELECT sm.structurefieldid FROM `structurefield` as sm left join structure as s on sm.structureid = s.structureID WHERE s.structureid is null) as p)');
         // Remove empty structurefield relation to field
         db()->query('DELETE FROM structurefield WHERE structurefieldid in (select * from (SELECT sm.structurefieldid FROM `structurefield` as sm left join field as s on sm.fieldid = s.fieldid WHERE s.fieldid is null) as p)');
-        db()->query("ALTER TABLE  `".dbName."`.`structurefield` ADD INDEX  `structureid` (  `StructureID` ) COMMENT '';");
+        db()->query("ALTER TABLE  `" . dbName . "`.`structurefield` ADD INDEX  `structureid` (  `StructureID` ) COMMENT '';");
         // Add cascade relation by structure
-        db()->query('ALTER TABLE  `structurefield` ADD FOREIGN KEY (  `StructureID` ) REFERENCES  `'.dbName.'`.`structure` (`StructureID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
+        db()->query('ALTER TABLE  `structurefield` ADD FOREIGN KEY (  `StructureID` ) REFERENCES  `' . dbName . '`.`structure` (`StructureID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
         // Add cascade relation by field
-        db()->query('ALTER TABLE  `structurefield` ADD FOREIGN KEY (  `FieldID` ) REFERENCES  `'.dbName.'`.`field` (`FieldID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
+        db()->query('ALTER TABLE  `structurefield` ADD FOREIGN KEY (  `FieldID` ) REFERENCES  `' . dbName . '`.`field` (`FieldID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
 
         // Do the same with groupright table
         db()->query('DELETE FROM groupright WHERE grouprightid in (select * from (SELECT sm.grouprightid FROM `groupright` as sm left join `group` as s on sm.groupid = s.groupid WHERE s.groupid is null) as p)');
         db()->query('DELETE FROM groupright WHERE grouprightid in (select * from (SELECT sm.grouprightid FROM `groupright` as sm left join `right` as s on sm.rightid = s.rightid WHERE s.rightid is null) as p)');
-        db()->query('ALTER TABLE  `groupright` ADD FOREIGN KEY (  `GroupID` ) REFERENCES  `'.dbName.'`.`group` (`GroupID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
-        db()->query('ALTER TABLE  `groupright` ADD FOREIGN KEY (  `RightID` ) REFERENCES  `'.dbName.'`.`right` (`RightID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
+        db()->query('ALTER TABLE  `groupright` ADD FOREIGN KEY (  `GroupID` ) REFERENCES  `' . dbName . '`.`group` (`GroupID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
+        db()->query('ALTER TABLE  `groupright` ADD FOREIGN KEY (  `RightID` ) REFERENCES  `' . dbName . '`.`right` (`RightID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
 
         // Do the same with gallery table
         db()->query('DELETE FROM gallery WHERE photoid in (select * from (SELECT sm.photoid FROM `gallery` as sm left join `material` as s on sm.materialid = s.materialid WHERE s.materialid is null) as p)');
-        db()->query('ALTER TABLE  `gallery` ADD FOREIGN KEY (  `MaterialID` ) REFERENCES  `'.dbName.'`.`material` (`MaterialID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
+        db()->query('ALTER TABLE  `gallery` ADD FOREIGN KEY (  `MaterialID` ) REFERENCES  `' . dbName . '`.`material` (`MaterialID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
         db()->query('DELETE FROM gallery WHERE photoid in (select * from (SELECT sm.photoid FROM `gallery` as sm left join `materialfield` as s on sm.materialfieldid = s.materialfieldid WHERE s.materialfieldid is null) as p)');
-        db()->query("ALTER TABLE  `".dbName."`.`gallery` ADD INDEX  `materialfield` (  `materialFieldId` ) COMMENT  '';");
-        db()->query("ALTER TABLE  `gallery` ADD FOREIGN KEY (  `materialFieldId` ) REFERENCES  `".dbName."`.`materialfield` (`MaterialFieldID`) ON DELETE CASCADE ON UPDATE CASCADE ;");
-        
+        db()->query("ALTER TABLE  `" . dbName . "`.`gallery` ADD INDEX  `materialfield` (  `materialFieldId` ) COMMENT  '';");
+        db()->query("ALTER TABLE  `gallery` ADD FOREIGN KEY (  `materialFieldId` ) REFERENCES  `" . dbName . "`.`materialfield` (`MaterialFieldID`) ON DELETE CASCADE ON UPDATE CASCADE ;");
+
         db()->query('DROP TABLE `related_materials`;');
     }
 
