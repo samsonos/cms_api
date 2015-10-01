@@ -897,6 +897,14 @@ class CMS extends CompressableService
         db()->query('DROP TABLE `related_materials`;');
     }
 
+    /**
+     * Add visibility field to structure for show and hide structure in user select structure
+     */
+    public function migrate_28_to_29()
+    {
+        db()->query("ALTER TABLE  `structure` ADD  `visible` INT( 1 ) NOT NULL DEFAULT  '1' AFTER  `system` ;");
+    }
+
     public function materialColumnToField($column, $structure)
     {
         // Find first user
