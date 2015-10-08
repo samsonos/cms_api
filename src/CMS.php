@@ -905,6 +905,31 @@ class CMS extends CompressableService
         db()->query("ALTER TABLE  `structure` ADD  `visible` INT( 1 ) NOT NULL DEFAULT  '1' AFTER  `system` ;");
     }
 
+    /**
+     * Remove seo and material structure
+     */
+    public function migrate_29_to_30()
+    {
+        $structures = null;
+        if (dbQuery('structure')->Name(array('material', 'seo'))->exec($structures)) {
+
+            foreach ($structures as $structure) {
+
+                $fieldQuery = dbQuery('structurefield')->cond('StructureID', $structure->StructureID);
+                foreach (dbQuery('materialfield')->cond('FieldID', $fieldQuery->fields("FieldID"))->exec() as $item) {
+                    $item->delete();
+                }
+                foreach (dbQuery('field')->cond('FieldID', $fieldQuery->fields("FieldID"))->exec() as $item) {
+                    $item->delete();
+                }
+                foreach ($fieldQuery->exec() as $item) {
+                    $item->delete();
+                }
+                $structure->delete();
+            }
+        }
+    }
+
     public function materialColumnToField($column, $structure)
     {
         // Find first user
