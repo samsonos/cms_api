@@ -930,6 +930,14 @@ class CMS extends CompressableService
         }
     }
 
+    /**
+     * Remove seo and material structure
+    */
+    public function migrate_30_to_31()
+    {
+        db()->query("ALTER TABLE  `structure` CHANGE  `visible`  `hidden` INT( 1 ) NOT NULL DEFAULT  '0';");
+    }
+
     public function materialColumnToField($column, $structure)
     {
         // Find first user
