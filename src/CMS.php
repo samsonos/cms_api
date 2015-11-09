@@ -181,7 +181,7 @@ class CMS extends CompressableService
 		  `Online` int(11) NOT NULL,
 		  `LastLogin` datetime NOT NULL,
 		  PRIMARY KEY (`UserID`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы пользователей
         $sql_gallery = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "gallery` (
@@ -194,7 +194,7 @@ class CMS extends CompressableService
 		  `Name` varchar(255) NOT NULL,
 		  `Active` int(11) NOT NULL,
 		  PRIMARY KEY (`PhotoID`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы групп пользователей
         $sql_group = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "group` (
@@ -202,7 +202,7 @@ class CMS extends CompressableService
 		  `Name` varchar(255) NOT NULL,
 		  `Active` int(11) NOT NULL,
 		  PRIMARY KEY (`GroupID`)
-		) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы связей пользователей и групп
         $sql_groupright = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "groupright` (
@@ -215,15 +215,16 @@ class CMS extends CompressableService
 		  `TS` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 		  `Active` int(11) NOT NULL,
 		  PRIMARY KEY (`GroupRightID`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;";
 
         // SQL команда на добавление таблицы прав пользователей
         $sql_right = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "right` (
 		  `RightID` int(20) NOT NULL AUTO_INCREMENT,
 		  `Name` varchar(255) NOT NULL,
+		  `Description` varchar(255) NOT NULL,
 		  `Active` int(11) NOT NULL,
 		  PRIMARY KEY (`RightID`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // Related materials
         $sql_relation_material = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "related_materials` (
@@ -233,7 +234,7 @@ class CMS extends CompressableService
 		  `second_material` int(11) NOT NULL,
 		  `second_locale` varchar(10) NOT NULL,
 		  PRIMARY KEY (`related_materials_id`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы материалов
         $sql_material = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "material` (
@@ -255,7 +256,7 @@ class CMS extends CompressableService
 		  `structure_id` int(11) NOT NULL,
 		PRIMARY KEY (`MaterialID`),
 		KEY `Url` (`Url`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы навигации
         $sql_structure = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "structure` (
@@ -271,7 +272,7 @@ class CMS extends CompressableService
 		  `Active` int(11) NOT NULL DEFAULT '1',
 		PRIMARY KEY (`StructureID`),
 		KEY `Url` (`Url`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL комманда на создание таблицы связей навигации и материалов
         $sql_structurematerial = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "structurematerial` (
@@ -283,7 +284,7 @@ class CMS extends CompressableService
 		  PRIMARY KEY (`StructureMaterialID`),
 		  KEY `StructureID` (`StructureID`),
 		  KEY `MaterialID` (`MaterialID`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы полей
         $sql_field = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "field` (
@@ -298,7 +299,7 @@ class CMS extends CompressableService
 		  `Modyfied` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 		  `Active` int(11) NOT NULL,
 		  PRIMARY KEY (`FieldID`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL команда на добавление таблицы связей ЄНС с полями
         $sql_navfield = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "structurefield` (
@@ -309,7 +310,7 @@ class CMS extends CompressableService
 		  `Active` int(11) NOT NULL,
 		  PRIMARY KEY (`StructureFieldID`),
 		  KEY `StructureID` (`StructureID`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL комманда на создание таблицы связей материалов и полей
         $sql_materialfield = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "materialfield` (
@@ -320,7 +321,7 @@ class CMS extends CompressableService
 		  `Active` int(11) NOT NULL,
 		  PRIMARY KEY (`MaterialFieldID`),
 		  KEY `MaterialID` (`MaterialID`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL комманда на создание таблицы связей между структурами
         $sql_structure_relation = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "structure_relation` (
@@ -328,11 +329,11 @@ class CMS extends CompressableService
 		  `parent_id` int(11) NOT NULL,
 		  `child_id` int(11) NOT NULL,
 		  PRIMARY KEY (`structure_relation_id`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // SQL table for storing database version
         $sql_version = " CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "cms_version` ( `version` varchar(15) not null default '1')
-				ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+				ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
 
         // Выполним SQL комманды
         db()->query($sql_version);
@@ -383,6 +384,7 @@ class CMS extends CompressableService
         new TableRelation('structure', 'structure_relation', 'StructureID', TableRelation::T_ONE_TO_MANY, 'child_id', 'parents_relations');
         new TableRelation('structure', 'structure', 'parents_relations.parent_id', TableRelation::T_ONE_TO_MANY, 'StructureID', 'parents');
         new TableRelation('structurematerial', 'structure_relation', 'StructureID', TableRelation::T_ONE_TO_MANY, 'parent_id');
+        new TableRelation('groupright', 'right', 'RightID', TableRelation::T_ONE_TO_MANY);
         //elapsed('CMS:prepare');
 
         // Все прошло успешно
@@ -452,9 +454,14 @@ class CMS extends CompressableService
 
         // Check if we did not already create user
         if (!sizeof(db()->fetch('SELECT * from user where email ="admin@admin.com"'))) {
-            db()->query("INSERT INTO `" . dbMySQLConnector::$prefix . "user` (`UserID`, `FName`, `SName`, `TName`, `email`, `md5_email`, `md5_password`, `created`, `modyfied`, `active`) VALUES
-	 (1, 'Виталий', 'Егоров', 'Игоревич', 'admin@admin.com', '64e1b8d34f425d19e1ee2ea7236d3028', '64e1b8d34f425d19e1ee2ea7236d3028', '2011-10-25 14:59:06', '2013-05-22 11:52:38',  1)
+            db()->query("INSERT INTO `" . dbMySQLConnector::$prefix . "user` (`UserID`, `FName`, `SName`, `TName`, `email`, `md5_email`, `md5_password`, `created`, `modyfied`, `active`, `group_id`) VALUES
+	 (1, 'Виталий', 'Егоров', 'Игоревич', 'admin@admin.com', '64e1b8d34f425d19e1ee2ea7236d3028', '64e1b8d34f425d19e1ee2ea7236d3028', '2011-10-25 14:59:06', '2013-05-22 11:52:38',  1, 1)
 			ON DUPLICATE KEY UPDATE active=1");
+        }
+
+        // Check if we did not already create user admin group
+        if (!sizeof(db()->fetch('SELECT * from `group` where GroupID ="Administrator"'))) {
+            db()->query("INSERT INTO `" . dbMySQLConnector::$prefix . "group` (`Name`, `Active`) VALUES ('Administrator', 1) ON DUPLICATE KEY UPDATE active=1");
         }
     }
 
@@ -528,7 +535,7 @@ class CMS extends CompressableService
 		  `value` varchar(255) NOT NULL,
 		  `locale` VARCHAR( 10 ) NOT NULL,
 		  PRIMARY KEY (`filter_id`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
+		) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;";
         db()->query($sql_filter);
 
         db()->query('ALTER TABLE  `' . dbMySQLConnector::$prefix . 'field` ADD  `filtered` INT( 10 ) NOT NULL AFTER  `local`');
@@ -814,6 +821,121 @@ class CMS extends CompressableService
         db()->query('ALTER TABLE `user` DROP `Password`');
         db()->query('ALTER TABLE `user` DROP `accessToken`');
         db()->query('ALTER TABLE `user` DROP `Online`');
+    }
+
+    public function migrate_27_to_28()
+    {
+        $dbName = db()->database();
+
+        db()->query('ALTER TABLE  `material` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `user` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `structure` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `structurematerial` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `structurefield` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `materialfield` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `field` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `group` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `right` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `groupright` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `gallery` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `material` ENGINE = INNODB;');
+        db()->query('ALTER TABLE  `structure_relation` ENGINE = INNODB;');
+
+
+        db()->query('ALTER TABLE  `material` ADD INDEX (`parent_id`)');
+        db()->query("ALTER TABLE  `material` CHANGE  `parent_id`  `parent_id` INT( 11 ) NULL DEFAULT  '0';");
+
+        // Remove empty structurematerial to structure relations
+        db()->query("DELETE FROM structurematerial WHERE structurematerialid in (select * from (SELECT sm.structurematerialid FROM `structurematerial` as sm left join structure as s on sm.structureid = s.structureID WHERE s.structureid is null) as p)");
+        // Add cascade relation by structure
+        db()->query("ALTER TABLE  `structurematerial` ADD FOREIGN KEY (  `StructureID` ) REFERENCES  `" . dbName . "`.`structure` (`StructureID`) ON DELETE CASCADE ON UPDATE CASCADE ;");
+
+        // Remove empty structurematerial to material relations
+        db()->query("DELETE FROM structurematerial WHERE structurematerialid in (select * from (SELECT sm.structurematerialid FROM `structurematerial` as sm left join material as m on sm.materialid = m.materialid WHERE m.materialid is null) as p)");
+        // Add cascade relation by material
+        db()->query('ALTER TABLE  `structurematerial` ADD FOREIGN KEY (  `MaterialID` ) REFERENCES  `' . dbName . '`.`material` (`MaterialID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
+
+        // Remove empty structure_relation to structure
+        db()->query('DELETE FROM structure_relation WHERE structure_relation_id in (select * from (SELECT sm.structure_relation_id FROM `structure_relation` as sm left join structure as s on sm.child_id = s.structureid WHERE s.structureid is null) as p)');
+        db()->query('DELETE FROM structure_relation WHERE structure_relation_id in (select * from (SELECT sm.structure_relation_id FROM `structure_relation` as sm left join structure as s on sm.parent_id = s.structureid WHERE s.structureid is null) as p)');
+        // Add cascade relation by structure
+        db()->query('ALTER TABLE  `structure_relation` ADD FOREIGN KEY (  `parent_id` ) REFERENCES  `' . dbName . '`.`structure` (`StructureID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
+        db()->query('ALTER TABLE  `structure_relation` ADD FOREIGN KEY (  `child_id` ) REFERENCES  `' . dbName . '`.`structure` (`StructureID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
+
+        // Remove empty materialfield relation to material
+        db()->query('DELETE FROM materialfield WHERE materialfieldid in (select * from (SELECT mf.materialfieldid FROM `materialfield` as mf left join material as m on mf.materialid = m.materialid WHERE m.materialid is null) as p)');
+        // Remove empty materialfield relation to field
+        db()->query('DELETE FROM materialfield WHERE materialfieldid in (select * from (SELECT mf.materialfieldid FROM `materialfield` as mf left join field as s on mf.fieldid = s.fieldid WHERE s.fieldid is null) as p)');
+        // Add cascade relation by material
+        db()->query('ALTER TABLE  `materialfield` ADD FOREIGN KEY (  `MaterialID` ) REFERENCES  `' . dbName . '`.`material` (`MaterialID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
+        // Add cascade relation by field
+        db()->query('ALTER TABLE  `materialfield` ADD FOREIGN KEY (  `FieldID` ) REFERENCES  `' . dbName . '`.`field` (`FieldID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
+
+        // Remove empty structurefield relation to structure
+        db()->query('DELETE FROM structurefield WHERE structurefieldid in (select * from (SELECT sm.structurefieldid FROM `structurefield` as sm left join structure as s on sm.structureid = s.structureID WHERE s.structureid is null) as p)');
+        // Remove empty structurefield relation to field
+        db()->query('DELETE FROM structurefield WHERE structurefieldid in (select * from (SELECT sm.structurefieldid FROM `structurefield` as sm left join field as s on sm.fieldid = s.fieldid WHERE s.fieldid is null) as p)');
+        db()->query("ALTER TABLE  `" . dbName . "`.`structurefield` ADD INDEX  `structureid` (  `StructureID` ) COMMENT '';");
+        // Add cascade relation by structure
+        db()->query('ALTER TABLE  `structurefield` ADD FOREIGN KEY (  `StructureID` ) REFERENCES  `' . dbName . '`.`structure` (`StructureID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
+        // Add cascade relation by field
+        db()->query('ALTER TABLE  `structurefield` ADD FOREIGN KEY (  `FieldID` ) REFERENCES  `' . dbName . '`.`field` (`FieldID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
+
+        // Do the same with groupright table
+        db()->query('DELETE FROM groupright WHERE grouprightid in (select * from (SELECT sm.grouprightid FROM `groupright` as sm left join `group` as s on sm.groupid = s.groupid WHERE s.groupid is null) as p)');
+        db()->query('DELETE FROM groupright WHERE grouprightid in (select * from (SELECT sm.grouprightid FROM `groupright` as sm left join `right` as s on sm.rightid = s.rightid WHERE s.rightid is null) as p)');
+        db()->query('ALTER TABLE  `groupright` ADD FOREIGN KEY (  `GroupID` ) REFERENCES  `' . dbName . '`.`group` (`GroupID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
+        db()->query('ALTER TABLE  `groupright` ADD FOREIGN KEY (  `RightID` ) REFERENCES  `' . dbName . '`.`right` (`RightID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
+
+        // Do the same with gallery table
+        db()->query('DELETE FROM gallery WHERE photoid in (select * from (SELECT sm.photoid FROM `gallery` as sm left join `material` as s on sm.materialid = s.materialid WHERE s.materialid is null) as p)');
+        db()->query('ALTER TABLE  `gallery` ADD FOREIGN KEY (  `MaterialID` ) REFERENCES  `' . dbName . '`.`material` (`MaterialID`) ON DELETE CASCADE ON UPDATE CASCADE ;');
+        db()->query('DELETE FROM gallery WHERE photoid in (select * from (SELECT sm.photoid FROM `gallery` as sm left join `materialfield` as s on sm.materialfieldid = s.materialfieldid WHERE s.materialfieldid is null) as p)');
+        db()->query("ALTER TABLE  `" . dbName . "`.`gallery` ADD INDEX  `materialfield` (  `materialFieldId` ) COMMENT  '';");
+        db()->query("ALTER TABLE  `gallery` ADD FOREIGN KEY (  `materialFieldId` ) REFERENCES  `" . dbName . "`.`materialfield` (`MaterialFieldID`) ON DELETE CASCADE ON UPDATE CASCADE ;");
+
+        db()->query('DROP TABLE `related_materials`;');
+    }
+
+    /**
+     * Add visibility field to structure for show and hide structure in user select structure
+     */
+    public function migrate_28_to_29()
+    {
+        db()->query("ALTER TABLE  `structure` ADD  `visible` INT( 1 ) NOT NULL DEFAULT  '1' AFTER  `system` ;");
+    }
+
+    /**
+     * Remove seo and material structure
+     */
+    public function migrate_29_to_30()
+    {
+        $structures = null;
+        if (dbQuery('structure')->Name(array('material', 'seo'))->exec($structures)) {
+
+            foreach ($structures as $structure) {
+
+                $fieldQuery = dbQuery('structurefield')->cond('StructureID', $structure->StructureID);
+                foreach (dbQuery('materialfield')->cond('FieldID', $fieldQuery->fields("FieldID"))->exec() as $item) {
+                    $item->delete();
+                }
+                foreach (dbQuery('field')->cond('FieldID', $fieldQuery->fields("FieldID"))->exec() as $item) {
+                    $item->delete();
+                }
+                foreach ($fieldQuery->exec() as $item) {
+                    $item->delete();
+                }
+                $structure->delete();
+            }
+        }
+    }
+
+    /**
+     * Remove seo and material structure
+    */
+    public function migrate_30_to_31()
+    {
+        db()->query("ALTER TABLE  `structure` CHANGE  `visible`  `hidden` INT( 1 ) NOT NULL DEFAULT  '0';");
     }
 
     public function materialColumnToField($column, $structure)
