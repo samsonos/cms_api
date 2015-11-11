@@ -937,6 +937,15 @@ class CMS extends CompressableService
     {
         db()->query("ALTER TABLE  `structure` CHANGE  `visible`  `hidden` INT( 1 ) NOT NULL DEFAULT  '0';");
     }
+    
+    /** Removing old tables */
+    public function migrate_31_to_32()
+    {
+        elapsed('Removing `unitable` table');
+        db()->query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'unitable');
+        elapsed('Removing `scmstable` table');
+        db()->query('DROP TABLE IF EXISTS ' . dbMySQLConnector::$prefix . 'scmstable');
+    }
 
     public function materialColumnToField($column, $structure)
     {
