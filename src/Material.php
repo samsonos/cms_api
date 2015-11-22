@@ -21,23 +21,18 @@ class Material extends \samson\activerecord\material
     public static $_map = array();
 
     /**
-     * Get material entities by url(s).
+     * Get material entities collection by url(s).
      * @param array|string $url Material URL or their collection
      * @param self[]|array|null $return Variable where request result would be returned
      * @return bool|self[] True if material entities has been found
      */
     public static function byUrl($url, & $return = array())
     {
-        // Perform db request and get materials
-        if (dbQuery(get_called_class())
-            ->cond('Url', $url)
-            ->exec($return)) {
-            // If only one argument is passed - return query result, otherwise bool
-            return func_num_args() > 1 ? true : $return;
-        }
+        // Get field record by identifier column
+        $return = static::collectionByColumn(new dbQuery(), 'Url', $url);
 
-        // If only one argument is passed - return empty array, otherwise bool
-        return func_num_args() > 1 ? false : array();
+        // If only one argument is passed - return null, otherwise bool
+        return func_num_args() > 1 ? $return == null : $return;
     }
 
     /**
