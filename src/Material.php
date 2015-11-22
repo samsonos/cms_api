@@ -51,7 +51,7 @@ class Material extends \samson\activerecord\material
         ) {
             // Create new database record
             $fieldRecord = new $entity();
-            $fieldRecord->FieldID = 52;
+            $fieldRecord->FieldID = $fieldID;
             $fieldRecord->MaterialID = $this->id;
             $fieldRecord->Active = 1;
         }
