@@ -34,6 +34,32 @@ class Material extends \samson\activerecord\material
         // If only one argument is passed - return null, otherwise bool
         return func_num_args() > 1 ? $return == null : $return;
     }
+    
+    /**
+     * Set additional material field value by field identifier
+     * @param string $fieldID Field identifier
+     * @param string $value Value to be stored
+     * @param string $entity Field-material values table name
+     */
+    public function setFieldByID($fieldID, $value, $entity = 'materialfield')
+    {
+        /** @var \samsonframework\orm\Record $fieldRecord */
+        $fieldRecord = null;
+
+        // Try to find this field value for this material
+        if (Field::byID($fieldID, $value)
+        ) {
+            // Create new database record
+            $fieldRecord = new $entity();
+            $fieldRecord->FieldID = 52;
+            $fieldRecord->MaterialID = $this->id;
+            $fieldRecord->Active = 1;
+        }
+
+        // At this point we already have database record instance
+        $fieldRecord->Value = $value;
+        $fieldRecord->save();
+    }
 
     /**
      * Get select additional field text value
