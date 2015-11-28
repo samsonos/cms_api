@@ -10,7 +10,7 @@ namespace samson\cms;
  * @author Vitaly Egorov <egorov@samsonos.com>
  * @copyright 2014 SamsonOS
  */
-class Navigation extends \samsoncms\api\Navigation implements \Iterator
+class Navigation extends \samsoncms\api\Navigation
 {
 
 }
