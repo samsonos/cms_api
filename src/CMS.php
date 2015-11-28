@@ -162,7 +162,7 @@ class CMS extends CompressableService
     /**
      * @see ModuleConnector::prepare()
      */
-    public function prepare()
+    public function oldprepare()
     {
         // SQL команда на добавление таблицы пользователей
         $sql_user = "CREATE TABLE IF NOT EXISTS `" . dbMySQLConnector::$prefix . "user` (
@@ -1188,6 +1188,9 @@ class CMS extends CompressableService
     /** @see \samson\core\ExternalModule::init() */
     public function init(array $params = array())
     {
+        if (class_exists('\samson\cms\CMSMaterial')){
+
+        }
         // Change static class data
         $this->afterCompress();
 
