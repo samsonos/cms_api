@@ -13,7 +13,7 @@ use samson\core\CompressableService;
 use samson\activerecord\dbRecord;
 use samson\activerecord\dbMySQLConnector;
 
-class CMS extends CompressableService
+class CMS extends \samsoncms\api\CMS
 {
     /**
      * Get materials count grouped by structure selectors
@@ -389,24 +389,6 @@ class CMS extends CompressableService
 
         // Все прошло успешно
         return true && parent::prepare();
-    }
-
-    /**
-     * Handler for CMSAPI database version manipulating
-     * @param string $to_version Version to switch to
-     * @return string Current database version
-     */
-    public function migrator($to_version = null)
-    {
-        // If something passed - change database version to it
-        if (func_num_args()) {
-            // Save current version to special db table
-            db()->query("ALTER TABLE  `" . dbMySQLConnector::$prefix . "cms_version` CHANGE  `version`  `version` VARCHAR( 15 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT  '" . $to_version . "';");
-            die('Database successfully migrated to [' . $to_version . ']');
-        } else { // Return current database version
-            $version_row = db()->fetch('SHOW COLUMNS FROM `' . dbMySQLConnector::$prefix . 'cms_version`');
-            return $version_row[0]['Default'];
-        }
     }
 
     /** Automatic migration to new CMS table structure */
