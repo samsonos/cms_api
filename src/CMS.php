@@ -1016,7 +1016,7 @@ class CMS extends \samsoncms\api\CMS
      * @param string $field Field name for searching
      * @return CMSMaterial Instance of CMSMaterial on successfull search
      */
-    public function & material($selector, $field = 'Url')
+    public function &material($selector, $field = 'Url')
     {
         $db_cmsmat = null;
 
@@ -1053,7 +1053,7 @@ class CMS extends \samsoncms\api\CMS
      * @param string $field
      * @return string|NULL
      */
-    public function & navigation($selector, $field = 'Url')
+    public function &navigation($selector, $field = 'Url')
     {
         $cmsnav = null;
 
@@ -1094,7 +1094,7 @@ class CMS extends \samsoncms\api\CMS
      * @param string $handler External handler
      * @return array
      */
-    public function & navmaterials($selector, $field = 'Url', $handler = null)
+    public function &navmaterials($selector, $field = 'Url', $handler = null)
     {
         $result = array();
 
@@ -1126,14 +1126,14 @@ class CMS extends \samsoncms\api\CMS
         $t_name = '_mf';
 
         // Save original material attributes
-        self::$materialAttributes = &CMSMaterial::$_attributes;
+        self::$materialAttributes = &Material::$_attributes;
 
         // Copy original material table attributes
-        CMSMaterial::$_attributes = \samson\activerecord\material::$_attributes;
-        CMSMaterial::$_sql_select = \samson\activerecord\material::$_sql_select;
-        CMSMaterial::$_sql_from = \samson\activerecord\material::$_sql_from;
-        CMSMaterial::$_own_group = \samson\activerecord\material::$_own_group;
-        CMSMaterial::$_map = \samson\activerecord\material::$_map;
+        CMSMaterial::$_attributes = \samson\activerecord\Material::$_attributes;
+        CMSMaterial::$_sql_select = \samson\activerecord\Material::$_sql_select;
+        CMSMaterial::$_sql_from = \samson\activerecord\Material::$_sql_from;
+        CMSMaterial::$_own_group = \samson\activerecord\Material::$_own_group;
+        CMSMaterial::$_map = \samson\activerecord\Material::$_map;
 
         // Perform db query to get all possible material fields
         if (dbQuery('field')->Active(1)->Name('', dbRelation::NOT_EQUAL)->exec($this->material_fields)) foreach ($this->material_fields as $db_field) {
@@ -1159,7 +1159,7 @@ class CMS extends \samsoncms\api\CMS
         }
 
         // Set additional object metadata
-        CMSMaterial::$_sql_select['this'] = ' STRAIGHT_JOIN ' . CMSMaterial::$_sql_select['this'];
+        CMSMaterial::$_sql_select['this'] = ' STRAIGHT_JOIN ' . Material::$_sql_select['this'];
         if (sizeof(self::$fields)) {
             CMSMaterial::$_sql_select['this'] .= ',' . implode(',', self::$fields);
         }
@@ -1170,13 +1170,7 @@ class CMS extends \samsoncms\api\CMS
     /** @see \samson\core\ExternalModule::init() */
     public function init(array $params = array())
     {
-        if (class_exists('\samson\cms\CMSMaterial')){
-
-        }
         // Change static class data
         $this->afterCompress();
-
-        // Create cache collection
-        dbRecord::$instances["samson\cms\CMSMaterial"] = array();
     }
 }
