@@ -7,6 +7,7 @@ use samson\activerecord\dbRecord;
 
 use samson\activerecord\dbQuery;
 
+/** @deprecated */
 class CMSMaterialQuery extends \samson\activerecord\dbQuery
 {	   
 	/** @see \samson\activerecord\dbQuery::exec() */

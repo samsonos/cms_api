@@ -10,6 +10,7 @@ namespace samson\cms;
  * This class extends default ActiveRecord material table record functionality.
  * @package samson\cms
  * @author Vitaly Egorov <egorov@samsonos.com>
+ * @deprecated Use \samsoncms\api\Material
  */
 class Material extends \samsoncms\api\Material
 {

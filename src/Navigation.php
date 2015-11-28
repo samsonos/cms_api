@@ -9,6 +9,7 @@ namespace samson\cms;
  * SamsonCMS Navigation element
  * @author Vitaly Egorov <egorov@samsonos.com>
  * @copyright 2014 SamsonOS
+ * @deprecated Use \samsoncms\api\Navigation
  */
 class Navigation extends \samsoncms\api\Navigation
 {

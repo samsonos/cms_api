@@ -9,6 +9,7 @@ use samson\activerecord\Argument;
 /**
  * Created by Maxim Omelchenko <omelchenko@samsonos.com>
  * on 05.09.14 at 17:57
+ * @deprecated
  */
 
 class Filter

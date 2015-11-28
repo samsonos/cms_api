@@ -9,6 +9,7 @@ use samson\activerecord\dbRecord;
  * Class for managing CMS material with all related data
  * @author Vitaly Iegorov <egorov@samsonos.com>
  * @version 0.9.1
+ * @deprecated
  */
 class CMSMaterial extends Material implements iModuleViewable
 {
