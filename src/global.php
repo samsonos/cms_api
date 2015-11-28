@@ -4,6 +4,7 @@ use samson\activerecord\dbQuery;
 /**
  * CMS(Content management system) - Получить Объект для работы с "Системой управления содержим" сайта
  * @return CMS Экземпляр объекта для работы с SamsonCMS
+ * @deprecated
  */
 function & cms(){ static $_v; return ( $_v = isset($_v) ? $_v : m('cmsapi'));}
 
@@ -13,6 +14,7 @@ function & cms(){ static $_v; return ( $_v = isset($_v) ? $_v : m('cmsapi'));}
  * @param mixed $selector 	Селектор для отбора материала SamsonCMS
  * @param mixed $field 		Поле материала SamsonCMS в котором ищеться переданный селектор
  * @return CMSMaterial Материал SamsonCMS
+ * @deprecated
  */
 function & cmsmat( $selector, $field = 'Url' ){ static $_c; $_c = isset($_c) ? $_c : cms(); return $_c->material( $selector, $field ); }
 
@@ -22,6 +24,7 @@ function & cmsmat( $selector, $field = 'Url' ){ static $_c; $_c = isset($_c) ? $
  * @param mixed $selector 	Селектор для элемента навигации SamsonCMS
  * @param mixed $field 		Поле элемента навигации SamsonCMS в котором ищеться переданный селектор
  * @return CMSNav Элемент навигации SamsonCMS
+ * @deprecated
  */
 function & cmsnav( $selector, $field = 'Url' ){static $_c; $_c = isset($_c) ? $_c : cms(); return $_c->navigation( $selector, $field );}
 
@@ -29,6 +32,7 @@ function & cmsnav( $selector, $field = 'Url' ){static $_c; $_c = isset($_c) ? $_
  * 
  * @param unknown $selector
  * @param unknown $field
+ * @deprecated
  */
 function & cmsnavmaterials( $selector, $handler = null, $field = 'Url' )
 { 
@@ -44,6 +48,7 @@ function & cmsnavmaterials( $selector, $handler = null, $field = 'Url' )
  * @param iCMSNav 	$cmsnav		Переменная в коротую будет возвращен найденный ЭНС
  * @param string 	$field		Имя поля по которому выполняется поиск
  * @return boolean Найден ли ЭНС или нет
+ * @deprecated
  */
 function ifcmsnav( $selector, & $cmsnav = NULL, $field = 'Url' )
 {
@@ -67,6 +72,7 @@ function ifcmsnav( $selector, & $cmsnav = NULL, $field = 'Url' )
  * @param CMSMaterial 	$cmsmat		Переменная в коротую будет возвращен найденный материал
  * @param string 		$field		Имя поля по которому выполняется поиск
  * @return boolean Найден ли материал или нет
+ * @deprecated
  */
 function ifcmsmat( $selector, & $cmsmat = NULL, $field = 'Url' )
 {
@@ -83,20 +89,32 @@ function ifcmsmat( $selector, & $cmsmat = NULL, $field = 'Url' )
 	return true;
 }
 
-/** @return \samson\cms\Query */
+/** @return \samson\cms\Query
+ * @deprecated
+ */
 function cmsquery(){ return new samson\cms\CMSMaterialQuery(); }
 
-/** @deprecated @return dbQuery */
+/** @deprecated @return dbQuery
+ * @deprecated
+ */
 function _cmsmaterial(){ return new dbQuery('samson\cms\CMSMaterial'); }
 
-/** @deprecated @return dbQuery */
+/** @deprecated @return dbQuery
+ * @deprecated
+ */
 function _cmsmaterialfield(){	return new dbQuery('samson\cms\CMSMaterialField'); }
 
-/** @deprecated @return dbQuery */
+/** @deprecated @return dbQuery
+ * @deprecated
+ */
 function _cmsnav(){ return new dbQuery('\samson\cms\CMSNav'); }
 
-/** @deprecated @return dbQuery */
+/** @deprecated @return dbQuery
+ * @deprecated
+ */
 function _cmsnavfield(){	return new dbQuery('samson\cms\CMSNavField');}
 
-/** @deprecated @return dbQuery */
+/** @deprecated @return dbQuery
+ * @deprecated
+ */
 function _cmsnavmaterial(){return new dbQuery('samson\cms\CMSNavMaterial');}
