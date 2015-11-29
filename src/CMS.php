@@ -21,9 +21,6 @@ class CMS extends \samsoncms\api\CMS
     /** @var array Collection of original material table attributes before spoofing */
     public static $materialAttributes = array();
 
-    /** @var string Database table names prefix */
-    public $tablePrefix = '';
-
     /**
      * Collection of material additional fields
      * @deprecated TODO: Remove!
@@ -161,18 +158,6 @@ class CMS extends \samsoncms\api\CMS
 
     /** Identifier */
     protected $id = 'cmsapi';
-
-    /**
-     * Collection of material additional fields
-     * @deprecated TODO: Remove!
-     */
-    public $material_fields = array();
-
-    /** @var string[] Collection of material fields SQL commands to include into SQL SELECT statement */
-    public static $fields = array();
-
-    /** @var array Collection of original material table attributes before spoofing */
-    public static $materialAttributes = array();
 
     /**
      * @see ModuleConnector::prepare()
