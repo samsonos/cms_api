@@ -20,6 +20,15 @@ class Navigation extends \samsoncms\api\Navigation implements \Iterator
     protected $base = false;
 
     /**
+     * Material query injection
+     * @param \samson\activerecord\dbQuery $query Query object
+     */
+    public function materialsHandlers(&$query)
+    {
+        $query->join('gallery');
+    }
+
+    /**
      * Get all materials related to current navigation
      * @return Material[] Collection of related materials
      * @deprecated Will be removed in nex major version
