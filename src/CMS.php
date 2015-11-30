@@ -490,7 +490,7 @@ class CMS extends \samsoncms\api\CMS
     {
         $db_structures = null;
         // Convert all old "date" fields to numeric for fixing db requests
-        if (dbQuery('structure')->Active(1)->exec($db_structures)) {
+        if (dbQuery('structure')->cond('Active',1)->exec($db_structures)) {
             foreach ($db_structures as $db_structure) {
                 $relation = new \samson\activerecord\structure_relation(false);
                 $relation->parent_id = $db_structure->ParentID;
@@ -939,7 +939,7 @@ class CMS extends \samsoncms\api\CMS
 
         // Create structure for all materials
         $db_structure = null;
-        if (!dbQuery('structure')->Url('__' . $structure)->Active(1)->first($db_structure)) {
+        if (!dbQuery('structure')->Url('__' . $structure)->cond('Active',1)->first($db_structure)) {
             $db_structure = new \samson\activerecord\structure(false);
             $db_structure->Name = $structure;
             $db_structure->Url = '__' . $structure;
@@ -961,7 +961,7 @@ class CMS extends \samsoncms\api\CMS
 
         // Create structure field relations
         $db_sf = null;
-        if (!dbQuery('structurefield')->FieldID($dbField->id)->StructureID($db_structure->id)->Active(1)->first($db_sf)) {
+        if (!dbQuery('structurefield')->FieldID($dbField->id)->StructureID($db_structure->id)->cond('Active',1)->first($db_sf)) {
             $db_sf = new \samson\activerecord\structurefield(false);
             $db_sf->FieldID = $dbField->id;
             $db_sf->StructureID = $db_structure->id;
@@ -971,7 +971,7 @@ class CMS extends \samsoncms\api\CMS
 
         // Iterate all existing materials
         $db_materials = array();
-        if (dbQuery('material')->Active('1')->Draft('0')->exec($db_materials)) {
+        if (dbQuery('material')->cond('Active', '1')->Draft('0')->exec($db_materials)) {
             trace('Found materials:' . sizeof($db_materials));
             foreach ($db_materials as $db_material) {
                 //trace('Updating material:'.$db_material->id);
@@ -990,7 +990,7 @@ class CMS extends \samsoncms\api\CMS
 
                 // If this material has no Content field right now
                 $db_mf = null;
-                if (!dbQuery('materialfield')->MaterialID($db_material->id)->FieldID($dbField->id)->Active(1)->first($db_mf)) {
+                if (!dbQuery('materialfield')->MaterialID($db_material->id)->FieldID($dbField->id)->cond('Active', 1)->first($db_mf)) {
                     // Create Content additional field
                     $db_mf = new \samson\activerecord\materialfield(false);
                     $db_mf->MaterialID = $db_material->id;
@@ -1136,7 +1136,7 @@ class CMS extends \samsoncms\api\CMS
         CMSMaterial::$_map = \samson\activerecord\Material::$_map;
 
         // Perform db query to get all possible material fields
-        if (dbQuery('field')->Active(1)->Name('', dbRelation::NOT_EQUAL)->exec($this->material_fields)) foreach ($this->material_fields as $db_field) {
+        if (dbQuery('field')->cond('Active', 1)->cond('Name', '', dbRelation::NOT_EQUAL)->exec($this->material_fields)) foreach ($this->material_fields as $db_field) {
             // Add additional field localization condition
             if ($db_field->local == 1) $equal = '((' . $t_name . '.FieldID = ' . $db_field->id . ')&&(' . $t_name . ".locale = '" . locale() . "'))";
             else $equal = '((' . $t_name . '.FieldID = ' . $db_field->id . ')&&(' . $t_name . ".locale = ''))";
