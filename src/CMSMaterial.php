@@ -13,6 +13,13 @@ use samson\activerecord\dbRecord;
  */
 class CMSMaterial extends Material implements iModuleViewable
 {
+    /** Override table attributes for late static binding */
+    public static $_attributes = array();
+    public static $_sql_select = array();
+    public static $_sql_from = array();
+    public static $_own_group = array();
+    public static $_map = array();
+
     /**
      * Find all related material to current
      * @param function $handler External DB request handler
