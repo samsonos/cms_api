@@ -136,9 +136,6 @@ class CMSMaterial extends Material implements iModuleViewable
         $externalHandler = null,
         $params = array()
     ) {
-        // Create query
-        $query = new dbQuery();
-
         /** @var array $resultTable Collection of collections of field cells */
         $resultTable = array();
         /** @var array $dbTableFieldsIds Array of table structure column identifiers */
