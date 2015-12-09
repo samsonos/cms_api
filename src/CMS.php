@@ -13,7 +13,7 @@ use samson\core\CompressableService;
 use samson\activerecord\dbRecord;
 use samson\activerecord\dbMySQLConnector;
 
-class CMS extends \samsoncms\api\CMS
+class CMS extends \samson\core\CompressableExternalModule
 {
     /** @var string[] Collection of material fields SQL commands to include into SQL SELECT statement */
     public static $fields = array();
