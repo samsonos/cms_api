@@ -1024,7 +1024,7 @@ class CMS extends \samson\core\CompressableExternalModule
         if ($field == 'id') $field = 'MaterialID';
 
         // Build classname with PHP < 5.3 compatibility
-        $classname = ns_classname('cmsmaterial', 'samson\cms');
+        $classname = \samson\core\AutoLoader::className('cmsmaterial', 'samson\cms');
 
         // If instance of CMSMaterial passed - just return it
         if ($selector instanceof $classname) return $selector;
