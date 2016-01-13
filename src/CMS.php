@@ -1139,7 +1139,7 @@ class CMS extends \samson\core\CompressableExternalModule
         if (dbQuery('field')->cond('Active', 1)->cond('Name', '', dbRelation::NOT_EQUAL)->exec($this->material_fields)) foreach ($this->material_fields as $db_field) {
             // Add additional field localization condition
             if ($db_field->local == 1) $equal = '((' . $t_name . '.FieldID = ' . $db_field->id . ')&&(' . $t_name . ".locale = '" . locale() . "'))";
-            else $equal = '((' . $t_name . '.FieldID = ' . $db_field->id . ')&&(' . $t_name . ".locale = ''))";
+            else $equal = '((' . $t_name . '.FieldID = ' . $db_field->id . ')&&(' . $t_name . ".locale is NULL))";
 
             // Define field value DB column for storing data
             $v_col = 'Value';
