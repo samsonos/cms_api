@@ -172,21 +172,23 @@ class Navigation extends \samsoncms\api\Navigation implements \Iterator
             $classname = get_class($this);
             $cmsnav = null;
             if (dbQuery($classname)
-                ->cond('Active', 1)
-                ->StructureID($this->id)
+                ->where('Active', 1)
+                ->where('StructureID', $this->id)
                 ->join('children_relations', null, true)
                 ->join('children', get_class($this))
                 ->join('parents_relations', null, true)
                 ->join('parents', get_class($this))
-                ->first($cmsnav)
+                ->exec($cmsnav)
             ) {
 
+                $cmsnav = array_shift($cmsnav);
+
                 if (isset($cmsnav->onetomany['_children'])) {
-                    $this->onetomany['_children'] = &$cmsnav->onetomany['_children'];
+                    $this->onetomany['_children'] = $cmsnav->onetomany['_children'];
                 }
 
                 if (isset($cmsnav->onetomany['_parents'])) {
-                    $this->onetomany['_parents'] = &$cmsnav->onetomany['_parents'];
+                    $this->onetomany['_parents'] = $cmsnav->onetomany['_parents'];
                 }
 
                 $this->prepare();
