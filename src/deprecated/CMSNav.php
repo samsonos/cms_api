@@ -180,9 +180,9 @@ class CMSNav extends Navigation
 
             if( isset($_SESSION['__CMS_EDITOR__']) )
                 $html = m('cmsapi')
-                    ->set('field',$name)
-                    ->set('id',$this->id)
-                    ->set('value',$this->$name)
+                    ->set($name, 'field')
+                    ->set($this->id, 'id')
+                    ->set($this->$name, 'value')
                     ->set('entity','cmsnav')
                     ->output('app/view/editor/material.php');
 
